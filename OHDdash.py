@@ -225,6 +225,28 @@ def update_graph(value):
 
 
 # Heatmap: Topic-Verteilung über die einzelnen Chunks eines Interviews
+# @app.callback(
+#     Output(component_id='heat_map_interview', component_property='figure'),
+#     Output("interview_titel", "children"),
+#     Input("heat_map", "clickData"),
+#
+# )
+# def interview_heat_map(clickData):
+#     global interview_id
+#
+#     interview_id = clickData["points"][0]["y"]
+#     dff = {}
+#     for chunks in top_dic["weight"][interview_id[0:3]][interview_id]:
+#         dff[chunks] = top_dic["weight"][interview_id[0:3]][interview_id][chunks]
+#
+#     df = pd.DataFrame.from_dict(dff)
+#     df.index = pd.to_numeric(df.index)
+#     titel = "Heatmap Interview: " + interview_id
+#     fig = px.imshow(df, color_continuous_scale='deep')
+#     fig.update_traces(hovertemplate="Chunk: %{x}" "<br>Topic: %{y}" "<br>Weight: %{z}<extra></extra>")
+#
+#     return fig, titel
+
 @app.callback(
     Output(component_id='heat_map_interview', component_property='figure'),
     Output("interview_titel", "children"),
@@ -235,16 +257,14 @@ def interview_heat_map(clickData):
     global interview_id
 
     interview_id = clickData["points"][0]["y"]
-    dff = {}
-    for chunks in top_dic["weight"][interview_id[0:3]][interview_id]:
-        dff[chunks] = top_dic["weight"][interview_id[0:3]][interview_id][chunks]
-
-    df = pd.DataFrame.from_dict(dff)
-    df.index = pd.to_numeric(df.index)
+    fig = chronology_matrix(interview_id, top_dic)
     titel = "Heatmap Interview: " + interview_id
-    fig = px.imshow(df, color_continuous_scale='deep')
     fig.update_traces(hovertemplate="Chunk: %{x}" "<br>Topic: %{y}" "<br>Weight: %{z}<extra></extra>")
+
     return fig, titel
+
+
+
 
 
 # Print der einzelnen Sätze des ausgewählten Chunks

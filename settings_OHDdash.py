@@ -23,6 +23,9 @@ from functions import top_words
 import copy
 from ohtm.topic_evaluation.balkendiagram import bar_dic
 from ohtm.topic_evaluation.heatmap_corpus import heatmap_corpus
+from interview_chronology_analysis import *
+from interview_chronology_analysis.interview_chronology_analysis import chronology_matrix
+
 
 workingfolder = "C:\\Users\\phili\\FAUbox\\Oral History Digital\\Python\\Project\\OHDdash\\OHDdash_files\\"
 
