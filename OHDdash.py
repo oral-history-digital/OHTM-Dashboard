@@ -269,9 +269,6 @@ def interview_heat_map(clickData):
     return fig, titel
 
 
-
-
-
 # Print der einzelnen Sätze des ausgewählten Chunks
 @app.callback(
     Output(component_id='sents', component_property='children'),
