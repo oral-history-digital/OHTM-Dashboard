@@ -1,6 +1,7 @@
 from settings_OHDdash import *
 
 global top_dic
+global chronology_df
 load_file_name = "OHD_complete_pre_150c_80t.json"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
@@ -118,7 +119,7 @@ def render_page_content(pathname):
                 ], width=6),
                 dbc.Col([
                     html.H5([dbc.Badge(id="sent_titel", color="danger")], className="text-center")
-                ], width=5),
+                ], width=6),
             ]),
             dbc.Row([
                 dbc.Col([
@@ -137,7 +138,8 @@ def render_page_content(pathname):
                                   )),
                     ]),
                 ], width=5),
-            ])
+            ]),
+
         ]
 
     elif pathname == "/page-1":
@@ -251,15 +253,17 @@ def update_graph(value):
     Output(component_id='heat_map_interview', component_property='figure'),
     Output("interview_titel", "children"),
     Input("heat_map", "clickData"),
-
 )
 def interview_heat_map(clickData):
     global interview_id
+    global chronology_df
 
     interview_id = clickData["points"][0]["y"]
-    fig = chronology_matrix(interview_id, top_dic)
+    chronology_data = chronology_matrix(top_dic, interview_id)
+    chronology_df = chronology_data[1]
+    fig = chronology_data[0]
     titel = "Heatmap Interview: " + interview_id
-    fig.update_traces(hovertemplate="Chunk: %{x}" "<br>Topic: %{y}" "<br>Weight: %{z}<extra></extra>")
+    # fig[0].update_traces(hovertemplate="Chunk: %{x}" "<br>Topic: %{y}" "<br>Weight: %{z}<extra></extra>")
 
     return fig, titel
 
@@ -274,7 +278,12 @@ def interview_heat_map(clickData):
     Input("heat_map_interview", "clickData"),
 )
 def sent_drawing(clickData):
-    chunk_id = clickData["points"][0]["x"]
+
+    #chunk_id = clickData["points"][0]["x"]
+    time_id = clickData["points"][0]["x"]
+    row_index = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == time_id].index[0]) # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
+    chunk_id = chronology_df.loc[row_index]["ind"] # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
+
     sent_example = []
     speaker = "None"
     for a in top_dic["korpus"][interview_id[0:3]][interview_id]["sent"]:
