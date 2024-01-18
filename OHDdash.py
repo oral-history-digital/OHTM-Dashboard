@@ -259,11 +259,10 @@ def interview_heat_map(clickData):
     global chronology_df
 
     interview_id = clickData["points"][0]["y"]
-    chronology_data = chronology_matrix(top_dic, interview_id)
+    chronology_data = chronology_matrix(top_dic, interview_id, return_fig=True, print_fig=False)
     chronology_df = chronology_data[1]
     fig = chronology_data[0]
-    titel = "Heatmap Interview: " + interview_id
-    # fig[0].update_traces(hovertemplate="Chunk: %{x}" "<br>Topic: %{y}" "<br>Weight: %{z}<extra></extra>")
+    titel = "Interview chronology " + interview_id
 
     return fig, titel
 
