@@ -257,10 +257,12 @@ def update_graph(value):
 def interview_heat_map(clickData):
     global interview_id
     global chronology_df
+    global tc_indicator
 
     interview_id = clickData["points"][0]["y"]
     chronology_data = chronology_matrix(top_dic, interview_id, return_fig=True, print_fig=False)
     chronology_df = chronology_data[1]
+    tc_indicator = chronology_data[2]
     fig = chronology_data[0]
     titel = "Interview chronology " + interview_id
 
@@ -279,9 +281,13 @@ def interview_heat_map(clickData):
 def sent_drawing(clickData):
 
     #chunk_id = clickData["points"][0]["x"]
-    time_id = clickData["points"][0]["x"]
-    row_index = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == time_id].index[0]) # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
-    chunk_id = chronology_df.loc[row_index]["ind"] # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
+
+    if tc_indicator:
+        time_id = clickData["points"][0]["x"]
+        row_index = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == time_id].index[0]) # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
+        chunk_id = chronology_df.loc[row_index]["ind"] # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
+    else:
+        chunk_id = clickData["points"][0]["x"]
 
     sent_example = []
     speaker = "None"
