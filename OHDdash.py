@@ -2,7 +2,7 @@ from settings_OHDdash import *
 
 global top_dic
 global chronology_df
-load_file_name = "OHD_complete_pre_150c_80t.json"
+load_file_name = "HAI_complete_test_chunks"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
 with open(workingfolder + load_file_name) as f:
@@ -129,16 +129,28 @@ def render_page_content(pathname):
                     dbc.Row([
                         (html.Div(id="sents", children=[], className="box1",
                                   style={
-                                      'backgroundColor': '#dee2e6',
+                                      'backgroundColor': '#FFFFFF',
                                       'max-height': '400px',
-                                      "outline": "2px solid #ff4444",
-                                      "border": "4px solid #dee2e6",
+                                      "outline": "2px solid #FFFFFF",
+                                      "border": "4px solid #FFFFFF",
                                       'display': 'inline-block',
                                       "overflow": "auto"}
                                   )),
                     ]),
                 ], width=5),
             ]),
+            dbc.Row([
+                dbc.Col([
+                    dbc.Checklist(
+                        options=[
+                            {"label": "Topic Filter", "value": "filter"},
+                            ],
+                        value=[],
+                        id="switch_topic_filter",
+                        switch=True,
+                    ),
+                ])
+            ])
 
         ]
 
@@ -253,14 +265,22 @@ def update_graph(value):
     Output(component_id='heat_map_interview', component_property='figure'),
     Output("interview_titel", "children"),
     Input("heat_map", "clickData"),
+    Input("switch_topic_filter", "value"),
 )
-def interview_heat_map(clickData):
+def interview_heat_map(clickData, filter_switch):
+    print(filter_switch)
+    if "filter" in filter_switch:
+        topic_filtering = True
+    else: topic_filtering = False
+
+    print(topic_filtering)
+
     global interview_id
     global chronology_df
     global tc_indicator
 
     interview_id = clickData["points"][0]["y"]
-    chronology_data = chronology_matrix(top_dic, interview_id, return_fig=True, print_fig=False)
+    chronology_data = chronology_matrix(top_dic, interview_id, return_fig=True, print_fig=False, topic_filter = topic_filtering)
     chronology_df = chronology_data[1]
     tc_indicator = chronology_data[2]
     fig = chronology_data[0]
