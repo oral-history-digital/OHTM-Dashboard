@@ -127,15 +127,7 @@ def render_page_content(pathname):
                 ], width=6),
                 dbc.Col([
                     dbc.Row([
-                        (html.Div(id="sents", children=[], className="box1",
-                                  style={
-                                      'backgroundColor': '#FFFFFF',
-                                      'max-height': '400px',
-                                      "outline": "2px solid #FFFFFF",
-                                      "border": "4px solid #FFFFFF",
-                                      'display': 'inline-block',
-                                      "overflow": "auto"}
-                                  )),
+                        html.Div(id='textarea', style={'whiteSpace': 'pre-line'}),
                     ]),
                 ], width=5),
             ]),
@@ -291,7 +283,7 @@ def interview_heat_map(clickData, filter_switch):
 
 # Print der einzelnen Sätze des ausgewählten Chunks
 @app.callback(
-    Output(component_id='sents', component_property='children'),
+    Output(component_id='textarea', component_property='children'),
     Output("sent_titel", "children"),
     Input("heat_map_interview", "clickData"),
 )
@@ -313,7 +305,7 @@ def sent_drawing(clickData):
             if speaker == top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"]:
                 sent_example.append(top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["raw"] + ". ")
             else:
-                sent_example.append("*" + top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"] + "*: ")
+                sent_example.append("\n" + "*" + top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"] + "*: ")
                 sent_example.append(top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["raw"] + ". ")
                 speaker = top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"]
 
