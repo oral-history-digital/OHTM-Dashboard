@@ -100,7 +100,19 @@ def render_page_content(pathname):
                                  multi=False,
                                  value="all",
                                  style={'width': "80%"}
-                                 )], width=6),
+                                 )], width=4),
+                dbc.Col([
+                    dbc.Checklist(
+                        options=[
+                            {"label": "Z Score", "value": "z_score"},
+                        ],
+                        value=[],
+                        id="switch_z_score_global_heatmap",
+                        switch=True,
+                    ),
+
+
+                ], width = 1)
             ]),
 
             dbc.Row([
@@ -119,7 +131,31 @@ def render_page_content(pathname):
                 ], width=6),
                 dbc.Col([
                     html.H5([dbc.Badge(id="sent_titel", color="danger")], className="text-center")
-                ], width=6),
+                ], width=5),
+                dbc.Row([
+                    dbc.Col([
+                        dbc.Checklist(
+                            options=[
+                                {"label": "Topic Filter", "value": "filter"},
+                                {"label": "Z Score", "value": "z_score"}
+                            ],
+                            value=[],
+                            id="switch_chronology_filter",
+                            switch=True,
+                            inline = True
+                        ),
+
+                    ], width =3),
+                    dbc.Col([
+                        html.Div(dbc.Input(id='threshold_top_filter_value', placeholder="Top Filter Threshold", type='number')),
+
+                    ], width = 1),
+                    dbc.Col([
+                        html.Div(dbc.Input(id='outlier_threshold_value', placeholder="Outlier Threshold",
+                                           type='number')),
+                    ], width=1)
+                ]),
+
             ]),
             dbc.Row([
                 dbc.Col([
@@ -131,18 +167,6 @@ def render_page_content(pathname):
                     ]),
                 ], width=5),
             ]),
-            dbc.Row([
-                dbc.Col([
-                    dbc.Checklist(
-                        options=[
-                            {"label": "Topic Filter", "value": "filter"},
-                            ],
-                        value=[],
-                        id="switch_topic_filter",
-                        switch=True,
-                    ),
-                ])
-            ])
 
         ]
 
@@ -224,55 +248,46 @@ def render_page_content(pathname):
 @app.callback(
     Output(component_id='heat_map', component_property='figure'),
     Input(component_id='slct_archiv', component_property='value'),
+    Input("switch_z_score_global_heatmap", "value")
 )
-def update_graph(value):
-    fig = heatmap_corpus(top_dic, option_selected=str(value), show_fig=False, return_fig=True)
+def update_graph(value, z_score_global):
+    if "z_score" in z_score_global:
+        z_score = True
+    else: z_score = False
+
+    fig = heatmap_corpus(top_dic, option_selected=str(value),z_score = z_score,show_fig=False, return_fig=True)
     return fig
 
 
-# Heatmap: Topic-Verteilung über die einzelnen Chunks eines Interviews
-# @app.callback(
-#     Output(component_id='heat_map_interview', component_property='figure'),
-#     Output("interview_titel", "children"),
-#     Input("heat_map", "clickData"),
-#
-# )
-# def interview_heat_map(clickData):
-#     global interview_id
-#
-#     interview_id = clickData["points"][0]["y"]
-#     dff = {}
-#     for chunks in top_dic["weight"][interview_id[0:3]][interview_id]:
-#         dff[chunks] = top_dic["weight"][interview_id[0:3]][interview_id][chunks]
-#
-#     df = pd.DataFrame.from_dict(dff)
-#     df.index = pd.to_numeric(df.index)
-#     titel = "Heatmap Interview: " + interview_id
-#     fig = px.imshow(df, color_continuous_scale='deep')
-#     fig.update_traces(hovertemplate="Chunk: %{x}" "<br>Topic: %{y}" "<br>Weight: %{z}<extra></extra>")
-#
-#     return fig, titel
-
+# Chronologie Heatmap
 @app.callback(
     Output(component_id='heat_map_interview', component_property='figure'),
     Output("interview_titel", "children"),
     Input("heat_map", "clickData"),
-    Input("switch_topic_filter", "value"),
+    Input("switch_chronology_filter", "value"),
+    Input("threshold_top_filter_value", "value"),
+    Input("outlier_threshold_value", "value"),
 )
-def interview_heat_map(clickData, filter_switch):
-    print(filter_switch)
-    if "filter" in filter_switch:
-        topic_filtering = True
-    else: topic_filtering = False
-
-    print(topic_filtering)
-
+def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th):
     global interview_id
     global chronology_df
     global tc_indicator
 
+    if "filter" in heatmap_filter:
+        topic_filtering = True
+    else: topic_filtering = False
+
+    if "z_score" in heatmap_filter:
+        z_score = True
+    else: z_score = False
+
+    if top_filter_th == None:
+        top_filter_th = 0.01
+    if outlier_th == None:
+        outlier_th = 0.02
+
     interview_id = clickData["points"][0]["y"]
-    chronology_data = chronology_matrix(top_dic, interview_id, return_fig=True, print_fig=False, topic_filter = topic_filtering)
+    chronology_data = chronology_matrix(top_dic, interview_id, return_fig=True, print_fig=False, z_score = z_score, topic_filter = topic_filtering, threshold_top_filter=top_filter_th, outlier_threshold=outlier_th)
     chronology_df = chronology_data[1]
     tc_indicator = chronology_data[2]
     fig = chronology_data[0]
