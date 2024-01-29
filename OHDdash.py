@@ -48,8 +48,9 @@ sidebar = html.Div(
             [
                 dbc.NavLink("Dash-Board", href="/", active="exact"),
                 dbc.NavLink("Text Search", href="/page-1", active="exact"),
-                dbc.NavLink("Topic-Übersicht", href="/page-2", active="exact"),
-                dbc.NavLink("Interview", href="/page-3", active="exact"),
+                dbc.NavLink("Balkendiagram", href="/page-2", active="exact"),
+                dbc.NavLink("Chronology Heamtap", href="/page-3", active="exact"),
+                dbc.NavLink("Topic Übersicht", href="/page-4", active="exact"),
             ],
             vertical=True,
             pills=True,
@@ -147,6 +148,10 @@ def render_page_content(pathname):
 
                     ], width =3),
                     dbc.Col([
+                        html.Div(dbc.Input(id='interview_manual_id', placeholder="Interview",type='word')),
+
+                    ], width=1),
+                    dbc.Col([
                         html.Div(dbc.Input(id='threshold_top_filter_value', placeholder="Top Filter Threshold", type='number')),
 
                     ], width = 1),
@@ -229,10 +234,53 @@ def render_page_content(pathname):
 
     elif pathname == "/page-3":
         return [
+            dbc.Row([
+                dbc.Col([
+                    html.H5([dbc.Badge(id="interview_titel_detail", color="danger")], className="text-center")
+                ], width=6),
+                dbc.Col([
+                    html.H5([dbc.Badge(id="sent_titel_detail", color="danger")], className="text-center")
+                ], width=5),
+                dbc.Row([
+                    dbc.Col([
+                        dbc.Checklist(
+                            options=[
+                                {"label": "Topic Filter", "value": "filter"},
+                                {"label": "Z Score", "value": "z_score"}
+                            ],
+                            value=[],
+                            id="switch_chronology_filter",
+                            switch=True,
+                            inline=True
+                        ),
 
-                html.Div(id="text", children='Enter a json and press enter'),
-                html.Div(dcc.Input(id='json_name', placeholder="enter", type='text')),
-                html.Button("enter", id='load_enter'),
+                    ], width=3),
+                    dbc.Col([
+                        html.Div(dbc.Input(id='interview_manual_id_detail', placeholder="Interview", type='word')),
+
+                    ], width=1),
+                    dbc.Col([
+                        html.Div(dbc.Input(id='threshold_top_filter_value_detail', placeholder="Top Filter Threshold",
+                                           type='number')),
+
+                    ], width=1),
+                    dbc.Col([
+                        html.Div(dbc.Input(id='outlier_threshold_value_detail', placeholder="Outlier Threshold",
+                                           type='number')),
+                    ], width=1)
+                ]),
+
+            ]),
+            dbc.Row([
+                dbc.Col([
+                    dcc.Graph(id='heat_map_interview_detail', figure={})
+                ], width=6),
+                dbc.Col([
+                    dbc.Row([
+                        html.Div(id='textarea_detail', style={'whiteSpace': 'pre-line'}),
+                    ]),
+                ], width=5),
+            ]),
                 ]
 
     # If the user tries to reach a different page, return a 404 message
@@ -267,11 +315,13 @@ def update_graph(value, z_score_global):
     Input("switch_chronology_filter", "value"),
     Input("threshold_top_filter_value", "value"),
     Input("outlier_threshold_value", "value"),
+    Input("interview_manual_id", "value"),
 )
-def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th):
+def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th, interview_manual_id):
     global interview_id
     global chronology_df
     global tc_indicator
+
 
     if "filter" in heatmap_filter:
         topic_filtering = True
@@ -286,7 +336,13 @@ def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th):
     if outlier_th == None:
         outlier_th = 0.02
 
-    interview_id = clickData["points"][0]["y"]
+    if interview_manual_id is not None:
+        interview_id = interview_manual_id
+        if interview_manual_id == '':
+            interview_id = clickData["points"][0]["y"]
+    else:
+        interview_id = clickData["points"][0]["y"]
+
     chronology_data = chronology_matrix(top_dic, interview_id, return_fig=True, print_fig=False, z_score = z_score, topic_filter = topic_filtering, threshold_top_filter=top_filter_th, outlier_threshold=outlier_th)
     chronology_df = chronology_data[1]
     tc_indicator = chronology_data[2]
@@ -416,6 +472,45 @@ def weight_print(topic_print, weight_print, n_clicks):
         columns = [{"name": i, "id": i} for i in df_rounded.columns]
 
         return data, columns
+
+    # Heatmap Chronology Heatmap Detail
+    @app.callback(
+        Output(component_id='heat_map_interview_detail', component_property='figure'),
+        Output("interview_titel_detail", "children"),
+        Input("switch_chronology_filter_detail", "value"),
+        Input("threshold_top_filter_value_detail", "value"),
+        Input("outlier_threshold_value_detail", "value"),
+        Input("interview_manual_id_detail", "value"),
+    )
+    def interview_heat_map(heatmap_filter, top_filter_th, outlier_th, interview_manual_id):
+
+        if "filter" in heatmap_filter:
+            topic_filtering = True
+        else:
+            topic_filtering = False
+
+        if "z_score" in heatmap_filter:
+            z_score = True
+        else:
+            z_score = False
+
+        if top_filter_th == None:
+            top_filter_th = 0.01
+        if outlier_th == None:
+            outlier_th = 0.02
+
+        if interview_manual_id is not None:
+            interview_id = interview_manual_id
+
+        chronology_data = chronology_matrix(top_dic, interview_id, return_fig=True, print_fig=False, z_score=z_score,
+                                            topic_filter=topic_filtering, threshold_top_filter=top_filter_th,
+                                            outlier_threshold=outlier_th)
+        chronology_df = chronology_data[1]
+        tc_indicator = chronology_data[2]
+        fig = chronology_data[0]
+        titel = "Interview chronology " + interview_id
+
+        return fig, titel
 
 
 if __name__ == '__main__':
