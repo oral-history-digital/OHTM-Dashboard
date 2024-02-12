@@ -249,7 +249,7 @@ def render_page_content(pathname):
                                 {"label": "Z Score", "value": "z_score"}
                             ],
                             value=[],
-                            id="switch_chronology_filter",
+                            id="switch_chronology_filter_detail",
                             switch=True,
                             inline=True
                         ),
@@ -272,14 +272,17 @@ def render_page_content(pathname):
 
             ]),
             dbc.Row([
-                dbc.Col([
-                    dcc.Graph(id='heat_map_interview_detail', figure={})
-                ], width=6),
-                dbc.Col([
-                    dbc.Row([
-                        html.Div(id='textarea_detail', style={'whiteSpace': 'pre-line'}),
-                    ]),
-                ], width=5),
+                html.H5([dbc.Badge(id="interview_title_detail", color="danger")], className="text-center")
+            ]),
+            dbc.Row([
+                    dcc.Graph(id='heat_map_interview_detail', figure={}),
+            dbc.Row([
+                html.H5([dbc.Badge(id="sent_title_detail", color="danger")], className="text-center")
+            ]),
+            dbc.Row([
+                    html.Div(id='textarea_detail', style={'whiteSpace': 'pre-line'}),
+                ]),
+
             ]),
                 ]
 
@@ -473,45 +476,80 @@ def weight_print(topic_print, weight_print, n_clicks):
 
         return data, columns
 
-    # Heatmap Chronology Heatmap Detail
-    @app.callback(
-        Output(component_id='heat_map_interview_detail', component_property='figure'),
-        Output("interview_titel_detail", "children"),
-        Input("switch_chronology_filter_detail", "value"),
-        Input("threshold_top_filter_value_detail", "value"),
-        Input("outlier_threshold_value_detail", "value"),
-        Input("interview_manual_id_detail", "value"),
-    )
-    def interview_heat_map(heatmap_filter, top_filter_th, outlier_th, interview_manual_id):
+# Heatmap Chronology Heatmap Detail
+@app.callback(
+    Output(component_id='heat_map_interview_detail', component_property='figure'),
+    Output("interview_title_detail", "children"),
+    Input("switch_chronology_filter_detail", "value"),
+    Input("threshold_top_filter_value_detail", "value"),
+    Input("outlier_threshold_value_detail", "value"),
+    Input("interview_manual_id_detail", "value"),
+)
+def interview_heat_map(heatmap_filter, top_filter_th, outlier_th, interview_manual_id):
 
-        if "filter" in heatmap_filter:
-            topic_filtering = True
-        else:
-            topic_filtering = False
+    global chronology_df_detail
+    global tc_indicator_detail
+    global interview_id_detail
 
-        if "z_score" in heatmap_filter:
-            z_score = True
-        else:
-            z_score = False
+    if "filter" in heatmap_filter:
+        topic_filtering = True
+    else:
+        topic_filtering = False
 
-        if top_filter_th == None:
-            top_filter_th = 0.01
-        if outlier_th == None:
-            outlier_th = 0.02
+    if "z_score" in heatmap_filter:
+        z_score = True
+    else:
+        z_score = False
 
-        if interview_manual_id is not None:
-            interview_id = interview_manual_id
+    if top_filter_th == None:
+        top_filter_th = 0.01
+    if outlier_th == None:
+        outlier_th = 0.02
 
-        chronology_data = chronology_matrix(top_dic, interview_id, return_fig=True, print_fig=False, z_score=z_score,
-                                            topic_filter=topic_filtering, threshold_top_filter=top_filter_th,
-                                            outlier_threshold=outlier_th)
-        chronology_df = chronology_data[1]
-        tc_indicator = chronology_data[2]
-        fig = chronology_data[0]
-        titel = "Interview chronology " + interview_id
 
-        return fig, titel
+    interview_id_detail = interview_manual_id
 
+    chronology_data = chronology_matrix(top_dic, interview_id_detail, return_fig=True, print_fig=False, z_score=z_score,
+                                        topic_filter=topic_filtering, threshold_top_filter=top_filter_th,
+                                        outlier_threshold=outlier_th)
+    chronology_df_detail = chronology_data[1]
+    tc_indicator_detail = chronology_data[2]
+    fig = chronology_data[0]
+    title = "Interview chronology " + interview_id_detail
+
+    return fig, title
+
+# Print der einzelnen Sätze des ausgewählten Chunks
+@app.callback(
+    Output(component_id='textarea_detail', component_property='children'),
+    Output("sent_title_detail", "children"),
+    Input("heat_map_interview_detail", "clickData"),
+)
+def sent_drawing_detail(clickData):
+
+    #chunk_id = clickData["points"][0]["x"]
+    interview_id = interview_id_detail
+
+    if tc_indicator_detail:
+        time_id = clickData["points"][0]["x"]
+        row_index = chronology_df_detail.index.get_loc(chronology_df[chronology_df_detail["minute"] == time_id].index[0]) # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
+        chunk_id = chronology_df_detail.loc[row_index]["ind"] # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
+    else:
+        chunk_id = clickData["points"][0]["x"]
+
+    sent_example = []
+    speaker = "None"
+    for a in top_dic["korpus"][interview_id[0:3]][interview_id]["sent"]:
+        if top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["chunk"] == int(chunk_id):
+            if speaker == top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"]:
+                sent_example.append(top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["raw"] + ". ")
+            else:
+                sent_example.append("\n" + "*" + top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"] + "*: ")
+                sent_example.append(top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["raw"] + ". ")
+                speaker = top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"]
+
+    sent_id = "Chunk: " + str(chunk_id)
+    return sent_example, sent_id
 
 if __name__ == '__main__':
     app.run_server(debug=False, port=3002)
