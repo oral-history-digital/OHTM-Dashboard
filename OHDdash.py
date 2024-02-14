@@ -2,7 +2,7 @@ from settings_OHDdash import *
 
 global top_dic
 global chronology_df
-load_file_name = "HAI_complete_test_chunks"
+load_file_name = "ohd_complete_lemetized_pos_on_75c_80t"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
 with open(workingfolder + load_file_name) as f:
@@ -409,9 +409,19 @@ def bar_map(data2):
 @app.callback(
     Output("topics", "children"),
     Input("input", "value"),
+    Input("heat_map_interview", "clickData"),
 )
-def df_input(value):
-    entry = top_words(value, top_dic)
+def df_input(value, clickData_detail):      # Nach dem Einfügen der Click Funktion funktioniert die Anzeige auf anderen Seiten des Dashes nicht mehr (14.2.2024)
+
+    if value is not None:
+        topic_value = value
+        if value == '':
+            topic_value =clickData_detail["points"][0]["y"]
+    else:
+        topic_value =clickData_detail["points"][0]["y"]
+
+
+    entry = top_words(topic_value, top_dic)
     return entry
 
 @app.callback(
