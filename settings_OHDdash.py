@@ -15,7 +15,7 @@ import plotly.express as px
 import warnings
 from copy import deepcopy
 import dash
-from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL
+from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL, ctx
 import dash_bootstrap_components as dbc
 import base64
 import json
@@ -27,7 +27,7 @@ from interview_chronology_analysis import *
 from interview_chronology_analysis.interview_chronology_analysis import chronology_matrix
 
 
-workingfolder = "C:\\Users\\phili\\FAUbox\\Oral History Digital\\Python\\Project\\OHDdash\\OHDdash_files\\"
+workingfolder = "C:\\Users\\phili\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Python\\Project\\OHDdash\\OHDdash_files\\"
 
 
 

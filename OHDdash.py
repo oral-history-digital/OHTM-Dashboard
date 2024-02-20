@@ -2,7 +2,7 @@ from settings_OHDdash import *
 
 global top_dic
 global chronology_df
-load_file_name = "ohd_complete_lemetized_pos_on_75c_80t"
+load_file_name = "ohd_complete_lemmetized_pos_off_75c_80t"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
 with open(workingfolder + load_file_name) as f:
@@ -16,6 +16,7 @@ def b64_image(image_filename):
 
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
 
 # styling the sidebar
 SIDEBAR_STYLE = {
@@ -37,10 +38,16 @@ CONTENT_STYLE = {
 
 sidebar = html.Div(
     [
-        dcc.Store(id="top_dic", data = {}, storage_type ="session"),
-        dcc.Store(id="heat_dic", data ={}, storage_type = "session"),
-        dcc.Store(id="top_dic2", data = {}, storage_type ="session"),
-        dcc.Store(id="data_path", storage_type = "session"),
+        dcc.Store(id="top_dic", data={}, storage_type="session"),
+        dcc.Store(id="heat_dic", data={}, storage_type="session"),
+        dcc.Store(id="top_dic2", data={}, storage_type="session"),
+        dcc.Store(id="data_path", storage_type="session"),
+        dcc.Store(id = "heatmap_interview_topic_nr", data = "", storage_type="session"),
+        dcc.Store(id="heatmap_interview_detail_topic_nr", data="", storage_type="session"),
+        dcc.Store(id="bar_topic_nr", data="", storage_type="session"),
+        dcc.Store(id="bar_detail_topic_nr", data="", storage_type="session"),
+        dcc.Store(id="heatmap_corpus_topic_nr", data="", storage_type="session"),
+
         html.P(id='placeholder'),
         html.Img(src=b64_image(image_filename), style={"max-width": "100%"}),
         html.Hr(id="dummy", children=[]),
@@ -405,23 +412,75 @@ def bar_map(data2):
     fig = bar_dic(top_dic, show_fig = False, return_fig = True)
     return fig
 
+@app.callback(
+    Output("heatmap_interview_topic_nr", "data"),
+    Input("heat_map_interview", "clickData"),
+)
+def gloabl_topic_nr_update(clickData):
+
+    topic = clickData["points"][0]["y"]
+    print(topic)
+    return topic
+
+@app.callback(
+    Output("heatmap_interview_detail_topic_nr", "data"),
+    Input("heat_map_interview_detail", "clickData"),
+)
+def gloabl_topic_nr_update(clickData):
+
+    topic = clickData["points"][0]["y"]
+    print(topic)
+    return topic
+
+@app.callback(
+    Output("bar_topic_nr", "data"),
+    Input("bar", "clickData"),
+)
+def gloabl_topic_nr_update(clickData):
+
+    topic = clickData["points"][0]["x"]
+    print(topic)
+    return topic
+
+@app.callback(
+    Output("bar_detail_topic_nr", "data"),
+    Input("bar2", "clickData"),
+)
+def gloabl_topic_nr_update(clickData):
+
+    topic = clickData["points"][0]["x"]
+    print(topic)
+    return topic
+
+@app.callback(
+    Output("heatmap_corpus_topic_nr", "data"),
+    Input("heat_map", "clickData"),
+)
+def gloabl_topic_nr_update(clickData):
+
+    topic = clickData["points"][0]["x"]
+    print(topic)
+    return topic
+
+
 # Ausgabe der ersten 50 Worte des ausgewählten Topics
 @app.callback(
     Output("topics", "children"),
     Input("input", "value"),
-    Input("heat_map_interview", "clickData"),
-)
-def df_input(value, clickData_detail):      # Nach dem Einfügen der Click Funktion funktioniert die Anzeige auf anderen Seiten des Dashes nicht mehr (14.2.2024)
+    Input("heatmap_interview_topic_nr", "data"),
+    Input("heatmap_interview_detail_topic_nr", "data"),
+    Input("bar_topic_nr", "data"),
+    Input("bar_detail_topic_nr", "data"),
+    Input("heatmap_corpus_topic_nr", "data"),
 
-    if value is not None:
-        topic_value = value
-        if value == '':
-            topic_value =clickData_detail["points"][0]["y"]
-    else:
-        topic_value =clickData_detail["points"][0]["y"]
+)
+def df_input(value1, value2, value3, value4, value5, value6):
+    print(ctx.triggered)
+    topic_value = ctx.triggered[0]["value"]
 
 
     entry = top_words(topic_value, top_dic)
+
     return entry
 
 @app.callback(
