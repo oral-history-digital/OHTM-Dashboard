@@ -50,7 +50,6 @@ sidebar = html.Div(
         dcc.Store(id="chunk_number_frontpage", data="", storage_type = "sesssion"),
         dcc.Store(id="chunk_number_detail", data="", storage_type="sesssion"),
 
-
         html.P(id='placeholder'),
         html.Img(src=b64_image(image_filename), style={"max-width": "100%"}),
         html.Hr(id="dummy", children=[]),
@@ -154,7 +153,8 @@ def render_page_content(pathname):
                         dbc.Checklist(
                             options=[
                                 {"label": "Topic Filter", "value": "filter"},
-                                {"label": "Z Score", "value": "z_score"}
+                                {"label": "Z Score", "value": "z_score"},
+                                {"label": "Mark", "value": "mark"}
                             ],
                             value=[],
                             id="switch_chronology_filter",
@@ -339,10 +339,13 @@ def update_graph(value, z_score_global):
     Input("threshold_top_filter_value", "value"),
     Input("outlier_threshold_value", "value"),
     Input("interview_manual_id", "value"),
+    Input("heat_map_interview", "clickData"),
+    Input("chunk_number_frontpage", "data"),
+
     prevent_initial_call = True
 
 )
-def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th, interview_manual_id):
+def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th, interview_manual_id,clickData_2, chunk_number_storage):
     global interview_id
     global chronology_df
     global tc_indicator
@@ -372,7 +375,56 @@ def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th, int
     chronology_df = chronology_data[1]
     tc_indicator = chronology_data[2]
     fig = chronology_data[0]
-    titel = "Interview chronology " + interview_id
+
+    print(ctx.triggered)
+
+    if ctx.triggered[0]["prop_id"] == "heat_map.clickData":
+        titel = "Interview chronology " + interview_id
+    else:
+        if "mark" in heatmap_filter:
+            if tc_indicator:
+
+                row_index_clicked = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == clickData_2["points"][0]["x"]].index[0])
+                chunk_number_clicked = chronology_df.loc[row_index_clicked]["ind"]
+
+                row_index = chronology_df.index.get_loc(
+                chronology_df[chronology_df["ind"] == chunk_number_clicked].index[0])
+                time_id = chronology_df.loc[row_index]["minute"]
+                row_index_before = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked - 1].index[0])
+                time_id_before = chronology_df.loc[row_index_before]["minute"]
+                row_index_after = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked + 1].index[0])
+                time_id_after = chronology_df.loc[row_index_after]["minute"]
+
+                x_0 = (time_id + time_id_before) / 2
+                x_1 = (time_id + time_id_after) / 2
+
+            else:
+                x_0 = clickData_2["points"][0]["x"]-0.5
+                x_1 = clickData_2["points"][0]["x"]+0.5
+
+            if ctx.triggered[0]["prop_id"] == "chunk_number_frontpage.data":
+                if tc_indicator:
+                    row_index = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage].index[0])
+                    time_id = chronology_df.loc[row_index]["minute"]
+                    row_index_before = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage-1].index[0])
+                    time_id_before = chronology_df.loc[row_index_before]["minute"]
+                    row_index_after = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage+1].index[0])
+                    time_id_after = chronology_df.loc[row_index_after]["minute"]
+
+                    x_0 = (time_id+time_id_before)/2
+                    x_1 = (time_id+time_id_after)/2
+
+                else:
+                    x_0 = chunk_number_storage - 0.5
+                    x_1 = chunk_number_storage + 0.5
+
+
+            fig.add_vrect(
+                x0=x_0, x1=x_1,
+                fillcolor="LightSalmon", opacity=0.3,
+                layer="above", line_width=1,)
+
+        titel = "Interview chronology " + interview_id
 
     return fig, titel
 
@@ -400,6 +452,7 @@ def sent_drawing(clickData, input_before, input_next, chunk_number):
             time_id = clickData["points"][0]["x"]
             row_index = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == time_id].index[0]) # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
             chunk_id = chronology_df.loc[row_index]["ind"] # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
+            print(chronology_df.loc[row_index])
         else:
             chunk_id = clickData["points"][0]["x"]
 
@@ -501,10 +554,8 @@ def gloabl_topic_nr_update(clickData):
 
 )
 def df_input(value1, value2, value3, value4, value5, value6):
-    print(ctx.triggered)
+
     topic_value = ctx.triggered[0]["value"]
-
-
     entry = top_words(topic_value, top_dic)
 
     return entry
