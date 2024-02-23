@@ -5,7 +5,7 @@ global chronology_df
 load_file_name = "ohd_complete_lemmetized_pos_off_75c_80t"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
-with open(workingfolder + load_file_name) as f:
+with open(file_workingfolder + load_file_name) as f:
     top_dic = json.load(f)
 
 
@@ -376,8 +376,6 @@ def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th, int
     tc_indicator = chronology_data[2]
     fig = chronology_data[0]
 
-    print(ctx.triggered)
-
     if ctx.triggered[0]["prop_id"] == "heat_map.clickData":
         titel = "Interview chronology " + interview_id
     else:
@@ -387,16 +385,36 @@ def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th, int
                 row_index_clicked = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == clickData_2["points"][0]["x"]].index[0])
                 chunk_number_clicked = chronology_df.loc[row_index_clicked]["ind"]
 
-                row_index = chronology_df.index.get_loc(
-                chronology_df[chronology_df["ind"] == chunk_number_clicked].index[0])
-                time_id = chronology_df.loc[row_index]["minute"]
-                row_index_before = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked - 1].index[0])
-                time_id_before = chronology_df.loc[row_index_before]["minute"]
-                row_index_after = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked + 1].index[0])
-                time_id_after = chronology_df.loc[row_index_after]["minute"]
+                if chunk_number_clicked == 0:
+                    row_index = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked].index[0])
+                    time_id = chronology_df.loc[row_index]["minute"]
+                    row_index_after = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked + 1].index[0])
+                    time_id_after = chronology_df.loc[row_index_after]["minute"]
 
-                x_0 = (time_id + time_id_before) / 2
-                x_1 = (time_id + time_id_after) / 2
+                    x_1 = (time_id + time_id_after) / 2
+                    x_0 = x_1 - time_id
+
+
+                elif chunk_number_clicked == chronology_df["ind"][chronology_df.index[-1]]:
+                    row_index = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked].index[0])
+                    time_id = chronology_df.loc[row_index]["minute"]
+                    row_index_before = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked - 1].index[0])
+                    time_id_before = chronology_df.loc[row_index_before]["minute"]
+
+                    x_0 = (time_id + time_id_before) / 2
+                    x_1 = time_id + (time_id - x_0)
+
+                else:
+                    row_index = chronology_df.index.get_loc(
+                    chronology_df[chronology_df["ind"] == chunk_number_clicked].index[0])
+                    time_id = chronology_df.loc[row_index]["minute"]
+                    row_index_before = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked - 1].index[0])
+                    time_id_before = chronology_df.loc[row_index_before]["minute"]
+                    row_index_after = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked + 1].index[0])
+                    time_id_after = chronology_df.loc[row_index_after]["minute"]
+
+                    x_0 = (time_id + time_id_before) / 2
+                    x_1 = (time_id + time_id_after) / 2
 
             else:
                 x_0 = clickData_2["points"][0]["x"]-0.5
@@ -404,15 +422,42 @@ def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th, int
 
             if ctx.triggered[0]["prop_id"] == "chunk_number_frontpage.data":
                 if tc_indicator:
-                    row_index = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage].index[0])
-                    time_id = chronology_df.loc[row_index]["minute"]
-                    row_index_before = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage-1].index[0])
-                    time_id_before = chronology_df.loc[row_index_before]["minute"]
-                    row_index_after = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage+1].index[0])
-                    time_id_after = chronology_df.loc[row_index_after]["minute"]
 
-                    x_0 = (time_id+time_id_before)/2
-                    x_1 = (time_id+time_id_after)/2
+                    if chunk_number_storage == 0:
+                        row_index = chronology_df.index.get_loc(
+                            chronology_df[chronology_df["ind"] == chunk_number_storage].index[0])
+                        time_id = chronology_df.loc[row_index]["minute"]
+                        row_index_after = chronology_df.index.get_loc(
+                            chronology_df[chronology_df["ind"] == chunk_number_storage + 1].index[0])
+                        time_id_after = chronology_df.loc[row_index_after]["minute"]
+
+                        x_1 = (time_id + time_id_after) / 2
+                        x_0 = x_1 - time_id
+
+
+                    elif chunk_number_storage == chronology_df["ind"][chronology_df.index[-1]]:
+                        print("last")
+                        row_index = chronology_df.index.get_loc(
+                            chronology_df[chronology_df["ind"] == chunk_number_storage].index[0])
+                        time_id = chronology_df.loc[row_index]["minute"]
+                        row_index_before = chronology_df.index.get_loc(
+                            chronology_df[chronology_df["ind"] == chunk_number_storage - 1].index[0])
+                        time_id_before = chronology_df.loc[row_index_before]["minute"]
+
+                        x_0 = (time_id + time_id_before) / 2
+                        x_1 = time_id + (time_id - x_0)
+
+                    else:
+
+                        row_index = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage].index[0])
+                        time_id = chronology_df.loc[row_index]["minute"]
+                        row_index_before = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage-1].index[0])
+                        time_id_before = chronology_df.loc[row_index_before]["minute"]
+                        row_index_after = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage+1].index[0])
+                        time_id_after = chronology_df.loc[row_index_after]["minute"]
+
+                        x_0 = (time_id+time_id_before)/2
+                        x_1 = (time_id+time_id_after)/2
 
                 else:
                     x_0 = chunk_number_storage - 0.5
@@ -452,7 +497,6 @@ def sent_drawing(clickData, input_before, input_next, chunk_number):
             time_id = clickData["points"][0]["x"]
             row_index = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == time_id].index[0]) # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
             chunk_id = chronology_df.loc[row_index]["ind"] # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
-            print(chronology_df.loc[row_index])
         else:
             chunk_id = clickData["points"][0]["x"]
 

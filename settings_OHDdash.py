@@ -27,7 +27,8 @@ from interview_chronology_analysis import *
 from interview_chronology_analysis.interview_chronology_analysis import chronology_matrix
 
 
-workingfolder = "C:\\Users\\phili\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Python\\Project\\OHDdash\\OHDdash_files\\"
+workingfolder = "C:\\Users\\phili\Dropbox\\Python\\Project\\OHDdash\\OHDdash_files\\"
+file_workingfolder = "C:\\Users\\phili\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Topic Modeling\\main test\\github_test\\"
 
 
 
