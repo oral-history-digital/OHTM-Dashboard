@@ -15,7 +15,8 @@ import plotly.express as px
 import warnings
 from copy import deepcopy
 import dash
-from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL, ctx
+from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL
+from dash import ctx
 import dash_bootstrap_components as dbc
 import base64
 import json
@@ -28,16 +29,14 @@ from interview_chronology_analysis.interview_chronology_analysis import chronolo
 
 
 workingfolder = "C:\\Users\\phili\Dropbox\\Python\\Project\\OHDdash\\OHDdash_files\\"
+#workingfolder = "C:\\Users\\bayerschmidt\Dropbox\\Python\\Project\\OHDdash\\OHDdash_files\\"
+
+
+
 file_workingfolder = "C:\\Users\\phili\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Topic Modeling\\main test\\github_test\\"
-
-
-
+#file_workingfolder = "C:\\Users\\bayerschmidt\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Topic Modeling\\main test\\github_test\\"
 
 
 image_filename = workingfolder + "OHD_Logo.png"
-
-
-with open(workingfolder + "OHD_complete_pre_150c_80t.json") as f:
-    top_dic = json.load(f)
 
 
