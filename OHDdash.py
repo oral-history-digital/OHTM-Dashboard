@@ -431,7 +431,10 @@ def render_page_content(pathname):
         return [
             html.Div(dbc.Input(id='word_number', placeholder="weight", type='number')),
             dbc.Button("print", id='enter_print_topics', color="dark"),
+            dbc.Row(html.Hr()),
+            dbc.Col([
             html.Div(id = "topic_table")
+                ], width = 8),
                 ]
 
 
@@ -454,6 +457,7 @@ def update_graph(value, z_score_global):
     if "z_score" in z_score_global:
         z_score = True
     else: z_score = False
+    print(value)
 
     fig = heatmap_corpus(top_dic, option_selected=str(value),z_score = z_score,show_fig=False, return_fig=True)
     return fig
