@@ -26,6 +26,7 @@ from ohtm.topic_evaluation.balkendiagram import bar_dic
 from ohtm.topic_evaluation.heatmap_corpus import heatmap_corpus
 from interview_chronology_analysis import *
 from interview_chronology_analysis.interview_chronology_analysis import chronology_matrix
+from interview_chronology_analysis.Narrative_o_Meter import top_global_correlations_json, global_vertical_correlation_search_json, global_horizontal_correlation_search_json
 
 
 workingfolder = "C:\\Users\\phili\Dropbox\\Python\\Project\\OHDdash\\OHDdash_files\\"

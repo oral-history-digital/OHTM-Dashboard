@@ -2,7 +2,7 @@ from settings_OHDdash import *
 
 global top_dic
 global chronology_df
-load_file_name = "ohd_complete_lemmetized_pos_off_75c_80t"
+load_file_name = "ohd_complete_final_raw_preprocessed_lem_pos_off_70t_80c_alpha_5_200_2000_enriched"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
 with open(file_workingfolder + load_file_name) as f:
@@ -76,6 +76,7 @@ sidebar = html.Div(
                       min=0, max=100 - 1, step=1
                       ),
         ]),
+        dbc.Row(html.Hr()),
         dbc.Row([
             html.Div(id="topics",
                      style={
@@ -89,38 +90,66 @@ sidebar = html.Div(
                              )
         ]),
         dbc.Row(html.Hr()),
-        dbc.Row([
-            dcc.Textarea(
-                id='textarea-example',
-                value='Hier können sie Notizen machen',
-                style={'width': 220, 'height': 170, 'font-size': "15px", },
-            ),
-        ]),
-        dbc.Row(html.Hr()),
-        dbc.Label("Chose one"),
-        dbc.Row([
-            dbc.RadioItems(
-                options=[
-                    {"label": "Horizontal", "value": 1},
-                    {"label": "Vertikal", "value": 2},
-                ],
-                value=1,
-                id="correlation_switch",
-                inline = True,
-            ),
-        ]),
-        dbc.Row([
-        html.Div(id="correlation_output",
-                 style={
-                     'height': '200px',
-                     'width': '95%',
-                     "padding": "1% 1%",
-                     'display': 'block',
-                     'font-size': "15px",
-                     'background-color': 'rgb(249,249,249)',
-                     "overflow": "auto"}
-                 ),
-        ]),
+
+        dbc.Accordion(
+            [
+                dbc.AccordionItem(html.Div([
+                    dbc.Row([
+                        dbc.RadioItems(
+                            options=[
+                                {"label": "Horizontal", "value": 1},
+                                {"label": "Vertikal", "value": 2},
+                            ],
+                            value=1,
+                            id="correlation_switch",
+                            inline=True,
+                        ),
+                    ]),
+                    dbc.Row([
+                        html.Div([
+                            dbc.Pagination(id="gross_nr_correlations_per_chunk_pagination", max_value=4, min_value=2,
+                                           size="sm")
+                        ]),
+                    ]),
+                    dbc.Row([
+                        html.Div(id="correlation_output",
+                                 style={
+                                     'height': '200px',
+                                     'width': '95%',
+                                     "padding": "1% 1%",
+                                     'whiteSpace': 'pre-line',
+                                     'display': 'inline-block',
+                                     'font-size': "15px",
+                                     'background-color': 'rgb(249,249,249)',
+                                     "overflow": "auto"}
+                                 ),
+                    ]),
+
+
+
+
+                ]),
+
+
+                    title="Correlation",
+                ),
+                dbc.AccordionItem(html.Div([
+                    dbc.Row([
+                        dcc.Textarea(
+                            id='textarea-example',
+                            value='Hier können sie Notizen machen',
+                            style={'width': 220, 'height': 170, 'font-size': "15px", },
+                        ),
+                    ]),
+
+                ]),
+
+                    title="Notizen",
+                ),
+
+            ],
+            always_open=True,
+        ),
     ],
     style=SIDEBAR_STYLE,
 )
@@ -250,29 +279,56 @@ def render_page_content(pathname):
 
     elif pathname == "/page-1":
         return [
-                dbc.Col([
-                    dbc.Row([
-                html.Div(id="text", children='Enter Topic Number and weight Value'),
-                        ]),
-                    dbc.Row([
-                        html.Div(dbc.Input(id='topic_print', placeholder="topic", type='number')),
-                        html.Div(dbc.Input(id='weight_print', placeholder="weight", type='number')),
-                        ]),
-                    dbc.Row([
-                        html.Div(dbc.Input(id='interview_id_search', placeholder="Interview-ID", type='text')),
-                        dbc.Checklist(
-                            options=[
-                                {"label": "Interview-Search", "value": "int_search"},
-                            ],
-                            value=[],
-                            id="switch_interview_search",
-                            switch=True,
-                            inline=True
-                        ),
-                        ]),
-                dbc.Button("print", id='enter_print', color="dark"),
-                ], width = 6),
-                html.Div(id = "table-container")
+            dbc.Row([
+            dbc.Col([
+                html.Div([
+                    dbc.InputGroup(
+                        [dbc.InputGroupText("Topic"), dbc.Input(id='topic_print', placeholder="Topic", type='number'),
+                    ], className="mb-3"),
+                    dbc.InputGroup(
+                        [dbc.InputGroupText("Weight"), dbc.Input(id='weight_print', placeholder="Weight", type='number'),
+                    ], className="mb-3"),
+                    dbc.InputGroup(
+                        [dbc.InputGroupText("Interview ID"), dbc.Input(id='interview_id_search', placeholder="Interview ID", type='text'),
+                    ], className="mb-3"),
+
+            ]),
+            ], width = 2),
+
+            dbc.Col([
+                html.Div([
+                    dbc.InputGroup([dbc.InputGroupText("Topic_c 1"), dbc.Input(id='topic_c_1', placeholder="Topic", type='number'),
+                         ], className="mb-3"),
+                    dbc.InputGroup([dbc.InputGroupText("Topic_c 2"),dbc.Input(id='topic_c_2', placeholder="Topic", type='number'),
+                         ], className="mb-3"),
+                    dbc.InputGroup([dbc.Select(options=[
+                        {"label": "Korpus Search", "value": 1},
+                        {"label": "Interview Search", "value": 2},
+                        {"label": "Correlation Search Vertical", "value": 3},
+                        {"label": "Correlation Search Horizontal", "value": 4},
+
+                    ], id = "text_search_options")])
+
+
+                ]),
+            ], width = 2),
+            dbc.Col([
+                html.Div([
+                    dbc.InputGroup([dbc.InputGroupText("Topic_c 3"),
+                                    dbc.Input(id='topic_c_3', placeholder="Topic", type='number'),
+                                    ], className="mb-3"),
+                    dbc.InputGroup([dbc.InputGroupText("Topic_c 4"),
+                                    dbc.Input(id='topic_c_4', placeholder="Topic", type='number'),
+                                    ], className="mb-3"),
+                    dbc.InputGroup([ dbc.Button("Search", id='enter_print', color="dark")], className="mb-3"),
+
+                ]),
+            ], width=2),
+                ]),
+            dbc.Row([
+                dbc.Col([html.Div(id = "table-container")], width=8),
+            ]),
+
                 ]
 
     elif pathname == "/page-2":
@@ -712,14 +768,20 @@ def df_input(value):
     Input("weight_print", "value"),
     Input("enter_print", "n_clicks"),
     Input("interview_id_search", "value"),
-    Input("switch_interview_search", "value"),
+    Input("text_search_options", "value"),
+    Input('topic_c_1', "value"),
+    Input('topic_c_2', "value"),
+    Input('topic_c_3', "value"),
+    Input('topic_c_4', "value"),
 
 )
 
-def weight_print(topic_print, weight_print, n_clicks, interview_id,switch_interview_search):
+def weight_print(topic_print, weight_print, n_clicks, interview_id,text_search_options, t_1, t_2, t_3, t_4):
+
+    print(ctx.triggered)
 
     if ctx.triggered[0]["prop_id"] == "enter_print.n_clicks":
-        if "int_search" in switch_interview_search:
+        if text_search_options == "2":
             sent_final = []
             topic = topic_print
             chunk = weight_print
@@ -748,7 +810,10 @@ def weight_print(topic_print, weight_print, n_clicks, interview_id,switch_interv
             # columns = [{"name": i, "id": i} for i in df_rounded.columns]
             table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="dark",
                                              responsive=True, )
-        else:
+            return table
+
+
+        if text_search_options == "1":
             sent_final = []
             topic = topic_print
             chunk = weight_print
@@ -776,19 +841,37 @@ def weight_print(topic_print, weight_print, n_clicks, interview_id,switch_interv
             # columns = [{"name": i, "id": i} for i in df_rounded.columns]
             table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="dark", responsive = True, )
 
-    return table
+            return table
+
+        if text_search_options == "3":
+
+            a = global_vertical_correlation_search_json(top_dic, t1=t_1, t2=t_2, t3 =t_3, t4 = t_4, return_search=True)
+            df = pd.DataFrame(a)
+            df.columns = ["Interview", "Chunk Nr"]
+            table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="dark",
+                                             responsive=True, )
+            return table
+
+        if text_search_options == "4":
+
+            a = global_horizontal_correlation_search_json(top_dic, t1=t_1, t2=t_2, return_search=True)
+            df = pd.DataFrame(a)
+            df.columns = ["Interview", "Chunk Nr"]
+            table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="dark",
+                                             responsive=True, )
+            return table
+
+        if text_search_options == "3":
+
+            a = global_horizontal_correlation_search_json(top_dic, t1=t_1, t2=t_2, return_search=True)
+            df = pd.DataFrame(a)
+            df.columns = ["Interview", "Chunk Nr"]
+            table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="dark",
+                                             responsive=True, )
+            return table
 
 
-html.Div(dbc.Input(id='interview_id_search', placeholder="Interview-ID", type='text')),
-dbc.Checklist(
-    options=[
-        {"label": "Interview-Search", "value": "int_search"},
-    ],
-    value=[],
-    id="switch_interview_search",
-    switch=True,
-    inline=True
-),
+
 
 
 
@@ -971,7 +1054,7 @@ def sent_drawing_detail(clickData, input_before, input_next, chunk_number):
                 speaker = top_dic["korpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["speaker"]
 
     sent_id = "Chunk: " + str(int(chunk_id))
-    print(sent_example)
+
     return sent_example, sent_id, chunk_id
 
 @app.callback(
@@ -996,6 +1079,25 @@ def print_all_topics(words, nClicks):
         table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="dark", responsive=True, )
 
         return table
+
+@app.callback(
+    Output("correlation_output", "children"),
+    Input("correlation_switch", "value"),
+    Input("gross_nr_correlations_per_chunk_pagination", "active_page")
+)
+def print_top_correlation(switch, gross_nr_correlations_per_chunk):
+    if switch == 1:
+        data = top_global_correlations_json(top_dic, 30, horizontal=True, gross_nr_correlations_per_chunk = gross_nr_correlations_per_chunk)
+        return_data = []
+        for line in data:
+            return_data.append(str(line) + "\n")
+        return return_data
+    if switch == 2:
+        data = top_global_correlations_json(top_dic, 30, vertical=True, gross_nr_correlations_per_chunk= gross_nr_correlations_per_chunk)
+        return_data = []
+        for line in data:
+            return_data.append(str(line) + "\n")
+        return return_data
 
 
 
