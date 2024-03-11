@@ -89,6 +89,7 @@ sidebar = html.Div(
                          "overflow": "auto"}
                              )
         ]),
+        dbc.Row(),
         dbc.Row(html.Hr()),
 
         dbc.Accordion(
@@ -124,13 +125,7 @@ sidebar = html.Div(
                                      "overflow": "auto"}
                                  ),
                     ]),
-
-
-
-
-                ]),
-
-
+               ]),
                     title="Correlation",
                 ),
                 dbc.AccordionItem(html.Div([
@@ -171,20 +166,13 @@ def render_page_content(pathname):
         return [
             dbc.Row([
                 dbc.Col([
-                    dcc.Dropdown(id="slct_archiv",
-                                 options=[
-                                     {"label": "Archiv Zwangsarbeit", "value": "ZWA"},
-                                     {"label": "Archiv Deutsches Gedächtnis", "value": "ADG"},
-                                     {"label": "Werkstatt der Erinnerung", "value": "WdE"},
-                                     {"label": "Museum Friedland", "value": "MFL"},
-                                     {"label": "Flucht Vertreibung Versöhnung", "value": "FVV"},
-                                     {"label": "Hannah-Arendt-Institut", "value": "HAI"},
-                                     {"label": "Gesamtkorpus", "value": "all"},
-                                 ],
-                                 multi=False,
-                                 value="all",
-                                 style={'width': "80%"}
-                                 )], width=4),
+                    dcc.Dropdown(id="slct_archiv", options = [ ],
+                                 value = "all",
+                                multi=False,
+                                style = {'width': "80%"},
+                                 ),
+
+                ], width=4),
                 dbc.Col([
                     dbc.Checklist(
                         options=[
@@ -429,9 +417,11 @@ def render_page_content(pathname):
 
     elif pathname == "/page-4":
         return [
+            dbc.Col([
             html.Div(dbc.Input(id='word_number', placeholder="weight", type='number')),
-            dbc.Button("print", id='enter_print_topics', color="dark"),
-            dbc.Row(html.Hr()),
+            dbc.Button("print", id='enter_print_topics', color="dark", size="sm"),
+            ], width = 2),
+
             dbc.Col([
             html.Div(id = "topic_table")
                 ], width = 8),
@@ -450,10 +440,11 @@ def render_page_content(pathname):
 # Heatmap für den gesamten Corpus mit Auswahlmöglichkeit für die einzelnen Archive
 @app.callback(
     Output(component_id='heat_map', component_property='figure'),
-    Input(component_id='slct_archiv', component_property='value'),
-    Input("switch_z_score_global_heatmap", "value")
+    Input('slct_archiv', "value"),
+    Input("switch_z_score_global_heatmap", "value"),
 )
 def update_graph(value, z_score_global):
+
     if "z_score" in z_score_global:
         z_score = True
     else: z_score = False
@@ -711,7 +702,7 @@ def gloabl_topic_nr_update(clickData):
 @app.callback(
     Output("heatmap_corpus_topic_nr", "data"),
     Input("heat_map", "clickData"),
-    prevent_initial_call=True
+
 )
 def gloabl_topic_nr_update(clickData):
 
@@ -1102,6 +1093,22 @@ def print_top_correlation(switch, gross_nr_correlations_per_chunk):
         for line in data:
             return_data.append(str(line) + "\n")
         return return_data
+
+@app.callback(
+    Output("slct_archiv", "options"),
+    Input("top_dic", "data2")
+)
+def creat_global_dropdown(data2):
+    print("worked")
+    drop_down_menu = []
+    for archives in top_dic["korpus"]:
+        print(archives)
+        a = {"label": archives, "value": archives}
+        drop_down_menu.append(a)
+        print(drop_down_menu)
+
+    drop_down_menu.append({"label": "Gesamtkorpus", "value": "all"})
+    return drop_down_menu
 
 
 
