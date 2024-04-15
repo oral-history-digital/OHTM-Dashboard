@@ -8,22 +8,23 @@ import spacy
 from seaborn.matrix import heatmap
 import seaborn as sns
 from datetime import datetime
-import pyLDAvis
-import pyLDAvis.gensim_models as gensimvis
+#import pyLDAvis
+#import pyLDAvis.gensim_models as gensimvis
 import pickle
 import plotly.express as px
 import warnings
 from copy import deepcopy
 import dash
-from dash import Dash, callback, html, dcc, dash_table, Input, Output, State, MATCH, ALL
+from dash import Dash, callback, dcc, dash_table, Input, Output, State, MATCH, ALL
+from dash import html
 from dash import ctx
 import dash_bootstrap_components as dbc
 import base64
 import json
 from functions import top_words
 import copy
-from ohtm.topic_evaluation.balkendiagram import bar_dic
-from ohtm.topic_evaluation.heatmap_corpus import heatmap_corpus
+from ohtm.topic_evaluation.bar_graph import bar_graph_corpus
+from ohtm.topic_evaluation.heatmaps import heatmap_corpus
 from interview_chronology_analysis import *
 from interview_chronology_analysis.interview_chronology_analysis import chronology_matrix
 from interview_chronology_analysis.Narrative_o_Meter import top_global_correlations_json, global_vertical_correlation_search_json, global_horizontal_correlation_search_json

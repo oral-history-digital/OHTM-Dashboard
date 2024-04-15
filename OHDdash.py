@@ -2,7 +2,7 @@ from settings_OHDdash import *
 
 global top_dic
 global chronology_df
-load_file_name = "ohd_complete_final_raw_preprocessed_lem_pos_off_70t_80c_alpha_5_200_2000_enriched"
+load_file_name = "ohd_complete_preprocessed_chunked_70_topics_80"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
 with open(file_workingfolder + load_file_name) as f:
@@ -63,7 +63,7 @@ sidebar = html.Div(
                                ],
             label="Menu",
             color="dark",
-            menu_variant="dark",
+           # menu_variant="dark",
             className ="m-1",
              ),
         ),
@@ -94,6 +94,19 @@ sidebar = html.Div(
 
         dbc.Accordion(
             [
+                dbc.AccordionItem(html.Div([
+                    dbc.Row([
+                        dcc.Textarea(
+                            id='textarea-example',
+                            value='Hier können sie Notizen machen',
+                            style={'width': 220, 'height': 170, 'font-size': "15px", },
+                        ),
+                    ]),
+
+                ]),
+
+                    title="Notizen",
+                ),
                 dbc.AccordionItem(html.Div([
                     dbc.Row([
                         dbc.RadioItems(
@@ -127,19 +140,6 @@ sidebar = html.Div(
                     ]),
                ]),
                     title="Correlation",
-                ),
-                dbc.AccordionItem(html.Div([
-                    dbc.Row([
-                        dcc.Textarea(
-                            id='textarea-example',
-                            value='Hier können sie Notizen machen',
-                            style={'width': 220, 'height': 170, 'font-size': "15px", },
-                        ),
-                    ]),
-
-                ]),
-
-                    title="Notizen",
                 ),
 
             ],
@@ -418,7 +418,7 @@ def render_page_content(pathname):
     elif pathname == "/page-4":
         return [
             dbc.Col([
-            html.Div(dbc.Input(id='word_number', placeholder="weight", type='number')),
+            html.Div(dbc.Input(id='word_number', placeholder="Anzahl Wörter pro Topic", type='number')),
             dbc.Button("print", id='enter_print_topics', color="dark", size="sm"),
             ], width = 2),
 
@@ -448,7 +448,6 @@ def update_graph(value, z_score_global):
     if "z_score" in z_score_global:
         z_score = True
     else: z_score = False
-    print(value)
 
     fig = heatmap_corpus(top_dic, option_selected=str(value),z_score = z_score,show_fig=False, return_fig=True)
     return fig
@@ -562,7 +561,6 @@ def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th, int
 
 
                     elif chunk_number_storage == chronology_df["ind"][chronology_df.index[-1]]:
-                        print("last")
                         row_index = chronology_df.index.get_loc(
                             chronology_df[chronology_df["ind"] == chunk_number_storage].index[0])
                         time_id = chronology_df.loc[row_index]["minute"]
@@ -628,14 +626,14 @@ def sent_drawing(clickData, input_before, input_next, chunk_number):
 
     sent_example = []
     speaker = "None"
-    for a in top_dic["korpus"][interview_id[0:3]][interview_id]["sent"]:
-        if top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["chunk"] == int(chunk_id):
-            if speaker == top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"]:
-                sent_example.append(top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["raw"] + ". ")
+    for a in top_dic["corpus"][interview_id[0:3]][interview_id]["sent"]:
+        if top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["chunk"] == int(chunk_id):
+            if speaker == top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"]:
+                sent_example.append(top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["raw"] + ". ")
             else:
-                sent_example.append("\n" + "*" + top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"] + "*: ")
-                sent_example.append(top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["raw"] + ". ")
-                speaker = top_dic["korpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"]
+                sent_example.append("\n" + "*" + top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"] + "*: ")
+                sent_example.append(top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["raw"] + ". ")
+                speaker = top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"]
 
     sent_id = "Chunk: " + str(chunk_id)
     return sent_example, sent_id, chunk_id
@@ -647,7 +645,7 @@ def sent_drawing(clickData, input_before, input_next, chunk_number):
     Input("top_dic", "data2"),
 )
 def bar_map(data2):
-    fig = bar_dic(top_dic, show_fig = False, return_fig = True)
+    fig = bar_graph_corpus(top_dic, show_fig = False, return_fig = True)
     return fig
 
 # Balkendiagramm auf der dritten Seite
@@ -657,7 +655,7 @@ def bar_map(data2):
 
 )
 def bar_map2(data2):
-    fig = bar_dic(top_dic, show_fig = False, return_fig = True)
+    fig = bar_graph_corpus(top_dic, show_fig = False, return_fig = True)
     return fig
 
 @app.callback(
@@ -773,31 +771,26 @@ def df_input(value):
 
 def weight_print(topic_print, weight_print, n_clicks, interview_id,text_search_options, t_1, t_2, t_3, t_4):
 
-    print(ctx.triggered)
-
     if ctx.triggered[0]["prop_id"] == "enter_print.n_clicks":
         if text_search_options == "2":
             sent_final = []
             topic = topic_print
             chunk = weight_print
             a = interview_id[:3]
-            print(a)
             i = interview_id
-            print(i)
             for chunks in top_dic["weight"][a][i]:
                 if str(top_dic["weight"][a][i][chunks][str(topic)]) >= str(chunk):
                     chunk_id = chunks
                     sent_current = []
-                    for sents in top_dic["korpus"][a][i]["sent"]:
-                        int_sent = copy.deepcopy(top_dic["korpus"][a][i]["sent"][sents]["chunk"])
+                    for sents in top_dic["corpus"][a][i]["sent"]:
+                        int_sent = copy.deepcopy(top_dic["corpus"][a][i]["sent"][sents]["chunk"])
                         if int(int_sent) == int(chunks):
-                            sent_current.append(str(top_dic["korpus"][a][i]["sent"][sents]["raw"]) + " ")
+                            sent_current.append(str(top_dic["corpus"][a][i]["sent"][sents]["raw"]) + " ")
                     sent_current = " ".join(sent_current)
                     sent_current_2 = (str(top_dic["weight"][a][i][chunks][str(topic)]), i, chunk_id, sent_current)
                     sent_final.append(sent_current_2)
             sent_final.sort(reverse=True)
             df = pd.DataFrame(sent_final)
-            print(df)
 
             df = df.round(3)
             df.columns = ["weight", "Interview", "Chunk Nr", "Chunk"]
@@ -820,10 +813,10 @@ def weight_print(topic_print, weight_print, n_clicks, interview_id,text_search_o
                             chunk_id = chunks
                             sent_current = []
 
-                            for sents in top_dic["korpus"][a][i]["sent"]:
-                                int_sent = copy.deepcopy(top_dic["korpus"][a][i]["sent"][sents]["chunk"])
+                            for sents in top_dic["corpus"][a][i]["sent"]:
+                                int_sent = copy.deepcopy(top_dic["corpus"][a][i]["sent"][sents]["chunk"])
                                 if int(int_sent) == int(chunks):
-                                    sent_current.append(str(top_dic["korpus"][a][i]["sent"][sents]["raw"]) + " ")
+                                    sent_current.append(str(top_dic["corpus"][a][i]["sent"][sents]["raw"]) + " ")
                             sent_current = " ".join(sent_current)
                             sent_current_2 = (str(top_dic["weight"][a][i][chunks][str(topic)]),sent_id,chunk_id, sent_current)
                             sent_final.append(sent_current_2)
@@ -856,17 +849,6 @@ def weight_print(topic_print, weight_print, n_clicks, interview_id,text_search_o
                                              responsive=True, )
             return table
 
-        if text_search_options == "3":
-
-            a = global_horizontal_correlation_search_json(top_dic, t1=t_1, t2=t_2, return_search=True)
-            df = pd.DataFrame(a)
-            df.columns = ["Interview", "Chunk Nr"]
-            table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="dark",
-                                             responsive=True, )
-            return table
-
-
-
 
 
 
@@ -888,7 +870,6 @@ def weight_print(topic_print, weight_print, n_clicks, interview_id,text_search_o
 
 )
 def interview_heat_map(interview_manual_id, heatmap_filter, top_filter_th, outlier_th,clickData_2, chunk_number_storage):
-    print(ctx.triggered)
     global chronology_df_detail
     global tc_indicator_detail
     global interview_id_detail
@@ -1039,14 +1020,14 @@ def sent_drawing_detail(clickData, input_before, input_next, chunk_number):
 
     sent_example = []
     speaker = "None"
-    for a in top_dic["korpus"][interview_id_detail[0:3]][interview_id_detail]["sent"]:
-        if top_dic["korpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["chunk"] == int(chunk_id):
-            if speaker == top_dic["korpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["speaker"]:
-                sent_example.append(top_dic["korpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["raw"] + ". ")
+    for a in top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"]:
+        if top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["chunk"] == int(chunk_id):
+            if speaker == top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["speaker"]:
+                sent_example.append(top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["raw"] + ". ")
             else:
-                sent_example.append("\n" + "*" + top_dic["korpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["speaker"] + "*: ")
-                sent_example.append(top_dic["korpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["raw"] + ". ")
-                speaker = top_dic["korpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["speaker"]
+                sent_example.append("\n" + "*" + top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["speaker"] + "*: ")
+                sent_example.append(top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["raw"] + ". ")
+                speaker = top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["speaker"]
 
     sent_id = "Chunk: " + str(int(chunk_id))
 
@@ -1101,11 +1082,9 @@ def print_top_correlation(switch, gross_nr_correlations_per_chunk):
 def creat_global_dropdown(data2):
     print("worked")
     drop_down_menu = []
-    for archives in top_dic["korpus"]:
-        print(archives)
+    for archives in top_dic["corpus"]:
         a = {"label": archives, "value": archives}
         drop_down_menu.append(a)
-        print(drop_down_menu)
 
     drop_down_menu.append({"label": "Gesamtkorpus", "value": "all"})
     return drop_down_menu
