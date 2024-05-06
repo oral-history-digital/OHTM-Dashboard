@@ -2,7 +2,7 @@ from settings_OHDdash import *
 
 global top_dic
 global chronology_df
-load_file_name = "ohd_complete_70_80_vortrag"
+load_file_name = "ohd_complete_240411_pre_70c_80t_corr"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
 with open(file_workingfolder + load_file_name) as f:

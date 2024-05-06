@@ -1,5 +1,5 @@
 from settings_OHDdash import *
-
+from functions import time_graph
 global top_dic
 global chronology_df
 load_file_name = "kloster_urkunden_vortrag_freiburg_40"
@@ -261,6 +261,18 @@ def render_page_content(pathname):
                                         }),
                     ]),
                 ], width=5),
+            ]),
+            dbc.Row([
+                dbc.Col([
+                        html.Div(dbc.Input(id='time_graph_topic', placeholder="Topics",
+                                           type='number')),
+                    ], width=1),
+                ]),
+            dbc.Row([
+                dbc.Col([
+                    dcc.Graph(id='time_graph', figure={})
+                ], width=6),
+
             ]),
 
         ]
@@ -1090,6 +1102,16 @@ def creat_global_dropdown(data2):
     return drop_down_menu
 
 
+@app.callback(
+    Output(component_id="time_graph", component_property="figure"),
+    Input("time_graph_topic", "value"),
+)
+def time_graphs(topics):
+    graph = time_graph(top_dic, str(topics))
+    return graph
+
+
 
 if __name__ == '__main__':
     app.run_server(debug=False, port=3002)
+
