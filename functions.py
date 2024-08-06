@@ -1,6 +1,8 @@
-import pandas as pd
 import json
+
+import pandas as pd
 import plotly_express as px
+
 
 def top_words(topic, top_dic):
     if type(top_dic) is not dict:

@@ -1,0 +1,6 @@
+dash-bootstrap-components==1.6.0
+dash==2.17.1
+matplotlib==3.9.0
+pandas==2.2.2
+seaborn==0.13.2
+spacy==3.7.5
