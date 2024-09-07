@@ -8,8 +8,6 @@ import spacy
 from seaborn.matrix import heatmap
 import seaborn as sns
 from datetime import datetime
-#import pyLDAvis
-#import pyLDAvis.gensim_models as gensimvis
 import pickle
 import plotly.express as px
 import warnings
@@ -21,7 +19,7 @@ from dash import ctx
 import dash_bootstrap_components as dbc
 import base64
 import json
-from OHDdash.functions import top_words
+from functions import top_words
 import copy
 from ohtm.topic_evaluation.bar_graph import bar_graph_corpus
 from ohtm.topic_evaluation.heatmaps import heatmap_corpus
@@ -31,7 +29,7 @@ from interview_chronology_analysis.Narrative_o_Meter import top_global_correlati
 
 
 
-workingfolder = "C:\\Users\\phili\Dropbox\\Python\\Project\\OHDdash\\OHDdash_files\\"
+workingfolder = "C:\\Users\\phili\\Nextcloud2\\Python\\Project\\OHDdash\\OHDdash_files\\"
 #workingfolder = "C:\\Users\\bayerschmidt\Dropbox\\Python\\Project\\OHDdash\\OHDdash_files\\"
 
 

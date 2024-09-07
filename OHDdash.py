@@ -1,8 +1,8 @@
-from OHDdash.settings_OHDdash import *
+from settings_OHDdash import *
 
 global top_dic
 global chronology_df
-load_file_name = "OHD_final_test_80_80_5"
+load_file_name = "OHD_final_100C_100T_A5"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
 with open(file_workingfolder + load_file_name) as f:
