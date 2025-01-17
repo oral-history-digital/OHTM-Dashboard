@@ -2,7 +2,7 @@ from settings_OHDdash import *
 
 global top_dic
 global chronology_df
-load_file_name = "OHD_final_100c_100T_A5_remade.json"
+load_file_name = "infer_combined_test.json"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
 with open(file_workingfolder + load_file_name) as f:
@@ -1092,4 +1092,4 @@ def creat_global_dropdown(data2):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False, port=3003)
+    app.run_server(debug=False, port=3004)

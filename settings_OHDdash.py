@@ -29,13 +29,13 @@ from interview_chronology_analysis.Narrative_o_Meter import top_global_correlati
 
 
 
-workingfolder = "C:\\Users\\phili\\Nextcloud2\\Python\\Project\\OHDdash\\OHDdash_files\\"
-#workingfolder = "C:\\Users\\bayerschmidt\Dropbox\\Python\\Project\\OHDdash\\OHDdash_files\\"
+workingfolder = "C:\\Users\\phili\\Nextcloud2\\Python\\Topic_Modeling\\"
+#workingfolder = "C:\\Users\\bayerschmidt\\Nextcloud\\Python\\Project\\ohtm_dash\\OHDdash_files\\"
 
 
 
 file_workingfolder = "C:\\Users\\phili\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Topic Modeling\\main test\\github_test\\"
-#file_workingfolder = "C:\\Users\\bayerschmidt\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Topic Modeling\\main test\\github_test\\"
+#file_workingfolder = "C:\\Users\\bayerschmidt\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Topic Modeling\\main test\\"
 
 
 image_filename = workingfolder + "OHD_Logo.png"

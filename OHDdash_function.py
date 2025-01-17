@@ -1,4 +1,4 @@
-from OHDdash.settings_OHDdash import *
+from settings_OHDdash import *
 
 global top_dic
 global chronology_df
@@ -1085,6 +1085,12 @@ def ohd_dash(top_dic):
         return drop_down_menu
 
 
+    app.run_server(debug=False, port=3002)
 
-    if __name__ == '__main__':
-        app.run_server(debug=False, port=3002)
+if __name__ == '__main__':
+    load_file_name = "ohd_complete_infertest_inferred.json"
+    # load_file_name = "OHD_auswahl_pre_150c_80t"
+
+    with open(file_workingfolder + load_file_name) as f:
+        top_dic = json.load(f)
+    ohd_dash(top_dic)

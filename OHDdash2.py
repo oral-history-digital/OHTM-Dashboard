@@ -2,7 +2,7 @@ from settings_OHDdash import *
 
 global top_dic
 global chronology_df
-load_file_name = "OHD_final_100c_100T_A5_remade.json"
+load_file_name = "OHD_final_100C_100T_A5"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
 with open(file_workingfolder + load_file_name) as f:
@@ -13,7 +13,6 @@ def b64_image(image_filename):
     with open(image_filename, 'rb') as f:
         image = f.read()
     return 'data:image/png;base64,' + base64.b64encode(image).decode('utf-8')
-
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
