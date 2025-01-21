@@ -31,12 +31,15 @@ def chunk_sent_drawing(ohtm_file, click_data_input, chunk_number, interview_id, 
         if interview_id in ohtm_file["corpus"][archive]:
             for a in ohtm_file["corpus"][archive][interview_id]["sent"]:
                 if ohtm_file["corpus"][archive][interview_id]["sent"][a]["chunk"] == int(chunk_id):
-                    if speaker == ohtm_file["corpus"][archive][interview_id]["sent"][a]["speaker"]:
-                        sent_example.append(ohtm_file["corpus"][archive][interview_id]["sent"][a]["raw"] + ". ")
+                    if ohtm_file["corpus"][archive][interview_id]["sent"][a]["speaker"] == {}:
+                        sent_example.append(ohtm_file["corpus"][archive][interview_id]["sent"][a]["raw"] + " ")
                     else:
-                        sent_example.append("\n" + "*" + ohtm_file["corpus"][archive][interview_id]["sent"][a]["speaker"] + "*: ")
-                        sent_example.append(ohtm_file["corpus"][archive][interview_id]["sent"][a]["raw"] + ". ")
-                        speaker = ohtm_file["corpus"][archive][interview_id]["sent"][a]["speaker"]
+                        if speaker == ohtm_file["corpus"][archive][interview_id]["sent"][a]["speaker"]:
+                            sent_example.append(ohtm_file["corpus"][archive][interview_id]["sent"][a]["raw"] + ". ")
+                        else:
+                            sent_example.append("\n" + "*" + ohtm_file["corpus"][archive][interview_id]["sent"][a]["speaker"] + "*: ")
+                            sent_example.append(ohtm_file["corpus"][archive][interview_id]["sent"][a]["raw"] + ". ")
+                            speaker = ohtm_file["corpus"][archive][interview_id]["sent"][a]["speaker"]
 
     sent_id = "Chunk: " + str(chunk_id)
     return sent_example, sent_id, chunk_id
