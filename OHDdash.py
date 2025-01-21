@@ -1,7 +1,23 @@
 from settings_OHDdash import *
 
 global top_dic
-global chronology_df
+global interview_heatmap_df
+
+
+from OHDdash_function import ohd_dash
+import json
+
+workingfolder = "C:\\Users\\phili\\Nextcloud2\\Python\\Topic_Modeling\\"
+#workingfolder = "C:\\Users\\bayerschmidt\\Nextcloud\\Python\\Project\\ohtm_dash\\OHDdash_files\\"
+
+
+
+file_workingfolder = "C:\\Users\\phili\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Topic Modeling\\main test\\github_test\\"
+#file_workingfolder = "C:\\Users\\bayerschmidt\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Topic Modeling\\main test\\"
+
+
+image_filename = workingfolder + "OHD_Logo.png"
+
 load_file_name = "OHD_final_100c_100T_A5_remade.json"
 #load_file_name = "OHD_auswahl_pre_150c_80t"
 
@@ -470,7 +486,7 @@ def update_graph(value, z_score_global):
 )
 def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th, interview_manual_id,clickData_2, chunk_number_storage):
     global interview_id
-    global chronology_df
+    global interview_heatmap_df
     global tc_indicator
 
 
@@ -619,8 +635,8 @@ def sent_drawing(clickData, input_before, input_next, chunk_number):
 
         if tc_indicator:
             time_id = clickData["points"][0]["x"]
-            row_index = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == time_id].index[0]) # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
-            chunk_id = chronology_df.loc[row_index]["ind"] # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
+            row_index = interview_heatmap_df.index.get_loc(interview_heatmap_df[interview_heatmap_df["minute"] == time_id].index[0]) # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
+            chunk_id = interview_heatmap_df.loc[row_index]["ind"] # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
         else:
             chunk_id = clickData["points"][0]["x"]
 

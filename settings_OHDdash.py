@@ -19,25 +19,21 @@ from dash import ctx
 import dash_bootstrap_components as dbc
 import base64
 import json
-from functions import top_words
+from ohtm_dash.functions.print_functions.print_topics import top_words
 import copy
-from ohtm.topic_evaluation.bar_graph import bar_graph_corpus
-from ohtm.topic_evaluation.heatmaps import heatmap_corpus
+from ohtm_dash.functions.graph_functions.bar_graph import bar_graph_corpus
+from ohtm_dash.functions.graph_functions.heat_maps import  heatmap_corpus
+from ohtm_dash.functions.graph_functions.heat_maps import  heatmap_interview
 from interview_chronology_analysis import *
 from interview_chronology_analysis.interview_chronology_analysis import chronology_matrix
 from interview_chronology_analysis.Narrative_o_Meter import top_global_correlations_json, global_vertical_correlation_search_json, global_horizontal_correlation_search_json
+from ohtm_dash.functions.dash_board_functions.dropdown_list import create_dropdown_list
+from ohtm_dash.functions.print_functions.print_topics import print_all_topics
+from ohtm_dash.functions.print_functions.print_chunk_sents import chunk_sent_drawing
+from ohtm_dash.functions.graph_functions.heatmap_marker import heatmap_marker_creation_normal
 
 
 
-workingfolder = "C:\\Users\\phili\\Nextcloud2\\Python\\Topic_Modeling\\"
-#workingfolder = "C:\\Users\\bayerschmidt\\Nextcloud\\Python\\Project\\ohtm_dash\\OHDdash_files\\"
 
-
-
-file_workingfolder = "C:\\Users\\phili\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Topic Modeling\\main test\\github_test\\"
-#file_workingfolder = "C:\\Users\\bayerschmidt\\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\\Topic Modeling\\main test\\"
-
-
-image_filename = workingfolder + "OHD_Logo.png"
 
 

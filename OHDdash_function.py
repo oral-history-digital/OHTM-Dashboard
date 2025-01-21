@@ -1,17 +1,17 @@
 from settings_OHDdash import *
-
 global top_dic
-global chronology_df
+global interview_heatmap_df
+global interview_id
+global tc_indicator
 
-def ohd_dash(top_dic):
+
+def ohd_dash(ohtm_file, image_filename):
     def b64_image(image_filename):
         with open(image_filename, 'rb') as f:
             image = f.read()
         return 'data:image/png;base64,' + base64.b64encode(image).decode('utf-8')
 
-
     app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
-
 
     # styling the sidebar
     SIDEBAR_STYLE = {
@@ -212,9 +212,9 @@ def ohd_dash(top_dic):
                         dbc.Col([
                             dbc.Checklist(
                                 options=[
-                                    {"label": "Topic Filter", "value": "filter"},
+                                    # {"label": "Topic Filter", "value": "filter"},
                                     {"label": "Z Score", "value": "z_score"},
-                                    {"label": "Mark", "value": "mark"}
+                                    {"label": "Marker", "value": "marker"}
                                 ],
                                 value=[],
                                 id="switch_chronology_filter",
@@ -354,9 +354,9 @@ def ohd_dash(top_dic):
                     dbc.Col([
                         dbc.Checklist(
                             options=[
-                                {"label": "Topic Filter", "value": "filter"},
+                                # {"label": "Topic Filter", "value": "filter"},
                                 {"label": "Z Score", "value": "z_score"},
-                                {"label": "Mark", "value": "mark"},
+                                {"label": "Marker", "value": "marker"},
                             ],
                             value=[],
                             id="switch_chronology_filter_detail",
@@ -432,23 +432,36 @@ def ohd_dash(top_dic):
             ]
         )
 
-    # Heatmap für den gesamten Corpus mit Auswahlmöglichkeit für die einzelnen Archive
+# Balkendiagramm auf der ersten Seite
+    @app.callback(
+        Output(component_id="bar", component_property="figure"),
+        Input("top_dic", "data2"),
+    )
+    def bar_map(data2):
+        fig = bar_graph_corpus(ohtm_file, show_fig=False, return_fig=True)
+        return fig
+
+# Dropbox auf Seite 1:
+    @app.callback(
+        Output("slct_archiv", "options"),
+        Input("top_dic", "data2")
+    )
+    def create_dropdown_list_dash(data2):
+        drop_down_menu = create_dropdown_list(ohtm_file)
+        return drop_down_menu
+
+# Heatmap for the whole corpus, with the option to select the different archives. [Page 1]
     @app.callback(
         Output(component_id='heat_map', component_property='figure'),
         Input('slct_archiv', "value"),
         Input("switch_z_score_global_heatmap", "value"),
     )
     def update_graph(value, z_score_global):
-
-        if "z_score" in z_score_global:
-            z_score = True
-        else: z_score = False
-
-        fig = heatmap_corpus(top_dic, option_selected=str(value),z_score = z_score,show_fig=False, return_fig=True)
+        fig = heatmap_corpus(ohtm_file, option_selected=str(value), z_score_global=z_score_global,
+                             show_fig=False, return_fig=True)
         return fig
 
-
-    # Chronologie Heatmap
+# Chronologie Heatmap
     @app.callback(
         Output(component_id='heat_map_interview', component_property='figure'),
         Output("interview_titel", "children"),
@@ -459,28 +472,18 @@ def ohd_dash(top_dic):
         Input("interview_manual_id", "value"),
         Input("heat_map_interview", "clickData"),
         Input("chunk_number_frontpage", "data"),
-
-        prevent_initial_call = True
-
+        prevent_initial_call=True
     )
-    def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th, interview_manual_id,clickData_2, chunk_number_storage):
+    def interview_heat_map(clickData, heatmap_filter, top_filter_th, outlier_th,
+                           interview_manual_id,clickData_2, chunk_number_storage):
         global interview_id
-        global chronology_df
+        global interview_heatmap_df
         global tc_indicator
 
-
-        if "filter" in heatmap_filter:
-            topic_filtering = True
-        else: topic_filtering = False
-
-        if "z_score" in heatmap_filter:
-            z_score = True
-        else: z_score = False
-
-        if top_filter_th == None:
-            top_filter_th = 0.01
-        if outlier_th == None:
-            outlier_th = 0.02
+        # if top_filter_th == None:
+        #     top_filter_th = 0.01
+        # if outlier_th == None:
+        #     outlier_th = 0.02
 
         if interview_manual_id is not None:
             interview_id = interview_manual_id
@@ -489,111 +492,26 @@ def ohd_dash(top_dic):
         else:
             interview_id = clickData["points"][0]["y"]
 
-        chronology_data = chronology_matrix(top_dic, interview_id, return_fig=True, print_fig=False, z_score = z_score, topic_filter = topic_filtering, threshold_top_filter=top_filter_th, outlier_threshold=outlier_th)
-        chronology_df = chronology_data[1]
-        tc_indicator = chronology_data[2]
-        fig = chronology_data[0]
-
+        interview_heatmap = heatmap_interview(ohtm_file=ohtm_file, interview_id=interview_id, return_fig=True,
+                                              show_fig=False, heatmap_filter=heatmap_filter,)
+        fig = interview_heatmap[0]
+        interview_heatmap_df = interview_heatmap[1]
+        tc_indicator = interview_heatmap[2]
         if ctx.triggered[0]["prop_id"] == "heat_map.clickData":
             titel = "Interview chronology " + interview_id
         elif ctx.triggered[0]["prop_id"] == "interview_manual_id.value":
             titel = "Interview chronology " + interview_id
         else:
-            if "mark" in heatmap_filter:
-                if tc_indicator:
-
-                    row_index_clicked = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == clickData_2["points"][0]["x"]].index[0])
-                    chunk_number_clicked = chronology_df.loc[row_index_clicked]["ind"]
-
-                    if chunk_number_clicked == 0:
-                        row_index = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked].index[0])
-                        time_id = chronology_df.loc[row_index]["minute"]
-                        row_index_after = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked + 1].index[0])
-                        time_id_after = chronology_df.loc[row_index_after]["minute"]
-
-                        x_1 = (time_id + time_id_after) / 2
-                        x_0 = x_1 - time_id
-
-
-                    elif chunk_number_clicked == chronology_df["ind"][chronology_df.index[-1]]:
-                        row_index = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked].index[0])
-                        time_id = chronology_df.loc[row_index]["minute"]
-                        row_index_before = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked - 1].index[0])
-                        time_id_before = chronology_df.loc[row_index_before]["minute"]
-
-                        x_0 = (time_id + time_id_before) / 2
-                        x_1 = time_id + (time_id - x_0)
-
-                    else:
-                        row_index = chronology_df.index.get_loc(
-                        chronology_df[chronology_df["ind"] == chunk_number_clicked].index[0])
-                        time_id = chronology_df.loc[row_index]["minute"]
-                        row_index_before = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked - 1].index[0])
-                        time_id_before = chronology_df.loc[row_index_before]["minute"]
-                        row_index_after = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_clicked + 1].index[0])
-                        time_id_after = chronology_df.loc[row_index_after]["minute"]
-
-                        x_0 = (time_id + time_id_before) / 2
-                        x_1 = (time_id + time_id_after) / 2
-
-                else:
-                    x_0 = clickData_2["points"][0]["x"]-0.5
-                    x_1 = clickData_2["points"][0]["x"]+0.5
-
-                if ctx.triggered[0]["prop_id"] == "chunk_number_frontpage.data":
-                    if tc_indicator:
-
-                        if chunk_number_storage == 0:
-                            row_index = chronology_df.index.get_loc(
-                                chronology_df[chronology_df["ind"] == chunk_number_storage].index[0])
-                            time_id = chronology_df.loc[row_index]["minute"]
-                            row_index_after = chronology_df.index.get_loc(
-                                chronology_df[chronology_df["ind"] == chunk_number_storage + 1].index[0])
-                            time_id_after = chronology_df.loc[row_index_after]["minute"]
-
-                            x_1 = (time_id + time_id_after) / 2
-                            x_0 = x_1 - time_id
-
-
-                        elif chunk_number_storage == chronology_df["ind"][chronology_df.index[-1]]:
-                            row_index = chronology_df.index.get_loc(
-                                chronology_df[chronology_df["ind"] == chunk_number_storage].index[0])
-                            time_id = chronology_df.loc[row_index]["minute"]
-                            row_index_before = chronology_df.index.get_loc(
-                                chronology_df[chronology_df["ind"] == chunk_number_storage - 1].index[0])
-                            time_id_before = chronology_df.loc[row_index_before]["minute"]
-
-                            x_0 = (time_id + time_id_before) / 2
-                            x_1 = time_id + (time_id - x_0)
-
-                        else:
-
-                            row_index = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage].index[0])
-                            time_id = chronology_df.loc[row_index]["minute"]
-                            row_index_before = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage-1].index[0])
-                            time_id_before = chronology_df.loc[row_index_before]["minute"]
-                            row_index_after = chronology_df.index.get_loc(chronology_df[chronology_df["ind"] == chunk_number_storage+1].index[0])
-                            time_id_after = chronology_df.loc[row_index_after]["minute"]
-
-                            x_0 = (time_id+time_id_before)/2
-                            x_1 = (time_id+time_id_after)/2
-
-                    else:
-                        x_0 = chunk_number_storage - 0.5
-                        x_1 = chunk_number_storage + 0.5
-
-
+            if "marker" in heatmap_filter:
+                marker = heatmap_marker_creation_normal(clickData_2, chunk_number_storage)
                 fig.add_vrect(
-                    x0=x_0, x1=x_1,
+                    x0=marker[0], x1=marker[1],
                     fillcolor="LightSalmon", opacity=0.3,
                     layer="above", line_width=1,)
-
             titel = "Interview chronology " + interview_id
-
         return fig, titel
 
-
-    # Ausgabe der Raw-Sätze des Chunks
+# Ausgabe der Raw-Sätze des Chunks
     @app.callback(
         Output(component_id='textarea', component_property='children'),
         Output("sent_titel", "children"),
@@ -604,62 +522,36 @@ def ohd_dash(top_dic):
         State("chunk_number_frontpage", "data"),
         prevent_initial_call=True
     )
-    def sent_drawing(clickData, input_before, input_next, chunk_number):
+    def sent_drawing_dash(clickData, input_before, input_next, chunk_number):
+        sent = chunk_sent_drawing(ohtm_file=ohtm_file,
+                                  click_data_input=clickData,
+                                  chunk_number=chunk_number,
+                                  interview_id=interview_id,
+                                  chronology_df="",
+                                  tc_indicator=False)
 
-        if ctx.triggered[0]["prop_id"] == "+_button_frontpage.n_clicks":
-            chunk_id = chunk_number +1
-        elif ctx.triggered[0]["prop_id"] == "-_button_frontpage.n_clicks":
-            chunk_id = chunk_number -1
-        else:
+        chunk_sent = sent[0]
+        sent_id = sent[1]
+        chunk_id = sent[2]
+        return chunk_sent, sent_id, chunk_id
 
-            if tc_indicator:
-                time_id = clickData["points"][0]["x"]
-                row_index = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == time_id].index[0]) # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
-                chunk_id = chronology_df.loc[row_index]["ind"] # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
-            else:
-                chunk_id = clickData["points"][0]["x"]
-
-        sent_example = []
-        speaker = "None"
-        for a in top_dic["corpus"][interview_id[0:3]][interview_id]["sent"]:
-            if top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["chunk"] == int(chunk_id):
-                if speaker == top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"]:
-                    sent_example.append(top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["raw"] + ". ")
-                else:
-                    sent_example.append("\n" + "*" + top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"] + "*: ")
-                    sent_example.append(top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["raw"] + ". ")
-                    speaker = top_dic["corpus"][interview_id[0:3]][interview_id]["sent"][a]["speaker"]
-
-        sent_id = "Chunk: " + str(chunk_id)
-        return sent_example, sent_id, chunk_id
-
-
-    # Balkendiagramm auf der ersten Seite
-    @app.callback(
-        Output(component_id="bar", component_property="figure"),
-        Input("top_dic", "data2"),
-    )
-    def bar_map(data2):
-        fig = bar_graph_corpus(top_dic, show_fig = False, return_fig = True)
-        return fig
-
-    # Balkendiagramm auf der dritten Seite
+# Balkendiagramm auf der dritten Seite
     @app.callback(
         Output(component_id="bar2", component_property="figure"),
         Input("top_dic2", "data2"),
-
     )
     def bar_map2(data2):
-        fig = bar_graph_corpus(top_dic, show_fig = False, return_fig = True)
+        fig = bar_graph_corpus(ohtm_file, show_fig=False, return_fig=True)
         return fig
 
+# Function to identifie which topic is clicked in any graph. The information is than returned and the first words
+# of this topic are printed in the topic field.
     @app.callback(
         Output("heatmap_interview_topic_nr", "data"),
         Input("heat_map_interview", "clickData"),
         prevent_initial_call=True
     )
     def gloabl_topic_nr_update(clickData):
-
         topic = clickData["points"][0]["y"]
         return topic
 
@@ -669,7 +561,6 @@ def ohd_dash(top_dic):
         prevent_initial_call=True
     )
     def gloabl_topic_nr_update(clickData):
-
         topic = clickData["points"][0]["y"]
         return topic
 
@@ -679,7 +570,6 @@ def ohd_dash(top_dic):
         prevent_initial_call=True
     )
     def gloabl_topic_nr_update(clickData):
-
         topic = clickData["points"][0]["x"]
         return topic
 
@@ -688,22 +578,18 @@ def ohd_dash(top_dic):
         Input("bar2", "clickData"),
     )
     def gloabl_topic_nr_update(clickData):
-
         topic = clickData["points"][0]["x"]
         return topic
 
     @app.callback(
         Output("heatmap_corpus_topic_nr", "data"),
         Input("heat_map", "clickData"),
-
     )
     def gloabl_topic_nr_update(clickData):
-
         topic = clickData["points"][0]["x"]
         return topic
 
-
-    # Ausgabe der ersten 50 Worte des ausgewählten Topics von jedem Graphen bei Click oder manueller Eingabe
+# Ausgabe der ersten 50 Worte des ausgewählten Topics von jedem Graphen bei Click oder manueller Eingabe
     @app.callback(
         Output("topics", "children"),
         Input("input", "value"),
@@ -713,22 +599,20 @@ def ohd_dash(top_dic):
         Input("bar_detail_topic_nr", "data"),
         Input("heatmap_corpus_topic_nr", "data"),
         prevent_initial_call=True
-
     )
     def df_input(value1, value2, value3, value4, value5, value6):
-
         topic_value = ctx.triggered[0]["value"]
-        entry = top_words(topic_value, top_dic)
-
+        entry = top_words(topic_value, ohtm_file)
         return entry
 
+# Print the topics on the single_bar_side
     @app.callback(
         Output("topics1", "children"),
         Input("input1", "value"),
         prevent_initial_call=True
     )
     def df_input(value):
-        entry = top_words(value, top_dic)
+        entry = top_words(value, ohtm_file)
         return entry
 
     @app.callback(
@@ -737,7 +621,7 @@ def ohd_dash(top_dic):
         prevent_initial_call=True
     )
     def df_input(value):
-        entry = top_words(value, top_dic)
+        entry = top_words(value, ohtm_file)
         return entry
 
     @app.callback(
@@ -746,10 +630,10 @@ def ohd_dash(top_dic):
         prevent_initial_call=True
     )
     def df_input(value):
-        entry = top_words(value, top_dic)
+        entry = top_words(value, ohtm_file)
         return entry
 
-    # Durchsuchung alles Chunks nach den größten weights für ein bestimmtes Topic
+# Durchsuchung alles Chunks nach den größten weights für ein bestimmtes Topic
     @app.callback(
         Output("table-container", "children"),
         Input("topic_print", "value"),
@@ -763,9 +647,7 @@ def ohd_dash(top_dic):
         Input('topic_c_4', "value"),
 
     )
-
-    def weight_print(topic_print, weight_print, n_clicks, interview_id,text_search_options, t_1, t_2, t_3, t_4):
-
+    def weight_print(topic_print, weight_print, n_clicks, interview_id, text_search_options, t_1, t_2, t_3, t_4):
         if ctx.triggered[0]["prop_id"] == "enter_print.n_clicks":
             if text_search_options == "2":
                 sent_final = []
@@ -773,16 +655,16 @@ def ohd_dash(top_dic):
                 chunk = weight_print
                 a = interview_id[:3]
                 i = interview_id
-                for chunks in top_dic["weight"][a][i]:
-                    if str(top_dic["weight"][a][i][chunks][str(topic)]) >= str(chunk):
+                for chunks in ohtm_file["weight"][a][i]:
+                    if str(ohtm_file["weight"][a][i][chunks][str(topic)]) >= str(chunk):
                         chunk_id = chunks
                         sent_current = []
-                        for sents in top_dic["corpus"][a][i]["sent"]:
-                            int_sent = copy.deepcopy(top_dic["corpus"][a][i]["sent"][sents]["chunk"])
+                        for sents in ohtm_file["corpus"][a][i]["sent"]:
+                            int_sent = copy.deepcopy(ohtm_file["corpus"][a][i]["sent"][sents]["chunk"])
                             if int(int_sent) == int(chunks):
-                                sent_current.append(str(top_dic["corpus"][a][i]["sent"][sents]["raw"]) + " ")
+                                sent_current.append(str(ohtm_file["corpus"][a][i]["sent"][sents]["raw"]) + " ")
                         sent_current = " ".join(sent_current)
-                        sent_current_2 = (str(top_dic["weight"][a][i][chunks][str(topic)]), i, chunk_id, sent_current)
+                        sent_current_2 = (str(ohtm_file["weight"][a][i][chunks][str(topic)]), i, chunk_id, sent_current)
                         sent_final.append(sent_current_2)
                 sent_final.sort(reverse=True)
                 df = pd.DataFrame(sent_final)
@@ -794,26 +676,24 @@ def ohd_dash(top_dic):
                 table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="dark",
                                                  responsive=True, )
                 return table
-
-
             if text_search_options == "1":
                 sent_final = []
                 topic = topic_print
                 chunk = weight_print
-                for a in top_dic["weight"]:
-                    for i in top_dic["weight"][a]:
-                        for chunks in top_dic["weight"][a][i]:
-                            if str(top_dic["weight"][a][i][chunks][str(topic)]) >= str(chunk):
+                for a in ohtm_file["weight"]:
+                    for i in ohtm_file["weight"][a]:
+                        for chunks in ohtm_file["weight"][a][i]:
+                            if str(ohtm_file["weight"][a][i][chunks][str(topic)]) >= str(chunk):
                                 sent_id = i
                                 chunk_id = chunks
                                 sent_current = []
 
-                                for sents in top_dic["corpus"][a][i]["sent"]:
-                                    int_sent = copy.deepcopy(top_dic["corpus"][a][i]["sent"][sents]["chunk"])
+                                for sents in ohtm_file["corpus"][a][i]["sent"]:
+                                    int_sent = copy.deepcopy(ohtm_file["corpus"][a][i]["sent"][sents]["chunk"])
                                     if int(int_sent) == int(chunks):
-                                        sent_current.append(str(top_dic["corpus"][a][i]["sent"][sents]["raw"]) + " ")
+                                        sent_current.append(str(ohtm_file["corpus"][a][i]["sent"][sents]["raw"]) + " ")
                                 sent_current = " ".join(sent_current)
-                                sent_current_2 = (str(top_dic["weight"][a][i][chunks][str(topic)]),sent_id,chunk_id, sent_current)
+                                sent_current_2 = (str(ohtm_file["weight"][a][i][chunks][str(topic)]), sent_id, chunk_id, sent_current)
                                 sent_final.append(sent_current_2)
                 sent_final.sort(reverse=True)
                 df = pd.DataFrame(sent_final)
@@ -828,7 +708,7 @@ def ohd_dash(top_dic):
 
             if text_search_options == "3":
 
-                a = global_vertical_correlation_search_json(top_dic, t1=t_1, t2=t_2, t3 =t_3, t4 = t_4, return_search=True)
+                a = global_vertical_correlation_search_json(ohtm_file, t1=t_1, t2=t_2, t3 =t_3, t4 = t_4, return_search=True)
                 df = pd.DataFrame(a)
                 df.columns = ["Interview", "Chunk Nr"]
                 table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="dark",
@@ -837,22 +717,14 @@ def ohd_dash(top_dic):
 
             if text_search_options == "4":
 
-                a = global_horizontal_correlation_search_json(top_dic, t1=t_1, t2=t_2, return_search=True)
+                a = global_horizontal_correlation_search_json(ohtm_file, t1=t_1, t2=t_2, return_search=True)
                 df = pd.DataFrame(a)
                 df.columns = ["Interview", "Chunk Nr"]
                 table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="dark",
                                                  responsive=True, )
                 return table
 
-
-
-
-    # Heatmap Chronology Heatmap Detail
-
-
-    # Chronologie Heatmap
-
-
+# Heatmap Chronology Heatmap Detail     # Chronologie Heatmap
     @app.callback(
         Output(component_id='heat_map_interview_detail', component_property='figure'),
         Output("interview_title_detail", "children"),
@@ -864,130 +736,36 @@ def ohd_dash(top_dic):
         Input("chunk_number_detail", "data"),
 
     )
-    def interview_heat_map(interview_manual_id, heatmap_filter, top_filter_th, outlier_th,clickData_2, chunk_number_storage):
+    def interview_heat_map_dash(interview_manual_id, heatmap_filter, top_filter_th, outlier_th, clickData_2, chunk_number_storage):
         global chronology_df_detail
         global tc_indicator_detail
         global interview_id_detail
 
-
-        if "filter" in heatmap_filter:
-            topic_filtering = True
-        else: topic_filtering = False
-
-        if "z_score" in heatmap_filter:
-            z_score = True
-        else: z_score = False
-
-        if top_filter_th == None:
-            top_filter_th = 0.01
-        if outlier_th == None:
-            outlier_th = 0.02
+        # if top_filter_th == None:
+        #     top_filter_th = 0.01
+        # if outlier_th == None:
+        #     outlier_th = 0.02
 
         interview_id_detail = interview_manual_id
-
-        chronology_data = chronology_matrix(top_dic, interview_id_detail, return_fig=True, print_fig=False, z_score = z_score, topic_filter = topic_filtering, threshold_top_filter=top_filter_th, outlier_threshold=outlier_th)
+        chronology_data = heatmap_interview(ohtm_file=ohtm_file, interview_id=interview_id_detail, return_fig=True,
+                                            show_fig=False, heatmap_filter=heatmap_filter,)
         chronology_df_detail = chronology_data[1]
-        tc_indicator_detail = chronology_data[2]
+        tc_indicator_detail = False
         fig = chronology_data[0]
 
         if ctx.triggered[0]["prop_id"] == "interview_manual_id_detail.value":
             titel = "Interview chronology " + interview_id_detail
         else:
-            if "mark" in heatmap_filter:
-                if tc_indicator_detail:
-
-                    row_index_clicked = chronology_df_detail.index.get_loc(chronology_df_detail[chronology_df_detail["minute"] == clickData_2["points"][0]["x"]].index[0])
-                    chunk_number_clicked = chronology_df_detail.loc[row_index_clicked]["ind"]
-
-                    if chunk_number_clicked == 0:
-                        row_index = chronology_df_detail.index.get_loc(chronology_df_detail[chronology_df_detail["ind"] == chunk_number_clicked].index[0])
-                        time_id = chronology_df_detail.loc[row_index]["minute"]
-                        row_index_after = chronology_df_detail.index.get_loc(chronology_df_detail[chronology_df_detail["ind"] == chunk_number_clicked + 1].index[0])
-                        time_id_after = chronology_df_detail.loc[row_index_after]["minute"]
-
-                        x_1 = (time_id + time_id_after) / 2
-                        x_0 = x_1 - time_id
-
-
-                    elif chunk_number_clicked == chronology_df_detail["ind"][chronology_df_detail.index[-1]]:
-                        row_index = chronology_df_detail.index.get_loc(chronology_df_detail[chronology_df_detail["ind"] == chunk_number_clicked].index[0])
-                        time_id = chronology_df_detail.loc[row_index]["minute"]
-                        row_index_before = chronology_df_detail.index.get_loc(chronology_df_detail[chronology_df_detail["ind"] == chunk_number_clicked - 1].index[0])
-                        time_id_before = chronology_df_detail.loc[row_index_before]["minute"]
-
-                        x_0 = (time_id + time_id_before) / 2
-                        x_1 = time_id + (time_id - x_0)
-
-                    else:
-                        row_index = chronology_df_detail.index.get_loc(
-                        chronology_df_detail[chronology_df_detail["ind"] == chunk_number_clicked].index[0])
-                        time_id = chronology_df_detail.loc[row_index]["minute"]
-                        row_index_before = chronology_df_detail.index.get_loc(chronology_df_detail[chronology_df_detail["ind"] == chunk_number_clicked - 1].index[0])
-                        time_id_before = chronology_df_detail.loc[row_index_before]["minute"]
-                        row_index_after = chronology_df_detail.index.get_loc(chronology_df_detail[chronology_df_detail["ind"] == chunk_number_clicked + 1].index[0])
-                        time_id_after = chronology_df_detail.loc[row_index_after]["minute"]
-
-                        x_0 = (time_id + time_id_before) / 2
-                        x_1 = (time_id + time_id_after) / 2
-
-                else:
-                    x_0 = clickData_2["points"][0]["x"]-0.5
-                    x_1 = clickData_2["points"][0]["x"]+0.5
-
-                if ctx.triggered[0]["prop_id"] == "chunk_number_detail.data":
-                    if tc_indicator_detail:
-
-                        if chunk_number_storage == 0:
-                            row_index = chronology_df_detail.index.get_loc(
-                                chronology_df_detail[chronology_df_detail["ind"] == chunk_number_storage].index[0])
-                            time_id = chronology_df_detail.loc[row_index]["minute"]
-                            row_index_after = chronology_df_detail.index.get_loc(
-                                chronology_df_detail[chronology_df_detail["ind"] == chunk_number_storage + 1].index[0])
-                            time_id_after = chronology_df_detail.loc[row_index_after]["minute"]
-
-                            x_1 = (time_id + time_id_after) / 2
-                            x_0 = x_1 - time_id
-
-
-                        elif chunk_number_storage == chronology_df_detail["ind"][chronology_df_detail.index[-1]]:
-                            print("last")
-                            row_index = chronology_df_detail.index.get_loc(
-                                chronology_df_detail[chronology_df_detail["ind"] == chunk_number_storage].index[0])
-                            time_id = chronology_df_detail.loc[row_index]["minute"]
-                            row_index_before = chronology_df_detail.index.get_loc(
-                                chronology_df_detail[chronology_df_detail["ind"] == chunk_number_storage - 1].index[0])
-                            time_id_before = chronology_df_detail.loc[row_index_before]["minute"]
-
-                            x_0 = (time_id + time_id_before) / 2
-                            x_1 = time_id + (time_id - x_0)
-
-                        else:
-
-                            row_index = chronology_df_detail.index.get_loc(chronology_df_detail[chronology_df_detail["ind"] == chunk_number_storage].index[0])
-                            time_id = chronology_df_detail.loc[row_index]["minute"]
-                            row_index_before = chronology_df_detail.index.get_loc(chronology_df_detail[chronology_df_detail["ind"] == chunk_number_storage-1].index[0])
-                            time_id_before = chronology_df_detail.loc[row_index_before]["minute"]
-                            row_index_after = chronology_df_detail.index.get_loc(chronology_df_detail[chronology_df_detail["ind"] == chunk_number_storage+1].index[0])
-                            time_id_after = chronology_df_detail.loc[row_index_after]["minute"]
-
-                            x_0 = (time_id+time_id_before)/2
-                            x_1 = (time_id+time_id_after)/2
-
-                    else:
-                        x_0 = chunk_number_storage - 0.5
-                        x_1 = chunk_number_storage + 0.5
-
-
+            if "marker" in heatmap_filter:
+                marker = heatmap_marker_creation_normal(clickData_2, chunk_number_storage)
                 fig.add_vrect(
-                    x0=x_0, x1=x_1,
+                    x0=marker[0], x1=marker[1],
                     fillcolor="LightSalmon", opacity=0.3,
                     layer="above", line_width=1,)
 
             titel = "Interview chronology " + interview_id_detail
 
         return fig, titel
-
-
 
     # Print der einzelnen Sätze des ausgewählten Chunks
     @app.callback(
@@ -998,99 +776,51 @@ def ohd_dash(top_dic):
         Input("-_button_detail", "n_clicks"),
         Input("+_button_detail", "n_clicks"),
         State("chunk_number_detail", "data"),
-
+        State("interview_manual_id_detail", "value")
     )
-    def sent_drawing_detail(clickData, input_before, input_next, chunk_number):
-        if ctx.triggered[0]["prop_id"] == "+_button_detail.n_clicks":
-            chunk_id = chunk_number +1
-        elif ctx.triggered[0]["prop_id"] == "-_button_detail.n_clicks":
-            chunk_id = chunk_number -1
-        else:
-            if tc_indicator_detail:
-                time_id = clickData["points"][0]["x"]
-                row_index = chronology_df_detail.index.get_loc(chronology_df_detail[chronology_df_detail["minute"] == time_id].index[0]) # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
-                chunk_id = chronology_df_detail.loc[row_index]["ind"] # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
-            else:
-                chunk_id = clickData["points"][0]["x"]
+    def sent_drawing_detail_dash(click_data, input_before, input_next, chunk_number, interview_manual_id_detail):
+        sent_chunk_drawing_heatmap_detail = chunk_sent_drawing(ohtm_file=ohtm_file,
+                                                               click_data_input=click_data,
+                                                               chunk_number=chunk_number,
+                                                               interview_id=interview_manual_id_detail,
+                                                               chronology_df="",
+                                                               tc_indicator=False
+                                                               )
+        chunk_sent = sent_chunk_drawing_heatmap_detail[0]
+        sent_id = sent_chunk_drawing_heatmap_detail[1]
+        chunk_id = sent_chunk_drawing_heatmap_detail[2]
 
-        sent_example = []
-        speaker = "None"
-        for a in top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"]:
-            if top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["chunk"] == int(chunk_id):
-                if speaker == top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["speaker"]:
-                    sent_example.append(top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["raw"] + ". ")
-                else:
-                    sent_example.append("\n" + "*" + top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["speaker"] + "*: ")
-                    sent_example.append(top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["raw"] + ". ")
-                    speaker = top_dic["corpus"][interview_id_detail[0:3]][interview_id_detail]["sent"][a]["speaker"]
+        return chunk_sent, sent_id, chunk_id
 
-        sent_id = "Chunk: " + str(int(chunk_id))
-
-        return sent_example, sent_id, chunk_id
-
+# Ausgabe der Topic-Listen auf Seite 4
     @app.callback(
         Output("topic_table", "children"),
         Input("word_number", "value"),
         Input("enter_print_topics", "n_clicks"),
     )
-    def print_all_topics(words, nClicks):
-        if ctx.triggered[0]["prop_id"] == "enter_print_topics.n_clicks":
-            number_of_words = words
-            data=[]
-            for topic in top_dic["words"]:
-                data_topic = []
-                out_line = []
-                for i in range(number_of_words):
-                    out_line.append((top_dic["words"][topic])[i][1] + ", ")
-                data_topic =(topic, out_line)
-                data.append(data_topic)
+    def print_all_topics_dash(words, nClicks):
+        table = print_all_topics(words, nClicks, ohtm_file)
+        return table
 
-            df = pd.DataFrame(data)
-            df.columns = ["Topic", "Words"]
-            table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="dark", responsive=True, )
-
-            return table
-
-    @app.callback(
-        Output("correlation_output", "children"),
-        Input("correlation_switch", "value"),
-        Input("gross_nr_correlations_per_chunk_pagination", "active_page")
-    )
-    def print_top_correlation(switch, gross_nr_correlations_per_chunk):
-        if switch == 1:
-            data = top_global_correlations_json(top_dic, 30, horizontal=True, gross_nr_correlations_per_chunk = gross_nr_correlations_per_chunk)
-            return_data = []
-            for line in data:
-                return_data.append(str(line) + "\n")
-            return return_data
-        if switch == 2:
-            data = top_global_correlations_json(top_dic, 30, vertical=True, gross_nr_correlations_per_chunk= gross_nr_correlations_per_chunk)
-            return_data = []
-            for line in data:
-                return_data.append(str(line) + "\n")
-            return return_data
-
-    @app.callback(
-        Output("slct_archiv", "options"),
-        Input("top_dic", "data2")
-    )
-    def creat_global_dropdown(data2):
-        print("worked")
-        drop_down_menu = []
-        for archives in top_dic["corpus"]:
-            a = {"label": archives, "value": archives}
-            drop_down_menu.append(a)
-
-        drop_down_menu.append({"label": "Gesamtkorpus", "value": "all"})
-        return drop_down_menu
-
+    # @app.callback(
+    #     Output("correlation_output", "children"),
+    #     Input("correlation_switch", "value"),
+    #     Input("gross_nr_correlations_per_chunk_pagination", "active_page")
+    # )
+    # def print_top_correlation_dash(switch, gross_nr_correlations_per_chunk):
+    #     if switch == 1:
+    #         data = top_global_correlations_json(ohtm_file, 30, horizontal=True, gross_nr_correlations_per_chunk = gross_nr_correlations_per_chunk)
+    #         return_data = []
+    #         for line in data:
+    #             return_data.append(str(line) + "\n")
+    #         return return_data
+    #     if switch == 2:
+    #         data = top_global_correlations_json(ohtm_file, 30, vertical=True, gross_nr_correlations_per_chunk= gross_nr_correlations_per_chunk)
+    #         return_data = []
+    #         for line in data:
+    #             return_data.append(str(line) + "\n")
+    #         return return_data
 
     app.run_server(debug=False, port=3002)
 
-if __name__ == '__main__':
-    load_file_name = "ohd_complete_infertest_inferred.json"
-    # load_file_name = "OHD_auswahl_pre_150c_80t"
 
-    with open(file_workingfolder + load_file_name) as f:
-        top_dic = json.load(f)
-    ohd_dash(top_dic)
