@@ -9,5 +9,5 @@ def create_dropdown_list(ohtm_file):
         a = {"label": archives, "value": archives}
         drop_down_list.append(a)
 
-    drop_down_list.append({"label": "Gesamtkorpus", "value": "all"})
+    drop_down_list.append({"label": "Corpus", "value": "all"})
     return drop_down_list

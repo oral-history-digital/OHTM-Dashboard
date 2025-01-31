@@ -1,6 +1,6 @@
 import pandas as pd
 import plotly_express as px
-from ohtm_pipeline.ohtm.basic_functions.convert_ohtm_file import convert_ohtm_file
+from functions.basic_functions.convert_ohtm_file import convert_ohtm_file
 
 
 def bar_graph_corpus(ohtm_file, show_fig: bool = True, return_fig: bool = False):
@@ -36,7 +36,7 @@ def bar_graph_corpus(ohtm_file, show_fig: bool = True, return_fig: bool = False)
                     else:
                         bar_dic[archive].update({t: bar_dic[archive][t] + interview_dic[archive][interview][t]})
             for entry in bar_dic[archive]:
-                bar_dic[archive].update({entry: bar_dic[archive][entry] / count})
+                bar_dic[archive].update({entry: bar_dic[archive][entry]})
 
         df = pd.DataFrame.from_dict(bar_dic)
 

@@ -18,7 +18,11 @@ def heatmap_marker_creation_normal(clickData_2, chunk_number_storage):
     return x_0, x_1
 
 
-def heatmap_marker_creation_chronic(chronology_df_detail, heatmap_filter, tc_indicator_detail, clickData_2, chunk_number_storage):
+def heatmap_marker_creation_chronic(chronology_df_detail,
+                                    heatmap_filter,
+                                    tc_indicator_detail,
+                                    clickData_2,
+                                    chunk_number_storage):
     if "mark" in heatmap_filter:
         if tc_indicator_detail:
 

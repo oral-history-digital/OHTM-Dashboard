@@ -1,7 +1,7 @@
 from builtins import print
 import pandas as pd
 import plotly_express as px
-from ohtm_dash.functions.basic_functions.convert_ohtm_file import convert_ohtm_file
+from functions.basic_functions.convert_ohtm_file import convert_ohtm_file
 
 
 def heatmap_corpus(ohtm_file, option_selected: str = "all",
@@ -13,6 +13,8 @@ def heatmap_corpus(ohtm_file, option_selected: str = "all",
         z_score = True
     else:
         z_score = False
+    if option_selected == "None":
+        option_selected ="all"
 
     if ohtm_file["settings"]["topic_modeling"]["trained"] == "True":
         if option_selected == "all":
@@ -57,7 +59,7 @@ def heatmap_corpus(ohtm_file, option_selected: str = "all",
             z_scores = ((df - mean) / std_dev)
             df = z_scores
 
-        df = df.swapaxes("index", "columns")
+        df = df.transpose()
         fig = px.imshow(df, color_continuous_scale='dense', aspect='auto')
         fig.update_traces(hovertemplate="Interview: %{y}" "<br>Topic: %{x}" "<br>Weight: %{z}<extra></extra>")
         fig.update_layout(clickmode='event+select')
@@ -80,44 +82,79 @@ improved. (17.1.2025)
 
 
 """
+from functions.graph_functions.heatmap_marker import heatmap_marker_creation_normal
+from dash import no_update
 
 
-def heatmap_interview(ohtm_file, interview_id: str = "", show_fig: bool = True,
-                      return_fig: bool = False, heatmap_filter: list = ""):
-    ohtm_file = convert_ohtm_file(ohtm_file)
-    tc_indictator = False
-    if "z_score" in heatmap_filter:
-        z_score = True
+def heatmap_interview_simple(ohtm_file,
+                             click_data,
+                             click_data_2,
+                             ctx_triggered,
+                             chunk_number_storage,
+                             heatmap_filter: list = "",
+                             interview_manual_id: str = "",
+                             ):
+    interview_id = None
+    if click_data == "off":
+        interview_id = interview_manual_id
     else:
-        z_score = False
-    if ohtm_file["settings"]["topic_modeling"]["trained"] == "True":
-        dff = {}
-        for archive in ohtm_file["weight"]:
-            if interview_id in ohtm_file["weight"][archive]:
-                for chunks in ohtm_file["weight"][archive][interview_id]:
-                    dff[chunks] = ohtm_file["weight"][archive][interview_id][chunks]
+        if interview_manual_id is not None:
+            interview_id = interview_manual_id
+            if interview_manual_id == '':
+                interview_id = click_data["points"][0]["y"]
+        else:
+            if click_data is not None:
+                interview_id = click_data["points"][0]["y"]
+    if interview_id is not None:
+        tc_indicator = False
+        ohtm_file = convert_ohtm_file(ohtm_file)
+        if "z_score" in heatmap_filter:
+            z_score = True
+        else:
+            z_score = False
+        if ohtm_file["settings"]["topic_modeling"]["trained"] == "True":
+            dff = {}
+            for archive in ohtm_file["weight"]:
+                if interview_id in ohtm_file["weight"][archive]:
+                    for chunks in ohtm_file["weight"][archive][interview_id]:
+                        dff[chunks] = ohtm_file["weight"][archive][interview_id][chunks]
 
-        df = pd.DataFrame.from_dict(dff)
-        df.index = pd.to_numeric(df.index)
-
-        # Berechnung der z-Standardisierung
-        if z_score:
-            mean = df.mean()
-            std_dev = df.std()
-            z_scores = ((df - mean)/std_dev)
-            df = z_scores
+            df = pd.DataFrame.from_dict(dff)
             df.index = pd.to_numeric(df.index)
 
-        fig = px.imshow(df, color_continuous_scale='dense')
-        fig.update_traces(hovertemplate="Chunk: %{x}" "<br>Topic: %{y}" "<br>Weight: %{z}<extra></extra>")
-        fig.update_traces(showlegend=False)
-        fig.update_traces(showscale=False)
-        fig.update(layout_coloraxis_showscale=False)
-        fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
-        if show_fig:
-            fig.show()
-        if return_fig:
-            return fig, df, tc_indictator
+            # Berechnung der z-Standardisierung
+            if z_score:
+                mean = df.mean()
+                std_dev = df.std()
+                z_scores = ((df - mean)/std_dev)
+                df = z_scores
+                df.index = pd.to_numeric(df.index)
 
+            fig = px.imshow(df, color_continuous_scale='dense')
+            fig.update_traces(hovertemplate="Chunk: %{x}" "<br>Topic: %{y}" "<br>Weight: %{z}<extra></extra>")
+            fig.update_traces(showlegend=False)
+            fig.update_traces(showscale=False)
+            fig.update(layout_coloraxis_showscale=False)
+            fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+            if ctx_triggered[0]["prop_id"] == "heat_map.clickData":
+                title = "Interview " + interview_id
+            elif ctx_triggered[0]["prop_id"] == "interview_manual_id.value":
+                title = "Interview " + interview_id
+            elif ctx_triggered[0]["prop_id"] == "interview_manual_id_detail.value":
+                title = "Interview " + interview_manual_id
+            else:
+                if "marker" in heatmap_filter:
+                    marker = heatmap_marker_creation_normal(click_data_2, chunk_number_storage)
+                    fig.add_vrect(
+                        x0=marker[0], x1=marker[1],
+                        fillcolor="LightSalmon", opacity=0.3,
+                        layer="above", line_width=1, )
+                title = "Interview " + interview_id
+
+            df = df.to_json() # dash only can store json, so this df has to be converted
+            return fig, title, interview_id, chunk_number_storage, tc_indicator, df
+
+        else:
+            print("No Topic Model trained")
     else:
-        print("No Topic Model trained")
+        return no_update, no_update, no_update, no_update, no_update, no_update

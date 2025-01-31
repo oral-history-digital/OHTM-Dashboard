@@ -1,0 +1,5 @@
+seaborn
+dash
+dash-bootstrap-components
+base64
+

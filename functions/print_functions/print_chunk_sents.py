@@ -2,7 +2,7 @@
 This function prints alle the sents, that are in one chunk, including the speakers.
 """
 from dash import ctx
-
+import pandas as pd
 
 def chunk_sent_drawing(ohtm_file, click_data_input, chunk_number, interview_id, chronology_df, tc_indicator):
     if ctx.triggered[0]["prop_id"] == "+_button_frontpage.n_clicks":
@@ -14,16 +14,23 @@ def chunk_sent_drawing(ohtm_file, click_data_input, chunk_number, interview_id, 
     elif ctx.triggered[0]["prop_id"] == "-_button_detail.n_clicks":
         chunk_id = int(chunk_number) - 1
     else:
-        # if tc_indicator:
-        #     print("NO TC INDICATOR")
-        # time_id = clickData["points"][0]["x"]
-        # row_index = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == time_id].index[0])
-        # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige
-        # DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
-        # chunk_id = chronology_df.loc[row_index]["ind"]
-        # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
-        # else:
-        chunk_id = click_data_input["points"][0]["x"]
+        if tc_indicator:
+            chronology_df = pd.read_json(chronology_df, orient='records')
+            time_id = click_data_input["points"][0]["x"]
+            try:
+                row_index = chronology_df.index.get_loc(chronology_df[chronology_df["minute"] == time_id].index[0])
+            except IndexError:
+                # If due to rownding errors, the value is not found, we search for the next value near to the one.
+                closest_match = chronology_df.iloc[(chronology_df["minute"] - time_id).abs().argmin()].name
+                row_index = chronology_df.index.get_loc(closest_match)
+
+            # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige
+            # DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
+            chunk_id = chronology_df.loc[row_index]["ind"]
+            print(chunk_id)
+            # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
+        else:
+            chunk_id = click_data_input["points"][0]["x"]
 
     sent_example = []
     speaker = "None"
