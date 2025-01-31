@@ -26,7 +26,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
             image = f.read()
         return 'data:image/png;base64,' + base64.b64encode(image).decode('utf-8')
     if chronologie_analyse:
-        from interview_chronology_analysis.interview_chronology_analysis_dash import chronology_matrix
+        from interview_chronology_analysis.labels_interview_chronology_analysis_dash import chronology_matrix
 
 
     app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True,
@@ -763,7 +763,15 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
     def gloabl_topic_nr_update(click_data):
         if click_data != None:
             if chronologie_analyse:
-                topic = click_data["points"][0]["y"]
+                if "T" in click_data["points"][0]["y"]:
+                    try:
+                        topic = click_data["points"][0]["y"]
+                        topic = topic.split(" ")[1][1:]
+                    except KeyError:
+                        topic = click_data["points"][0]["y"]
+                        topic = topic.split(" ")[0]
+                else:
+                    topic = click_data["points"][0]["y"]
             else:
                 topic = click_data["points"][0]["x"]
             return topic
@@ -776,7 +784,15 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
     def gloabl_topic_nr_update(click_data):
         if click_data != None:
             if chronologie_analyse:
-                topic = click_data["points"][0]["y"]
+                if "T" in click_data["points"][0]["y"]:
+                    try:
+                        topic = click_data["points"][0]["y"]
+                        topic = topic.split(" ")[1][1:]
+                    except KeyError:
+                        topic = click_data["points"][0]["y"]
+                        topic = topic.split(" ")[0]
+                else:
+                    topic = click_data["points"][0]["y"]
             else:
                 topic = click_data["points"][0]["x"]
             return topic
@@ -847,6 +863,6 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
     #             return_data.append(str(line) + "\n")
     #         return return_data
 
-    app.run_server(debug=True, port=3002)
+    app.run_server(debug=False, port=3002)
 
 

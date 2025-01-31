@@ -27,7 +27,6 @@ def chunk_sent_drawing(ohtm_file, click_data_input, chunk_number, interview_id, 
             # die Information aus dem DF aus Chronology. Hier wird die Zeit und das zugehörige
             # DF gespeichert. Wir müssen zunächst den Index der Zeitangabe finden
             chunk_id = chronology_df.loc[row_index]["ind"]
-            print(chunk_id)
             # mit dem Index der Zeitangabe kann hier der Chunkwert ausgelesen werden und als chunk_id übergeben werden
         else:
             chunk_id = click_data_input["points"][0]["x"]
