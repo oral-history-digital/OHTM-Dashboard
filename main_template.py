@@ -15,5 +15,5 @@ if __name__ == '__main__':
     load_file_name = r"OHD_final_100c_100T_A5_remade.ohtm"
     with open(os.path.join(input_folder, load_file_name)) as f:
         top_dic = json.load(f)
-    chronologie_analyse=True
+    chronologie_analyse=False
     ohd_dash(top_dic,chronologie_analyse)
