@@ -33,7 +33,7 @@ def top_words(ohtm_file, top_dic):
     word_dic = {}
     for top_words in top_dic["words"]:
         out_line = []
-        for i in range(50):
+        for i in range(30):
             out_line.append((top_dic["words"][top_words])[i][1])
         word_dic[top_words] = out_line
 

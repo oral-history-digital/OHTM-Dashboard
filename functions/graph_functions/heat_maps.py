@@ -5,7 +5,9 @@ from functions.basic_functions.convert_ohtm_file import convert_ohtm_file
 
 
 def heatmap_corpus(ohtm_file, option_selected: str = "all",
-                   show_fig: bool = True, return_fig: bool = False, z_score_global: str = "True"):
+                   show_fig: bool = True, return_fig: bool = False, z_score_global: str = "True",
+                   topic_filter_number: int = 0, topic_filter_threshold: float = 0, topic_filter: str = "True"
+                   ):
 
     ohtm_file = convert_ohtm_file(ohtm_file)
 
@@ -13,6 +15,10 @@ def heatmap_corpus(ohtm_file, option_selected: str = "all",
         z_score = True
     else:
         z_score = False
+    if "topic_filter" in z_score_global:
+        topic_filter_value = True
+    else:
+        topic_filter_value = False
     if option_selected == "None":
         option_selected ="all"
 
@@ -33,7 +39,6 @@ def heatmap_corpus(ohtm_file, option_selected: str = "all",
                                     {t: heat_dic[interview][t] + ohtm_file["weight"][archive][interview][c][t]})
                     for entry in heat_dic[interview]:
                         heat_dic[interview].update({entry: heat_dic[interview][entry] / count})
-            df = pd.DataFrame.from_dict(heat_dic)
         else:
             archive = option_selected
             heat_dic = {}
@@ -51,8 +56,18 @@ def heatmap_corpus(ohtm_file, option_selected: str = "all",
                 for entry in heat_dic[interview]:
                     heat_dic[interview].update({entry: heat_dic[interview][entry] / count})
 
-            df = pd.DataFrame.from_dict(heat_dic)
 
+        if topic_filter_value:
+            heat_dic_2 = {}
+            for interview in heat_dic:
+                if str(heat_dic[interview][str(topic_filter_number)]) >= str(topic_filter_threshold):
+                    if "e" in str(heat_dic[interview][str(topic_filter_number)]):
+                        next
+                    else:
+                        heat_dic_2[interview] = heat_dic[interview]
+            heat_dic = heat_dic_2
+
+        df = pd.DataFrame.from_dict(heat_dic)
         if z_score:
             mean = df.mean()
             std_dev = df.std()
