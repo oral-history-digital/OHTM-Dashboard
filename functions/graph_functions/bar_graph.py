@@ -48,6 +48,10 @@ def bar_graph_corpus(ohtm_file, show_fig: bool = True, return_fig: bool = False)
 
         fig = px.bar(df, color_discrete_sequence=px.colors.qualitative.G10)
         fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+        fig.update_layout(
+            xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
+            yaxis_title=None  # Entfernt die Y-Achsenbeschriftung
+        )
         if show_fig:
             fig.show()
         if return_fig:
