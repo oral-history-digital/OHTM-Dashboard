@@ -1,11 +1,11 @@
-""" """
 
-import json
+"""
 
-import dash_bootstrap_components as dbc
-import pandas as pd
+"""
 from dash import ctx
-
+import pandas as pd
+import dash_bootstrap_components as dbc
+import json
 
 def print_all_topics(words, nClicks, ohtm_file):
     if ctx.triggered[0]["prop_id"] == "enter_print_topics.n_clicks":
@@ -20,14 +20,7 @@ def print_all_topics(words, nClicks, ohtm_file):
             data.append(data_topic)
         df = pd.DataFrame(data)
         df.columns = ["Topic", "Words"]
-        table = dbc.Table.from_dataframe(
-            df,
-            striped=True,
-            bordered=True,
-            hover=True,
-            color="light",
-            responsive=True,
-        )
+        table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, color="light", responsive=True, )
 
         return table
 
@@ -50,6 +43,6 @@ def top_words(ohtm_file, top_dic):
         for out in word_dic[entry]:
             line += out + ", "
         word_dic2[entry] = line
-    df1 = pd.DataFrame.from_dict(word_dic2, orient="index")
+    df1 = pd.DataFrame.from_dict(word_dic2, orient='index')
     df2 = df1.loc[str(ohtm_file)]
     return df2
