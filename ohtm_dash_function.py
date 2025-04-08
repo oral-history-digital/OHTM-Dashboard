@@ -2,32 +2,35 @@
 
 """
 import base64
+
 import dash
 import dash_bootstrap_components as dbc
-from dash import html
 from dash import ctx
-from dash import Dash, callback, dcc, dash_table, Input, Output, State, MATCH, ALL, no_update
+from dash import dcc, Input, Output, State, no_update
+from dash import html
+
 from functions.dash_board_functions.dropdown_list import create_dropdown_list
-from functions.print_functions.print_topics import print_all_topics
+from functions.graph_functions.bar_graph import bar_graph_corpus
+from functions.graph_functions.heat_maps import heatmap_corpus
+from functions.graph_functions.heat_maps import heatmap_interview_simple
 from functions.print_functions.print_chunk_sents import chunk_sent_drawing
 from functions.print_functions.print_topic_search import print_topic_search_weight
+from functions.print_functions.print_topics import print_all_topics
 from functions.print_functions.print_topics import top_words
-from functions.graph_functions.bar_graph import bar_graph_corpus
-from functions.graph_functions.heat_maps import  heatmap_corpus
-from functions.graph_functions.heat_maps import  heatmap_interview_simple
 
 global top_dic
 
 logo_image_filename = "dash_ohd_image.png"
 
-def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
+
+def ohd_dash(ohtm_file, chronologie_analyse: bool = False):
     def b64_image(logo_image_filename):
         with open(logo_image_filename, 'rb') as f:
             image = f.read()
         return 'data:image/png;base64,' + base64.b64encode(image).decode('utf-8')
+
     if chronologie_analyse:
         from interview_chronology_analysis.labels_interview_chronology_analysis_dash import chronology_matrix
-
 
     app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], suppress_callback_exceptions=True,
                     prevent_initial_callbacks=True)
@@ -54,134 +57,135 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
     sidebar = html.Div(
         [
             dbc.Container([
-            dcc.Store(id="top_dic", data="", storage_type="session"),
-            dcc.Store(id="heat_dic", data={}, storage_type="session"),
-            dcc.Store(id="top_dic2", data={}, storage_type="session"),
-            dcc.Store(id="data_path", storage_type="session"),
-            dcc.Store(id = "heatmap_interview_topic_nr", data = "", storage_type="session"),
-            dcc.Store(id="heatmap_interview_detail_topic_nr", data="", storage_type="session"),
-            dcc.Store(id="bar_topic_nr", data="", storage_type="session"),
-            dcc.Store(id="bar_detail_topic_nr", data="", storage_type="session"),
-            dcc.Store(id="heatmap_corpus_topic_nr", data="", storage_type="session"),
-            dcc.Store(id="heatmap_corpus_detail_topic_nr", data="", storage_type="session"),
-            dcc.Store(id="chunk_number_frontpage", data="", storage_type="session"),
-            dcc.Store(id="chunk_number_heatmap_interview", data="", storage_type="session"),
-            dcc.Store(id="chunk_number_chunk_sent_draw", data="", storage_type="session"),
-            dcc.Store(id="chunk_number_detail", data="", storage_type="session"),
-            dcc.Store(id="interview_id_storage", data="", storage_type="session"),
-            dcc.Store(id="interview_id_storage_detail", data="", storage_type="session"),
-            dcc.Store(id="tc_indicator_detail", data="", storage_type="session"),
-            dcc.Store(id="tc_indicator", data="", storage_type="session"),
-            dcc.Store(id="interview_heatmap_df", data="", storage_type="session"),
-            dcc.Store(id="interview_heatmap_df_detail", data="", storage_type="session"),
+                dcc.Store(id="top_dic", data="", storage_type="session"),
+                dcc.Store(id="heat_dic", data={}, storage_type="session"),
+                dcc.Store(id="top_dic2", data={}, storage_type="session"),
+                dcc.Store(id="data_path", storage_type="session"),
+                dcc.Store(id="heatmap_interview_topic_nr", data="", storage_type="session"),
+                dcc.Store(id="heatmap_interview_detail_topic_nr", data="", storage_type="session"),
+                dcc.Store(id="bar_topic_nr", data="", storage_type="session"),
+                dcc.Store(id="bar_detail_topic_nr", data="", storage_type="session"),
+                dcc.Store(id="heatmap_corpus_topic_nr", data="", storage_type="session"),
+                dcc.Store(id="heatmap_corpus_detail_topic_nr", data="", storage_type="session"),
+                dcc.Store(id="chunk_number_frontpage", data="", storage_type="session"),
+                dcc.Store(id="chunk_number_heatmap_interview", data="", storage_type="session"),
+                dcc.Store(id="chunk_number_chunk_sent_draw", data="", storage_type="session"),
+                dcc.Store(id="chunk_number_detail", data="", storage_type="session"),
+                dcc.Store(id="interview_id_storage", data="", storage_type="session"),
+                dcc.Store(id="interview_id_storage_detail", data="", storage_type="session"),
+                dcc.Store(id="tc_indicator_detail", data="", storage_type="session"),
+                dcc.Store(id="tc_indicator", data="", storage_type="session"),
+                dcc.Store(id="interview_heatmap_df", data="", storage_type="session"),
+                dcc.Store(id="interview_heatmap_df_detail", data="", storage_type="session"),
 
-            html.Img(src=b64_image(logo_image_filename), style={"max-width": "100%"}),
-            dbc.Row([], style={"height": "0.5vh"}),
-            dbc.Row(html.Hr()),
-            dbc.Row([
-                dbc.DropdownMenu(
-                    children=[
-                        dbc.DropdownMenuItem("Dash-Board", href="/", style={'font-size': '1vw'} ),
-                        dbc.DropdownMenuItem("Text Search", href="/page-1", style={'font-size': '1vw'}),
-                        dbc.DropdownMenuItem("Balkendiagram", href="/page-2", style={'font-size': '1vw'}),
-                        dbc.DropdownMenuItem("Interview Heatmap", href="/page-3", style={'font-size': '1vw'}),
-                        dbc.DropdownMenuItem("Topic Wörter", href="/page-4", style={'font-size': '1vw'}),
-                        dbc.DropdownMenuItem("Heatmap", href="/page-5", style={'font-size': '1vw'}),
-                    ],
-                    label="Menu",
-                    color="dark",
-                    className="m-1",
-                    toggle_style = {'font-size': '1vw'} # PRÄSENTATION 0.8
-                    # menu_variant="dark",
+                html.Img(src=b64_image(logo_image_filename), style={"max-width": "100%"}),
+                dbc.Row([], style={"height": "0.5vh"}),
+                dbc.Row(html.Hr()),
+                dbc.Row([
+                    dbc.DropdownMenu(
+                        children=[
+                            dbc.DropdownMenuItem("Dash-Board", href="/", style={'font-size': '1vw'}),
+                            dbc.DropdownMenuItem("Text Search", href="/page-1", style={'font-size': '1vw'}),
+                            dbc.DropdownMenuItem("Balkendiagram", href="/page-2", style={'font-size': '1vw'}),
+                            dbc.DropdownMenuItem("Interview Heatmap", href="/page-3", style={'font-size': '1vw'}),
+                            dbc.DropdownMenuItem("Topic Wörter", href="/page-4", style={'font-size': '1vw'}),
+                            dbc.DropdownMenuItem("Heatmap", href="/page-5", style={'font-size': '1vw'}),
+                        ],
+                        label="Menu",
+                        color="dark",
+                        className="m-1",
+                        toggle_style={'font-size': '1vw'}  # PRÄSENTATION 0.8
+                        # menu_variant="dark",
                     ),
-            ],
-                style={"display": "flex"}
-            ),
-            dbc.Row([], style={"height": "1vh"}),
-            dbc.Row(html.Hr()),
+                ],
+                    style={"display": "flex"}
+                ),
+                dbc.Row([], style={"height": "1vh"}),
+                dbc.Row(html.Hr()),
                 dbc.Row([
                     html.H5(dbc.Badge(id="topic_number_sidebar_1", children="Topic: ", color="dark",
-                                  style={
-                                      'width': '50%',
-                                      'font-size': '1vw', # PRÄSENTATION 0.8
-                                  }))
-            ], style={"display": "flex"}),
+                                      style={
+                                          'width': '50%',
+                                          'font-size': '1vw',  # PRÄSENTATION 0.8
+                                      }))
+                ], style={"display": "flex"}),
                 dbc.Row([
                     dbc.Input(id="input", placeholder="Topic Nummer eingeben", type="number", size="m",
-                          min=0, max=100 - 1, step=1
-                          ),
-            ]),
-            dbc.Row(html.Hr()),
-            dbc.Row([
-                html.Div(
-                    [html.Br(), html.Br(), html.Br(), html.Br(), html.Br(), html.Br(), html.Br(), html.Br(), html.Br()],
-                    id="topics",
-                         style={
-                             'height': '20%',
-                             'width': '95%',
-                             "padding": "1% 1%",
-                             'display': 'block',
-                             'font-size': "1vw", # PRÄSENTATION 0.8
-                             'background-color': 'rgb(249,249,249)',
-                             "overflow": "auto"}
-                         )
-            ], style={"display": "flex", "alignItems": "center"}),
-            dbc.Row([], style={"height": "0.5vh"}),
-            dbc.Row(html.Hr()),
-            dbc.Accordion(
-                [
-                    dbc.AccordionItem(html.Div([
-                        dbc.Row([
-                            dcc.Textarea(
-                                id='textarea-example',
-                                value='Hier können sie Notizen machen',
-                                style={'width': "95%", 'height': "20%", 'font-size': "0.8vm", },
-                            ),
-                        ], style={"display": "flex", "alignItems": "center"}),
-                    ]),
-                        title="Notizen",
-                    ),
-                    # dbc.AccordionItem(html.Div([
-                    #     dbc.Row([
-                    #         dbc.RadioItems(
-                    #             options=[
-                    #                 {"label": "Horizontal", "value": 1},
-                    #                 {"label": "Vertikal", "value": 2},
-                    #             ],
-                    #             value=1,
-                    #             id="correlation_switch",
-                    #             inline=True,
-                    #         ),
-                    #     ]),
-                    #     dbc.Row([
-                    #         html.Div([
-                    #             dbc.Pagination(id="gross_nr_correlations_per_chunk_pagination",
-                    #                            max_value=4,
-                    #                            min_value=2,
-                    #                            size="sm")
-                    #         ]),
-                    #     ]),
-                    #     dbc.Row([
-                    #         html.Div(id="correlation_output",
-                    #                  style={
-                    #                      'height': '200px',
-                    #                      'width': '95%',
-                    #                      "padding": "1% 1%",
-                    #                      'whiteSpace': 'pre-line',
-                    #                      'display': 'inline-block',
-                    #                      'font-size': "15px",
-                    #                      'background-color': 'rgb(249,249,249)',
-                    #                      "overflow": "auto"}
-                    #                  ),
-                    #     ]),
-                    # ]),
-                    #     title="Correlation",
-                    # ),
+                              min=0, max=100 - 1, step=1
+                              ),
+                ]),
+                dbc.Row(html.Hr()),
+                dbc.Row([
+                    html.Div(
+                        [html.Br(), html.Br(), html.Br(), html.Br(), html.Br(), html.Br(), html.Br(), html.Br(),
+                         html.Br()],
+                        id="topics",
+                        style={
+                            'height': '20%',
+                            'width': '95%',
+                            "padding": "1% 1%",
+                            'display': 'block',
+                            'font-size': "1vw",  # PRÄSENTATION 0.8
+                            'background-color': 'rgb(249,249,249)',
+                            "overflow": "auto"}
+                    )
+                ], style={"display": "flex", "alignItems": "center"}),
+                dbc.Row([], style={"height": "0.5vh"}),
+                dbc.Row(html.Hr()),
+                dbc.Accordion(
+                    [
+                        dbc.AccordionItem(html.Div([
+                            dbc.Row([
+                                dcc.Textarea(
+                                    id='textarea-example',
+                                    value='Hier können sie Notizen machen',
+                                    style={'width': "95%", 'height': "20%", 'font-size': "0.8vm", },
+                                ),
+                            ], style={"display": "flex", "alignItems": "center"}),
+                        ]),
+                            title="Notizen",
+                        ),
+                        # dbc.AccordionItem(html.Div([
+                        #     dbc.Row([
+                        #         dbc.RadioItems(
+                        #             options=[
+                        #                 {"label": "Horizontal", "value": 1},
+                        #                 {"label": "Vertikal", "value": 2},
+                        #             ],
+                        #             value=1,
+                        #             id="correlation_switch",
+                        #             inline=True,
+                        #         ),
+                        #     ]),
+                        #     dbc.Row([
+                        #         html.Div([
+                        #             dbc.Pagination(id="gross_nr_correlations_per_chunk_pagination",
+                        #                            max_value=4,
+                        #                            min_value=2,
+                        #                            size="sm")
+                        #         ]),
+                        #     ]),
+                        #     dbc.Row([
+                        #         html.Div(id="correlation_output",
+                        #                  style={
+                        #                      'height': '200px',
+                        #                      'width': '95%',
+                        #                      "padding": "1% 1%",
+                        #                      'whiteSpace': 'pre-line',
+                        #                      'display': 'inline-block',
+                        #                      'font-size': "15px",
+                        #                      'background-color': 'rgb(249,249,249)',
+                        #                      "overflow": "auto"}
+                        #                  ),
+                        #     ]),
+                        # ]),
+                        #     title="Correlation",
+                        # ),
 
-                ],
-                always_open=True,
-            )
-                ],
+                    ],
+                    always_open=True,
+                )
+            ],
                 fluid=True)
         ],
         style=sidebar_style,
@@ -193,6 +197,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
         sidebar,
         content
     ], style={"height": "100vh", "width": "100vw", "display": "flex", "flexDirection": "column"})
+
     @app.callback(
         Output("page-content", "children"),
         [Input("url", "pathname")]
@@ -211,7 +216,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
                                    "font-size": "0.8vw", "display": "flex"},
                             placeholder="Corpus"
                         )
-                    ], width = 3, style={"display": "flex"}),
+                    ], width=3, style={"display": "flex"}),
                     dbc.Col([
                         dbc.Checklist(
                             options=[{"label": "Z Score", "value": "z_score"}],
@@ -220,157 +225,161 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
                             switch=True,
                             style={"width": "100%", "min-width": "150px", "font-size": "0.8vw", "display": "flex"}
                         )
-                    ], width = 2, style={"display": "flex"})
+                    ], width=2, style={"display": "flex"})
                 ], style={"height": "5vh"}),
-                 dbc.Row([
-                        dbc.Col([
-                            dcc.Graph(
-                                id='heat_map',
-                                figure={},
-                                config={"responsive": True},
-                                style={"height": "100%", "width": "100%", "display": "flex"}
-                            )
-                        ], width =7,style={"display": "flex"}),
-                        dbc.Col([
-                            dcc.Graph(
-                                id="bar",
-                                figure={},
-                                config={"responsive": True},
-                                style={"height": "100%", "width": "100%", "display": "flex"}
-                            )
+                dbc.Row([
+                    dbc.Col([
+                        dcc.Graph(
+                            id='heat_map',
+                            figure={},
+                            config={"responsive": True},
+                            style={"height": "100%", "width": "100%", "display": "flex"}
+                        )
+                    ], width=7, style={"display": "flex"}),
+                    dbc.Col([
+                        dcc.Graph(
+                            id="bar",
+                            figure={},
+                            config={"responsive": True},
+                            style={"height": "100%", "width": "100%", "display": "flex"}
+                        )
                     ], width=5, style={"display": "flex"})
                 ], style={"height": "40vh"}),
                 dbc.Row([
                     dbc.Col([
-                        html.H5([dbc.Badge(id="interview_titel", children=["Interview"],  color="dark", style={"font-size":"0.9vw", "display": "flex"})], className="text-center"),
-                        ],width = 2, style={"display": "flex"}),
+                        html.H5([dbc.Badge(id="interview_titel", children=["Interview"], color="dark",
+                                           style={"font-size": "0.9vw", "display": "flex"})], className="text-center"),
+                    ], width=2, style={"display": "flex"}),
                     dbc.Col([
                         dbc.Checklist(
-                                            options=[
-                                                {"label": "Topic Filter", "value": "filter"},
-                                                {"label": "Z Score", "value": "z_score"},
-                                                {"label": "Marker", "value": "marker"}
-                                            ],
-                                            value=[],
-                                            id="switch_chronology_filter",
-                                            switch=True,
-                                            inline=True,
-                                            style={"font-size": "0.7vw",
-                                                   "display": "flex"}
-                                        ),
-                        ],width=2, style={"display": "flex"}),
+                            options=[
+                                {"label": "Topic Filter", "value": "filter"},
+                                {"label": "Z Score", "value": "z_score"},
+                                {"label": "Marker", "value": "marker"}
+                            ],
+                            value=[],
+                            id="switch_chronology_filter",
+                            switch=True,
+                            inline=True,
+                            style={"font-size": "0.7vw",
+                                   "display": "flex"}
+                        ),
+                    ], width=2, style={"display": "flex"}),
                     dbc.Col([
-                                        html.Div(dbc.Input(id='interview_manual_id', placeholder="Interview", type='text', style={"width": "100%", "font-size": "0.8vw", "display": "flex"})),
-                                        html.Div(dbc.Input(id='threshold_top_filter_value',
-                                                           placeholder="Top Filter Threshold", type='number', style={"width": "1%", "font-size": "0.8vw", "display": "flex"})),
-                                        html.Div(dbc.Input(id='outlier_threshold_value', placeholder="Outlier Threshold",
-                                                           type='number', style={"width": "1%", "font-size": "0.8vw", "display": "flex"})),
-                                    ],width = 2, style={"display": "flex"}),
+                        html.Div(dbc.Input(id='interview_manual_id', placeholder="Interview", type='text',
+                                           style={"width": "100%", "font-size": "0.8vw", "display": "flex"})),
+                        html.Div(dbc.Input(id='threshold_top_filter_value',
+                                           placeholder="Top Filter Threshold", type='number',
+                                           style={"width": "1%", "font-size": "0.8vw", "display": "flex"})),
+                        html.Div(dbc.Input(id='outlier_threshold_value', placeholder="Outlier Threshold",
+                                           type='number',
+                                           style={"width": "1%", "font-size": "0.8vw", "display": "flex"})),
+                    ], width=2, style={"display": "flex"}),
                     dbc.Col([], width=2),
                     dbc.Col([
-                                    html.H5([
-                                        dbc.Button("<", id="-_button_frontpage", color="dark", size="sm",
-                                                   style={"font-size": "0.5vw"}),
-                                        dbc.Badge("chunk", id="sent_titel", color="dark",
-                                                  style={"font-size": "0.5vw", "alignItems": "center"}),
-                                        dbc.Button(">", id="+_button_frontpage", color="dark", size="sm",
-                                                   style={"font-size": "0.5vw"})
-                                    ], style={"display": "flex"}),
-                        ],width = 2, style={"display": "flex"} ),
+                        html.H5([
+                            dbc.Button("<", id="-_button_frontpage", color="dark", size="sm",
+                                       style={"font-size": "0.5vw"}),
+                            dbc.Badge("chunk", id="sent_titel", color="dark",
+                                      style={"font-size": "0.5vw", "alignItems": "center"}),
+                            dbc.Button(">", id="+_button_frontpage", color="dark", size="sm",
+                                       style={"font-size": "0.5vw"})
+                        ], style={"display": "flex"}),
+                    ], width=2, style={"display": "flex"}),
                     dbc.Col([], width=2),
-                    ], style={"height": "5vh"}),
+                ], style={"height": "5vh"}),
                 dbc.Row([
                     dbc.Col([
-                                    dcc.Graph(id='heat_map_interview', figure={}, style={"height": "100%", "width": "100%"},
-                                              config={"responsive": True})
-                                ], width = 6, style={"display": "flex"}),
+                        dcc.Graph(id='heat_map_interview', figure={}, style={"height": "100%", "width": "100%"},
+                                  config={"responsive": True})
+                    ], width=6, style={"display": "flex"}),
                     dbc.Col([
                         html.Div(
                             id='textarea',
-                                 style={
-                                     'whiteSpace': 'pre-line',
-                                     'display': 'inline-block',
-                                     'height': '45vh',
-                                     'display': 'block',
-                                     'font-size': "1vm",
-                                     'background-color': 'rgb(249,249,249)',
-                                     "overflow": "auto",
-                                        }),
-                        ],width = 6, style={"display": "flex"}),
+                            style={
+                                'whiteSpace': 'pre-line',
+                                'display': 'inline-block',
+                                'height': '45vh',
+                                'display': 'block',
+                                'font-size': "1vm",
+                                'background-color': 'rgb(249,249,249)',
+                                "overflow": "auto",
+                            }),
+                    ], width=6, style={"display": "flex"}),
                 ], style={"height": "40vh"})
 
-                    # dbc.Row([
-                    #     dbc.Col([
-                    #         dbc.Row([
-                    #             dbc.Col([
-                    #                 html.H5([dbc.Badge(id="interview_titel", color="dark", style={"font-size":"0.5vw", "display": "flex"})], className="text-center")
-                    #             ]),
-                    #         ]),
-                    #         dbc.Row([
-                    #             dbc.Col([
-                    #                 dbc.Checklist(
-                    #                     options=[
-                    #                         {"label": "Topic Filter", "value": "filter"},
-                    #                         {"label": "Z Score", "value": "z_score"},
-                    #                         {"label": "Marker", "value": "marker"}
-                    #                     ],
-                    #                     value=[],
-                    #                     id="switch_chronology_filter",
-                    #                     switch=True,
-                    #                     inline=True,
-                    #                     style={"font-size": "0.5vw",
-                    #                            "display": "flex"}
-                    #                 ),
-                    #             ], style={"display": "flex"}),
-                    #             dbc.Col([
-                    #                 html.Div(dbc.Input(id='interview_manual_id', placeholder="Interview", type='text')),
-                    #             ], width=1, style={"display": "flex", "alignItems": "left"}),
-                    #             dbc.Col([
-                    #                 html.Div(dbc.Input(id='threshold_top_filter_value',
-                    #                                    placeholder="Top Filter Threshold", type='number')),
-                    #             ], width=1, style={"display": "flex", "alignItems": "left"}),
-                    #             dbc.Col([
-                    #                 html.Div(dbc.Input(id='outlier_threshold_value', placeholder="Outlier Threshold",
-                    #                                    type='number')),
-                    #             ], width=1, style={"display": "flex", "alignItems": "left"})
-                    #             ]),
-                    #     dbc.Row([
-                    #         dbc.Col([
-                    #             dcc.Graph(id='heat_map_interview', figure={}, style={"height": "100%", "width": "100%"},
-                    #                       config={"responsive": True})
-                    #         ], style={"display": "flex", "alignItems": "left"}),
-                    #     ]),
-                    # ], style={"display": "flex", "alignItems": "left"}),
-                    #
-                    #     dbc.Col([
-                    #         dbc.Row([
-                    #             html.H5([
-                    #                 dbc.Button("<", id="-_button_frontpage", color="dark", size="sm",
-                    #                            style={"font-size": "0.5vw", "display": "flex"}),
-                    #                 dbc.Badge("chunk", id="sent_titel", color="dark",
-                    #                           style={"font-size": "0.5vw", "display": "flex"}),
-                    #                 dbc.Button(">", id="+_button_frontpage", color="dark", size="sm",
-                    #                            style={"font-size": "0.5vw", "display": "flex"})
-                    #             ], style={"display": "flex", "alignItems": "left"}),
-                    #         ]),
-                    #         dbc.Row([
-                    #             dbc.Col([
-                    #                 dbc.Row([
-                    #                     html.Div(id='textarea',
-                    #                              style={
-                    #                                  'whiteSpace': 'pre-line',
-                    #                                  'display': 'inline-block',
-                    #                                  'height': '45vh',
-                    #                                  'display': 'block',
-                    #                                  'font-size': "1vm",
-                    #                                  'background-color': 'rgb(249,249,249)',
-                    #                                  "overflow": "auto",
-                    #                                     }),
-                    #                 ]),
-                    #             ], style={"display": "flex", "alignItems": "left"}),
-                    #             ]),
-                    #         ], style={"display": "flex", "alignItems": "left"}),
-                    # ]),
+                # dbc.Row([
+                #     dbc.Col([
+                #         dbc.Row([
+                #             dbc.Col([
+                #                 html.H5([dbc.Badge(id="interview_titel", color="dark", style={"font-size":"0.5vw", "display": "flex"})], className="text-center")
+                #             ]),
+                #         ]),
+                #         dbc.Row([
+                #             dbc.Col([
+                #                 dbc.Checklist(
+                #                     options=[
+                #                         {"label": "Topic Filter", "value": "filter"},
+                #                         {"label": "Z Score", "value": "z_score"},
+                #                         {"label": "Marker", "value": "marker"}
+                #                     ],
+                #                     value=[],
+                #                     id="switch_chronology_filter",
+                #                     switch=True,
+                #                     inline=True,
+                #                     style={"font-size": "0.5vw",
+                #                            "display": "flex"}
+                #                 ),
+                #             ], style={"display": "flex"}),
+                #             dbc.Col([
+                #                 html.Div(dbc.Input(id='interview_manual_id', placeholder="Interview", type='text')),
+                #             ], width=1, style={"display": "flex", "alignItems": "left"}),
+                #             dbc.Col([
+                #                 html.Div(dbc.Input(id='threshold_top_filter_value',
+                #                                    placeholder="Top Filter Threshold", type='number')),
+                #             ], width=1, style={"display": "flex", "alignItems": "left"}),
+                #             dbc.Col([
+                #                 html.Div(dbc.Input(id='outlier_threshold_value', placeholder="Outlier Threshold",
+                #                                    type='number')),
+                #             ], width=1, style={"display": "flex", "alignItems": "left"})
+                #             ]),
+                #     dbc.Row([
+                #         dbc.Col([
+                #             dcc.Graph(id='heat_map_interview', figure={}, style={"height": "100%", "width": "100%"},
+                #                       config={"responsive": True})
+                #         ], style={"display": "flex", "alignItems": "left"}),
+                #     ]),
+                # ], style={"display": "flex", "alignItems": "left"}),
+                #
+                #     dbc.Col([
+                #         dbc.Row([
+                #             html.H5([
+                #                 dbc.Button("<", id="-_button_frontpage", color="dark", size="sm",
+                #                            style={"font-size": "0.5vw", "display": "flex"}),
+                #                 dbc.Badge("chunk", id="sent_titel", color="dark",
+                #                           style={"font-size": "0.5vw", "display": "flex"}),
+                #                 dbc.Button(">", id="+_button_frontpage", color="dark", size="sm",
+                #                            style={"font-size": "0.5vw", "display": "flex"})
+                #             ], style={"display": "flex", "alignItems": "left"}),
+                #         ]),
+                #         dbc.Row([
+                #             dbc.Col([
+                #                 dbc.Row([
+                #                     html.Div(id='textarea',
+                #                              style={
+                #                                  'whiteSpace': 'pre-line',
+                #                                  'display': 'inline-block',
+                #                                  'height': '45vh',
+                #                                  'display': 'block',
+                #                                  'font-size': "1vm",
+                #                                  'background-color': 'rgb(249,249,249)',
+                #                                  "overflow": "auto",
+                #                                     }),
+                #                 ]),
+                #             ], style={"display": "flex", "alignItems": "left"}),
+                #             ]),
+                #         ], style={"display": "flex", "alignItems": "left"}),
+                # ]),
             ], fluid=True)
             ]
         elif pathname == "/page-1":
@@ -395,10 +404,12 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
 
                     dbc.Col([
                         html.Div([
-                            dbc.InputGroup([dbc.InputGroupText("Topic_c 1"), dbc.Input(id='topic_c_1', placeholder="Topic", type='number'),
-                                 ], className="mb-3"),
-                            dbc.InputGroup([dbc.InputGroupText("Topic_c 2"),dbc.Input(id='topic_c_2', placeholder="Topic", type='number'),
-                                 ], className="mb-3"),
+                            dbc.InputGroup([dbc.InputGroupText("Topic_c 1"),
+                                            dbc.Input(id='topic_c_1', placeholder="Topic", type='number'),
+                                            ], className="mb-3"),
+                            dbc.InputGroup([dbc.InputGroupText("Topic_c 2"),
+                                            dbc.Input(id='topic_c_2', placeholder="Topic", type='number'),
+                                            ], className="mb-3"),
                             dbc.InputGroup([dbc.Select(options=[
                                 {"label": "Korpus Search", "value": "1"},
                                 {"label": "Interview Search", "value": "2"},
@@ -406,8 +417,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
                                 # {"label": "Correlation Search Horizontal", "value": 4},
 
                             ], id="text_search_options",
-                               value="1")])
-
+                                value="1")])
 
                         ]),
                     ], width=2),
@@ -423,12 +433,12 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
 
                         ]),
                     ], width=2),
-                    ]),
+                ]),
                 dbc.Row([
                     dbc.Col([html.Div(id="table-container")], width=8),
                 ]),
 
-                    ]
+            ]
 
         elif pathname == "/page-2":
             return [
@@ -439,54 +449,57 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
                 dbc.Row([
                     dbc.Col([
                         dbc.Input(id="input1", placeholder="Topic Nummer eingeben", type="number",
-                                  min=0, max=100 - 1, step=1, style={"width": "70%", "min-width": "100px", "font-size":"0.8vw", "display": "flex"}
+                                  min=0, max=100 - 1, step=1,
+                                  style={"width": "70%", "min-width": "100px", "font-size": "0.8vw", "display": "flex"}
                                   )
                     ]),
                     dbc.Col([
                         dbc.Input(id="input2", placeholder="Topic Nummer eingeben", type="number",
-                                  min=0, max=100 - 1, step=1, style={"width": "70%", "min-width": "100px", "font-size":"0.8vw", "display": "flex"}
+                                  min=0, max=100 - 1, step=1,
+                                  style={"width": "70%", "min-width": "100px", "font-size": "0.8vw", "display": "flex"}
                                   )
                     ]),
                     dbc.Col([
                         dbc.Input(id="input3", placeholder="Topic Nummer eingeben", type="number",
-                                  min=0, max=100 - 1, step=1, style={"width": "70%", "min-width": "100px", "font-size":"0.8vw", "display": "flex"}
+                                  min=0, max=100 - 1, step=1,
+                                  style={"width": "70%", "min-width": "100px", "font-size": "0.8vw", "display": "flex"}
                                   )
                     ]),
-                    dbc.Row([],style={"height": "1vh"}),
+                    dbc.Row([], style={"height": "1vh"}),
                     dbc.Row([
                         dbc.Col([
                             html.Div(id="topics1", style={
-                             'height': '100%',
-                             'width': '95%',
-                             "padding": "5% 5%",
-                             'display': 'block',
-                             'font-size': "1vw", # PRÄSENTATION 0.8
-                             'background-color': 'rgb(249,249,249)',
-                             "overflow": "off"}
-                         )
-            ], style={"display": "flex", "alignItems": "center"}),
+                                'height': '100%',
+                                'width': '95%',
+                                "padding": "5% 5%",
+                                'display': 'block',
+                                'font-size': "1vw",  # PRÄSENTATION 0.8
+                                'background-color': 'rgb(249,249,249)',
+                                "overflow": "off"}
+                                     )
+                        ], style={"display": "flex", "alignItems": "center"}),
                         dbc.Col([
                             html.Div(id="topics2", style={
-                             'height': '100%',
-                             'width': '95%',
-                             "padding": "5% 5%",
-                             'display': 'block',
-                             'font-size': "1vw", # PRÄSENTATION 0.8
-                             'background-color': 'rgb(249,249,249)',
-                             "overflow": "off"}
-                         )
-            ], style={"display": "flex", "alignItems": "center"}),
+                                'height': '100%',
+                                'width': '95%',
+                                "padding": "5% 5%",
+                                'display': 'block',
+                                'font-size': "1vw",  # PRÄSENTATION 0.8
+                                'background-color': 'rgb(249,249,249)',
+                                "overflow": "off"}
+                                     )
+                        ], style={"display": "flex", "alignItems": "center"}),
                         dbc.Col([
-                            html.Div(id="topics3",style={
-                             'height': '100%',
-                             'width': '95%',
-                             "padding": "5% 5%",
-                             'display': 'block',
-                             'font-size': "1vw", # PRÄSENTATION 0.8
-                             'background-color': 'rgb(249,249,249)',
-                             "overflow": "off"}
-                         )
-            ], style={"display": "flex", "alignItems": "center"}),
+                            html.Div(id="topics3", style={
+                                'height': '100%',
+                                'width': '95%',
+                                "padding": "5% 5%",
+                                'display': 'block',
+                                'font-size': "1vw",  # PRÄSENTATION 0.8
+                                'background-color': 'rgb(249,249,249)',
+                                "overflow": "off"}
+                                     )
+                        ], style={"display": "flex", "alignItems": "center"}),
 
                     ]), ])
             ]
@@ -525,7 +538,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
                     html.H5([dbc.Badge(id="interview_title_detail", color="dark")], className="text-center")
                 ]),
                 dbc.Row([
-                        dcc.Graph(id='heat_map_interview_detail', figure={}),
+                    dcc.Graph(id='heat_map_interview_detail', figure={}),
                 ]),
                 dbc.Row([
                     dbc.Col([], width=5),
@@ -533,7 +546,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
                         dbc.Button("<", id="-_button_detail", color="dark", size="sm"),
                         dbc.Badge("chunk", id="sent_title_detail", color="dark", className="text-center"),
                         dbc.Button(">", id="+_button_detail", color="dark", size="sm"),
-                        ], width=2),
+                    ], width=2),
                     dbc.Col([], width=5),
                 ]),
                 dbc.Row(html.Hr()),
@@ -547,7 +560,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
                                  'background-color': 'rgb(249,249,249)',
                                  "overflow": "auto",
                              }),
-                 ]),
+                ]),
             ]
         elif pathname == "/page-4":
             return [
@@ -558,8 +571,8 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
 
                 dbc.Col([
                     html.Div(id="topic_table")
-                    ], width=8),
-                    ]
+                ], width=8),
+            ]
         elif pathname == "/page-5":
             return [dbc.Container([
                 dbc.Row([
@@ -567,7 +580,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
                         dcc.Dropdown(id="slct_archiv_heat_map_corpus_detail", options=[],
                                      value="all",
                                      multi=False,
-                                     style={'width': '80%', 'min-width': '150px', "font-size":"0.8vw"},
+                                     style={'width': '80%', 'min-width': '150px', "font-size": "0.8vw"},
                                      placeholder="Corpus",
                                      ),
 
@@ -581,28 +594,31 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
                             value=[],
                             id="z_score_corpus_heatmap_detail",
                             switch=True,
-                            style={"width": "100%", "min-width": "150px", "font-size":"0.8vw", "display": "flex"}
+                            style={"width": "100%", "min-width": "150px", "font-size": "0.8vw", "display": "flex"}
                         ),
                     ], width=3, style={"display": "flex", "alignItems": "center"}),
                     dbc.Col([
                         html.Div(dbc.Input(id='corpus_heatmap_detail_topic', placeholder="Topic", type='int',
-                                           style={"width": "70%", "min-width": "100px", "font-size":"0.8vw", "display": "flex"})),
+                                           style={"width": "70%", "min-width": "100px", "font-size": "0.8vw",
+                                                  "display": "flex"})),
                     ], width=2),
                     dbc.Col([
                         html.Div(dbc.Input(id='corpus_heatmap_detail_threshold', placeholder="Threshold",
-                                           type='int', style={"width": "70%", "min-width": "100px", "font-size":"0.8vw", "display": "flex"})),
+                                           type='int',
+                                           style={"width": "70%", "min-width": "100px", "font-size": "0.8vw",
+                                                  "display": "flex"})),
                     ], width=2),
                 ], style={"display": "flex", "alignItems": "left"}),
                 dbc.Row([
-                    dcc.Graph(id='heat_map_corpus_detail', figure={}, style={"height": "100%", "width": "100%"}, config={"responsive": True})
+                    dcc.Graph(id='heat_map_corpus_detail', figure={}, style={"height": "100%", "width": "100%"},
+                              config={"responsive": True})
 
                 ], style={"height": "80vh"}),
                 dbc.Row()
             ], fluid=True)
             ]
 
-
-# If the user tries to reach a different page, return a 404 message
+        # If the user tries to reach a different page, return a 404 message
         return dbc.Jumbotron(
             [
                 html.H1("404: Not found", className="text-dark"),
@@ -611,9 +627,9 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
             ]
         )
 
-# Page 1
+    # Page 1
 
-# Dropboxmenue for corpus heatmap page 1
+    # Dropboxmenue for corpus heatmap page 1
     @app.callback(
         Output("slct_archiv", "options"),
         Input("top_dic", "data"),
@@ -623,7 +639,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
         drop_down_menu = create_dropdown_list(ohtm_file)
         return drop_down_menu
 
-# Bargraph on page 1
+    # Bargraph on page 1
     @app.callback(
         Output(component_id="bar", component_property="figure"),
         Input("top_dic", "data"),
@@ -633,7 +649,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
         fig = bar_graph_corpus(ohtm_file, show_fig=False, return_fig=True)
         return fig
 
-# Corpusheatmap page 1
+    # Corpusheatmap page 1
     @app.callback(
         Output(component_id='heat_map', component_property='figure'),
         Input('slct_archiv', "value"),
@@ -644,7 +660,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
                              show_fig=False, return_fig=True)
         return fig
 
-# Interviewheatmap page 1
+    # Interviewheatmap page 1
     @app.callback(
         Output(component_id='heat_map_interview', component_property='figure'),
         Output("interview_titel", "children"),
@@ -661,18 +677,18 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
         Input("chunk_number_frontpage", "data"),
     )
     def interview_heat_map_dash(click_data, heatmap_filter, top_filter_th, outlier_th,
-                           interview_manual_id, click_data_2, chunk_number_storage):
+                                interview_manual_id, click_data_2, chunk_number_storage):
         if chronologie_analyse:
 
             chronologie_heatmap = chronology_matrix(data=ohtm_file,
-                                                             click_data=click_data,
-                                                             click_data_2=click_data_2,
-                                                             ctx_triggered=ctx.triggered,
-                                                             interview_manual_id=interview_manual_id,
-                                                             heatmap_filter=heatmap_filter,
-                                                             threshold_top_filter=top_filter_th,
-                                                             outlier_threshold=outlier_th,
-                                                             chunk_number_storage=chunk_number_storage)
+                                                    click_data=click_data,
+                                                    click_data_2=click_data_2,
+                                                    ctx_triggered=ctx.triggered,
+                                                    interview_manual_id=interview_manual_id,
+                                                    heatmap_filter=heatmap_filter,
+                                                    threshold_top_filter=top_filter_th,
+                                                    outlier_threshold=outlier_th,
+                                                    chunk_number_storage=chunk_number_storage)
 
             if chronologie_heatmap is not None:
                 fig = chronologie_heatmap[0]
@@ -703,7 +719,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
             df_heatmap_interview = interview_heatmap[5]
             return fig, title, interview_id, chunk_number, tc_indicator, df_heatmap_interview
 
-# prints the raw sentences of the selected chunk into the field page 1
+    # prints the raw sentences of the selected chunk into the field page 1
     @app.callback(
         Output(component_id='textarea', component_property='children'),
         Output("sent_titel", "children"),
@@ -736,7 +752,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
             chunk_id = sent[2]
             return chunk_sent, sent_id, chunk_id
 
-# Update Chunk_number_frontpate storage out of heatmap_interview and print_chunk_sentences:
+    # Update Chunk_number_frontpate storage out of heatmap_interview and print_chunk_sentences:
     @app.callback(
         Output("chunk_number_frontpage", "data"),
         Input("chunk_number_chunk_sent_draw", "data"),
@@ -750,8 +766,8 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
             chunk_number = chunk_number_heat
             return chunk_number
 
-# Page 2
-# text search inside the chunks
+    # Page 2
+    # text search inside the chunks
     @app.callback(
         Output("table-container", "children"),
         Input("weight_print", "value"),
@@ -765,15 +781,15 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
         Input("topic_print", "value")
     )
     def text_search_detail(weight_print, n_clicks, interview_id, text_search_options, t_1, t_2, t_3, t_4,
-                            topic_print):
+                           topic_print):
         search_results = print_topic_search_weight(ohtm_file=ohtm_file, topic_print=topic_print,
-                                                       weight_print=weight_print, interview_id=interview_id,
-                                                       text_search_options=text_search_options, t_1=t_1, t_2=t_2,
-                                                       t_3=t_3, t_4=t_4)
+                                                   weight_print=weight_print, interview_id=interview_id,
+                                                   text_search_options=text_search_options, t_1=t_1, t_2=t_2,
+                                                   t_3=t_3, t_4=t_4)
         return search_results
 
-# Page 3
-# bargraph on page 3
+    # Page 3
+    # bargraph on page 3
     @app.callback(
         Output(component_id="bar2", component_property="figure"),
         Input("top_dic2", "data"),
@@ -783,7 +799,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
         fig = bar_graph_corpus(ohtm_file, show_fig=False, return_fig=True)
         return fig
 
-# Print the topics on the single_bar_side page 3
+    # Print the topics on the single_bar_side page 3
     @app.callback(
         Output("topics1", "children"),
         Input("input1", "value"),
@@ -811,8 +827,8 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
         entry = top_words(value, ohtm_file)
         return entry
 
-# Page 4
-# Deatil Interview Heatmap page 4
+    # Page 4
+    # Deatil Interview Heatmap page 4
     @app.callback(
         Output(component_id='heat_map_interview_detail', component_property='figure'),
         Output("interview_title_detail", "children"),
@@ -831,14 +847,14 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
                                 outlier_th, click_data_2, chunk_number_storage):
         if chronologie_analyse:
             chronologie_heatmap = chronology_matrix(data=ohtm_file,
-                                                             click_data="",
-                                                             click_data_2=click_data_2,
-                                                             ctx_triggered=ctx.triggered,
-                                                             interview_manual_id=interview_manual_id,
-                                                             heatmap_filter=heatmap_filter,
-                                                             threshold_top_filter=top_filter_th,
-                                                             outlier_threshold=outlier_th,
-                                                             chunk_number_storage=chunk_number_storage)
+                                                    click_data="",
+                                                    click_data_2=click_data_2,
+                                                    ctx_triggered=ctx.triggered,
+                                                    interview_manual_id=interview_manual_id,
+                                                    heatmap_filter=heatmap_filter,
+                                                    threshold_top_filter=top_filter_th,
+                                                    outlier_threshold=outlier_th,
+                                                    chunk_number_storage=chunk_number_storage)
             if chronologie_heatmap is not None:
                 fig = chronologie_heatmap[0]
                 title = chronologie_heatmap[1]
@@ -867,7 +883,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
             df_heatmap_interview = interview_heatmap[5]
             return fig, title, interview_id, tc_indicator, df_heatmap_interview
 
-# Interview Detail print the raw sents of the selected chunk
+    # Interview Detail print the raw sents of the selected chunk
     @app.callback(
         Output("textarea_detail", "children"),
         Output("sent_title_detail", "children"),
@@ -900,7 +916,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
 
             return chunk_sent, sent_id, chunk_id
 
-# Print the words from the topic-list page 5
+    # Print the words from the topic-list page 5
     @app.callback(
         Output("topic_table", "children"),
         Input("word_number", "value"),
@@ -910,9 +926,8 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
         table = print_all_topics(words, n_clicks, ohtm_file)
         return table
 
-
-# Function to identifie which topic is clicked in any graph. The information is than returned and the first words
-# of this topic are printed in the topic field.
+    # Function to identifie which topic is clicked in any graph. The information is than returned and the first words
+    # of this topic are printed in the topic field.
     @app.callback(
         Output("heatmap_interview_topic_nr", "data"),
         Input("heat_map_interview", "clickData"),
@@ -990,6 +1005,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
         if click_data != None:
             topic = click_data["points"][0]["x"]
             return topic
+
     @app.callback(
         Output("heatmap_corpus_detail_topic_nr", "data"),
         Input("heat_map_corpus_detail", "clickData"),
@@ -1000,7 +1016,7 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
             topic = click_data["points"][0]["x"]
             return topic
 
-# print the first 50 words of each topic that is selected on any graph on any page [menu]
+    # print the first 50 words of each topic that is selected on any graph on any page [menu]
     @app.callback(
         Output("topics", "children"),
         Output("topic_number_sidebar_1", "children"),
@@ -1066,5 +1082,3 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool =False):
     #         return return_data
 
     app.run_server(debug=False, port=3002)
-
-
