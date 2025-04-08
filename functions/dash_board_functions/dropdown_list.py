@@ -1,7 +1,5 @@
-"""
+""" """
 
-
-"""
 
 def create_dropdown_list(ohtm_file):
     drop_down_list = []

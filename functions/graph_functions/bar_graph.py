@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly_express as px
+
 from functions.basic_functions.convert_ohtm_file import convert_ohtm_file
 
 
@@ -17,12 +18,20 @@ def bar_graph_corpus(ohtm_file, show_fig: bool = True, return_fig: bool = False)
                     count += 1
                     for t in ohtm_file["weight"][archive][interview][c]:
                         if t not in interview_dic[archive][interview]:
-                            interview_dic[archive][interview].update({t: ohtm_file["weight"][archive][interview][c][t]})
+                            interview_dic[archive][interview].update(
+                                {t: ohtm_file["weight"][archive][interview][c][t]}
+                            )
                         else:
                             interview_dic[archive][interview].update(
-                                {t: interview_dic[archive][interview][t] + ohtm_file["weight"][archive][interview][c][t]})
+                                {
+                                    t: interview_dic[archive][interview][t]
+                                    + ohtm_file["weight"][archive][interview][c][t]
+                                }
+                            )
                 for entry in interview_dic[archive][interview]:
-                     interview_dic[archive][interview].update({entry:interview_dic[archive][interview][entry] / count})
+                    interview_dic[archive][interview].update(
+                        {entry: interview_dic[archive][interview][entry] / count}
+                    )
 
         bar_dic = {}
         for archive in interview_dic:
@@ -32,9 +41,16 @@ def bar_graph_corpus(ohtm_file, show_fig: bool = True, return_fig: bool = False)
                 count += 1
                 for t in interview_dic[archive][interview]:
                     if t not in bar_dic[archive]:
-                        bar_dic[archive].update({t: interview_dic[archive][interview][t]})
+                        bar_dic[archive].update(
+                            {t: interview_dic[archive][interview][t]}
+                        )
                     else:
-                        bar_dic[archive].update({t: bar_dic[archive][t] + interview_dic[archive][interview][t]})
+                        bar_dic[archive].update(
+                            {
+                                t: bar_dic[archive][t]
+                                + interview_dic[archive][interview][t]
+                            }
+                        )
             for entry in bar_dic[archive]:
                 bar_dic[archive].update({entry: bar_dic[archive][entry]})
 
@@ -50,7 +66,7 @@ def bar_graph_corpus(ohtm_file, show_fig: bool = True, return_fig: bool = False)
         fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
         fig.update_layout(
             xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
-            yaxis_title=None  # Entfernt die Y-Achsenbeschriftung
+            yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung
         )
         if show_fig:
             fig.show()
