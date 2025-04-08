@@ -18,7 +18,7 @@ global top_dic
 logo_image_filename = "dash_ohd_image.png"
 
 
-def ohd_dash(ohtm_file, chronologie_analyse: bool = False):
+def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
     def b64_image(logo_image_filename):
         with open(logo_image_filename, "rb") as f:
             image = f.read()
@@ -1695,4 +1695,4 @@ def ohd_dash(ohtm_file, chronologie_analyse: bool = False):
     #             return_data.append(str(line) + "\n")
     #         return return_data
 
-    app.run_server(debug=False, port=3002)
+    return app

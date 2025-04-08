@@ -9,5 +9,7 @@ wheels/
 # Virtual environments
 .venv
 
-# Own files
+# Our files
+.dockerignore
 main.py
+main_template.py
