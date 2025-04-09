@@ -1,5 +1,5 @@
 import pandas as pd
-import plotly_express as px
+import plotly.express as px
 
 from functions.basic_functions.convert_ohtm_file import convert_ohtm_file
 

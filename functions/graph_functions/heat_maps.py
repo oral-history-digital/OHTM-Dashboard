@@ -1,7 +1,7 @@
 from builtins import print
 
 import pandas as pd
-import plotly_express as px
+import plotly.express as px
 
 from functions.basic_functions.convert_ohtm_file import convert_ohtm_file
 
@@ -119,7 +119,7 @@ def heatmap_corpus(
 
 
 """
-This function has to be tested in the dash. Because now it is really slow. With the chagen to possilbe different 
+This function has to be tested in the dash. Because now it is really slow. With the chagen to possilbe different
 archive namens than the first 3 letters of the interview id, i had to find another way. Maye this function has to be
 improved. (17.1.2025)
 
