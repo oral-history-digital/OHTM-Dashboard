@@ -1,6 +1,7 @@
 """ """
 
 import copy
+from copy import deepcopy
 
 import dash_bootstrap_components as dbc
 import pandas as pd
@@ -57,6 +58,13 @@ def print_topic_search_weight(
                                             + " "
                                         )
                                 sent_current = " ".join(sent_current)
+                                top_ts = ohtm_file["weight"][archive][interview][chunks]
+                                top_ts_sorted = sorted(top_ts.items(), key=lambda x: x[1], reverse=True)
+                                final_topic_list = []
+                                for entry in top_ts_sorted[:5]:
+                                    final_topic_list.append(str(entry[0]) + ": " + str(entry[1]))
+                                final_topic_list = " | ".join(final_topic_list)
+
                                 sent_current_2 = (
                                     str(
                                         ohtm_file["weight"][archive][interview][chunks][
@@ -66,12 +74,13 @@ def print_topic_search_weight(
                                     sent_id,
                                     chunk_id,
                                     sent_current,
+                                    final_topic_list
                                 )
                                 sent_final.append(sent_current_2)
             sent_final.sort(reverse=True)
             df = pd.DataFrame(sent_final)
             df = df.round(3)
-            df.columns = ["weight", "Interview", "Chunk Nr", "Chunk"]
+            df.columns = ["weight", "Interview", "Chunk Nr", "Chunk", "Top 5 Topics"]
             # data = df_rounded.to_dict('records')
             # columns = [{"name": i, "id": i} for i in df_rounded.columns]
             table = dbc.Table.from_dataframe(

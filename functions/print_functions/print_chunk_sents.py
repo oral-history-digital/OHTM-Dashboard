@@ -3,12 +3,14 @@ This function prints alle the sents, that are in one chunk, including the speake
 """
 
 import pandas as pd
-from dash import ctx
+from dash import ctx, html
+from ohtm_dash.functions.basic_functions.create_link_to_ohd import create_link
 
 
 def chunk_sent_drawing(
-    ohtm_file, click_data_input, chunk_number, interview_id, chronology_df, tc_indicator
+    ohtm_file, click_data_input, chunk_number, interview_id, chronology_df, tc_indicator, show_links: bool = True
 ):
+    anonymized_status = False
     if ctx.triggered[0]["prop_id"] == "+_button_frontpage.n_clicks":
         chunk_id = int(chunk_number) + 1
     elif ctx.triggered[0]["prop_id"] == "+_button_detail.n_clicks":
@@ -41,12 +43,28 @@ def chunk_sent_drawing(
 
     sent_example = []
     speaker = "None"
+    chunk_start_marker = 0
+    link_tape = "1"
     for archive in ohtm_file["corpus"]:
         if interview_id in ohtm_file["corpus"][archive]:
+            try:
+                if ohtm_file["corpus"][archive][interview_id]["anonymized"] == "True":
+                    anonymized_status = True
+            except KeyError:
+                anonymized_status = False
             for sentence_number in ohtm_file["corpus"][archive][interview_id]["sent"]:
                 if ohtm_file["corpus"][archive][interview_id]["sent"][sentence_number][
                     "chunk"
                 ] == int(chunk_id):
+                    chunk_start_marker += 1
+                    if chunk_start_marker == 1:  # to mark the beginning of the chunk for the first timecode
+                        if ohtm_file["corpus"][archive][interview_id]["sent"][sentence_number]["time"] != {}:
+                            timcodes_available = True
+                            chunk_start_time = ohtm_file["corpus"][archive][interview_id]["sent"][sentence_number][
+                                "time"]
+                            link_tape = ohtm_file["corpus"][archive][interview_id]["sent"][sentence_number]["tape"]
+                        else:
+                            timcodes_available = False
                     if (
                         ohtm_file["corpus"][archive][interview_id]["sent"][
                             sentence_number
@@ -90,6 +108,25 @@ def chunk_sent_drawing(
                             speaker = ohtm_file["corpus"][archive][interview_id][
                                 "sent"
                             ][sentence_number]["speaker"]
+                            if ohtm_file["corpus"][archive][interview_id]["sent"][sentence_number]["time"] != {}:
+                                chunk_end_time = \
+                                    ohtm_file["corpus"][archive][interview_id]["sent"][sentence_number]["time"]
+            if timcodes_available:
+                sent_example.append("\n" + "\n" + "Timecode: " + str(chunk_start_time) + "–" + str(chunk_end_time))
+            else:
+                chunk_start_time = "False"
+                link_tape = "1"
+            if anonymized_status:
+                link = create_link(archive.lower(), interview_id.lower(), chunk_start_time, link_tape)
+                sent_example = ("This interview is anonymized and can be found here: " + "\n", html.A(link, href=link, target="_blank", style={'color': 'blue'}))
+                sent_id = "Chunk: " + str(chunk_id)
+                return sent_example, sent_id, chunk_id
+            else:
+                link = create_link(archive.lower(), interview_id.lower(), chunk_start_time, link_tape)
+                sent_example.append("\n")
+                sent_example.append(html.A(link, href=link, target="_blank", style={'color': 'blue'}))
+
 
     sent_id = "Chunk: " + str(chunk_id)
+    print(link)
     return sent_example, sent_id, chunk_id
