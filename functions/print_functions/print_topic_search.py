@@ -2,10 +2,10 @@
 
 import copy
 from copy import deepcopy
-
+from ohtm_dash.functions.basic_functions.create_link_to_ohd import create_link
 import dash_bootstrap_components as dbc
 import pandas as pd
-from dash import ctx
+from dash import ctx, html
 
 
 def print_topic_search_weight(
@@ -19,44 +19,71 @@ def print_topic_search_weight(
     topic_print,
     weight_print,
 ):
+    anonymized_status = False
     if ctx.triggered[0]["prop_id"] == "enter_print.n_clicks":
         if text_search_options == "1":
             sent_final = []
             topic = topic_print
             weight = weight_print
+            link_tape = "1"
             for archive in ohtm_file["weight"]:
                 for interview in ohtm_file["weight"][archive]:
+                    try:
+                        if ohtm_file["corpus"][archive][interview]["anonymized"] == "True":
+                            anonymized_status = True
+                    except KeyError:
+                        anonymized_status = False
                     for chunks in ohtm_file["weight"][archive][interview]:
-                        if str(
-                            ohtm_file["weight"][archive][interview][chunks][str(topic)]
-                        ) >= str(weight):
-                            if "e" in str(
-                                ohtm_file["weight"][archive][interview][chunks][
-                                    str(topic)
-                                ]
-                            ):
+                        chunk_start_marker = 0
+                        speaker = "None"
+                    for chunks in ohtm_file["weight"][archive][interview]:
+                        if str(ohtm_file["weight"][archive][interview][chunks][str(topic)]) >= str(weight):
+                            if "e" in str(ohtm_file["weight"][archive][interview][chunks][str(topic)]):
                                 next
                             else:
                                 sent_id = interview
                                 chunk_id = chunks
                                 sent_current = []
-                                for sents in ohtm_file["corpus"][archive][interview][
-                                    "sent"
-                                ]:
-                                    int_sent = copy.deepcopy(
-                                        ohtm_file["corpus"][archive][interview]["sent"][
-                                            sents
-                                        ]["chunk"]
-                                    )
+                                for number in ohtm_file["corpus"][archive][interview]["sent"]:
+                                    int_sent = copy.deepcopy(ohtm_file["corpus"][archive][interview]["sent"][number ]["chunk"])
                                     if int(int_sent) == int(chunks):
-                                        sent_current.append(
-                                            str(
-                                                ohtm_file["corpus"][archive][interview][
-                                                    "sent"
-                                                ][sents]["raw"]
-                                            )
-                                            + " "
-                                        )
+                                        chunk_start_marker += 1
+                                        if chunk_start_marker == 1:  # to mark the beginning of the chunk for the first timecode
+                                            if ohtm_file["corpus"][archive][interview]["sent"][number]["time"] != {}:
+                                                timcodes_available = True
+                                                chunk_start_time = \
+                                                    ohtm_file["corpus"][archive][interview]["sent"][number]["time"]
+                                                link_tape = \
+                                                    ohtm_file["corpus"][archive][interview]["sent"][number]["tape"]
+                                            else:
+                                                timcodes_available = False
+                                                link_tape = "1"
+                                                chunk_start_time = "False"
+                                        if ohtm_file["corpus"][archive][interview]["sent"][number]["speaker"] == {}:
+                                            sent_current.append(str(
+                                                ohtm_file["corpus"][archive][interview]["sent"][number]["raw"]) + " ")
+                                            chunk_end_time = \
+                                                ohtm_file["corpus"][archive][interview]["sent"][number]["time"]
+                                        else:
+                                            if speaker == ohtm_file["corpus"][archive][interview]["sent"][number][
+                                                "speaker"]:
+                                                sent_current.append(str(
+                                                    ohtm_file["corpus"][archive][interview]["sent"][number][
+                                                        "raw"]) + " ")
+                                                chunk_end_time = \
+                                                    ohtm_file["corpus"][archive][interview]["sent"][number]["time"]
+                                            else:
+                                                sent_current.append(str("*" +
+                                                                        ohtm_file["corpus"][archive][interview]["sent"][
+                                                                            number]["speaker"]) + ":* ")
+                                                sent_current.append(str(
+                                                    ohtm_file["corpus"][archive][interview]["sent"][number][
+                                                        "raw"]) + " ")
+                                                speaker = ohtm_file["corpus"][archive][interview]["sent"][number][
+                                                    "speaker"]
+                                                chunk_end_time = \
+                                                    ohtm_file["corpus"][archive][interview]["sent"][number]["time"]
+
                                 sent_current = " ".join(sent_current)
                                 top_ts = ohtm_file["weight"][archive][interview][chunks]
                                 top_ts_sorted = sorted(top_ts.items(), key=lambda x: x[1], reverse=True)
@@ -64,20 +91,35 @@ def print_topic_search_weight(
                                 for entry in top_ts_sorted[:5]:
                                     final_topic_list.append(str(entry[0]) + ": " + str(entry[1]))
                                 final_topic_list = " | ".join(final_topic_list)
+                                if timcodes_available:
+                                    sent_current += (
+                                        "\n" + "\n" + "Timecode: " + str(chunk_start_time) + "–" + str(
+                                            chunk_end_time))
+                                else:
+                                    chunk_start_time = "False"
+                                    link_tape = "1"
+                                if anonymized_status:
+                                    link = create_link(archive.lower(), interview.lower(), chunk_start_time,
+                                                       link_tape)
+                                    sent_current = ("This interview is anonymized and can be found here: " + "\n",
+                                                    html.A(link, href=link, target="_blank",
+                                                           style={'color': 'blue'}))
+                                else:
+                                    link = create_link(archive.lower(), interview.lower(), chunk_start_time,
+                                                       link_tape)
+                                    sent_current.append("\n")
+                                    sent_current.append(
+                                        html.A(link, href=link, target="_blank", style={'color': 'blue'}))
 
-                                sent_current_2 = (
-                                    str(
-                                        ohtm_file["weight"][archive][interview][chunks][
-                                            str(topic)
-                                        ]
-                                    ),
-                                    sent_id,
+
+                                sent_current_2 = (str(ohtm_file["weight"][archive][interview][chunks][str(topic)]),
+                                    interview,
                                     chunk_id,
                                     sent_current,
-                                    final_topic_list
+                                    final_topic_list,
                                 )
                                 sent_final.append(sent_current_2)
-            sent_final.sort(reverse=True)
+            sent_final.sort(reverse=True, key=lambda x: x[0])
             df = pd.DataFrame(sent_final)
             df = df.round(3)
             df.columns = ["weight", "Interview", "Chunk Nr", "Chunk", "Top 5 Topics"]
