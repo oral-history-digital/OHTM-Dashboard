@@ -107,13 +107,12 @@ def print_topic_search_weight(
                                 else:
                                     link = create_link(archive.lower(), interview.lower(), chunk_start_time,
                                                        link_tape)
-                                    sent_current.append("\n")
-                                    sent_current.append(
-                                        html.A(link, href=link, target="_blank", style={'color': 'blue'}))
+                                    sent_current = [sent_current, "\n",
+                                                     html.A(link, href=link, target="_blank", style={'color': 'blue'})]
 
 
                                 sent_current_2 = (str(ohtm_file["weight"][archive][interview][chunks][str(topic)]),
-                                    interview,
+                                    sent_id,
                                     chunk_id,
                                     sent_current,
                                     final_topic_list,
