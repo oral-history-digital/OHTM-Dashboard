@@ -4,7 +4,7 @@ This function prints alle the sents, that are in one chunk, including the speake
 
 import pandas as pd
 from dash import ctx, html
-from ohtm_dash.functions.basic_functions.create_link_to_ohd import create_link
+from functions.basic_functions.create_link_to_ohd import create_link
 
 
 def chunk_sent_drawing(

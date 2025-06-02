@@ -2,7 +2,7 @@
 
 import copy
 from copy import deepcopy
-from ohtm_dash.functions.basic_functions.create_link_to_ohd import create_link
+from functions.basic_functions.create_link_to_ohd import create_link
 import dash_bootstrap_components as dbc
 import pandas as pd
 from dash import ctx, html
@@ -110,6 +110,7 @@ def print_topic_search_weight(
                                     sent_current = [sent_current, "\n",
                                                      html.A(link, href=link, target="_blank", style={'color': 'blue'})]
 
+                                print(sent_current)
 
                                 sent_current_2 = (str(ohtm_file["weight"][archive][interview][chunks][str(topic)]),
                                     sent_id,
@@ -117,6 +118,7 @@ def print_topic_search_weight(
                                     sent_current,
                                     final_topic_list,
                                 )
+                                print(sent_current_2)
                                 sent_final.append(sent_current_2)
             sent_final.sort(reverse=True, key=lambda x: x[0])
             df = pd.DataFrame(sent_final)
