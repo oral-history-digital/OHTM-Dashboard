@@ -11,7 +11,7 @@ input_folder = r"C:\Users\phili\sciebo - Bayerschmidt, Philipp (bayerschmidt@fer
 
 
 if __name__ == "__main__":
-    load_file_name = r"null_chunks.ohtm"
+    load_file_name = r"OHD_final_100c_100T_A5_final.ohtm"
     with open(os.path.join(input_folder, load_file_name)) as f:
         ohtm_file = json.load(f)
     chronologie_analyse = False

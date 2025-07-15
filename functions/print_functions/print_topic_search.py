@@ -61,7 +61,7 @@ def print_topic_search_weight(
                                                 chunk_start_time = "False"
                                         if ohtm_file["corpus"][archive][interview]["sent"][number]["speaker"] == {}:
                                             sent_current.append(str(
-                                                ohtm_file["corpus"][archive][interview]["sent"][number]["raw"]) + " ")
+                                                ohtm_file["corpus"][archive][interview]["sent"][number]["raw"]) + ". ")
                                             chunk_end_time = \
                                                 ohtm_file["corpus"][archive][interview]["sent"][number]["time"]
                                         else:
@@ -69,7 +69,7 @@ def print_topic_search_weight(
                                                 "speaker"]:
                                                 sent_current.append(str(
                                                     ohtm_file["corpus"][archive][interview]["sent"][number][
-                                                        "raw"]) + " ")
+                                                        "raw"]) + ". ")
                                                 chunk_end_time = \
                                                     ohtm_file["corpus"][archive][interview]["sent"][number]["time"]
                                             else:
@@ -78,7 +78,7 @@ def print_topic_search_weight(
                                                                             number]["speaker"]) + ":* ")
                                                 sent_current.append(str(
                                                     ohtm_file["corpus"][archive][interview]["sent"][number][
-                                                        "raw"]) + " ")
+                                                        "raw"]) + ". ")
                                                 speaker = ohtm_file["corpus"][archive][interview]["sent"][number][
                                                     "speaker"]
                                                 chunk_end_time = \
@@ -110,15 +110,12 @@ def print_topic_search_weight(
                                     sent_current = [sent_current, "\n",
                                                      html.A(link, href=link, target="_blank", style={'color': 'blue'})]
 
-                                print(sent_current)
-
                                 sent_current_2 = (str(ohtm_file["weight"][archive][interview][chunks][str(topic)]),
                                     sent_id,
                                     chunk_id,
                                     sent_current,
                                     final_topic_list,
                                 )
-                                print(sent_current_2)
                                 sent_final.append(sent_current_2)
             sent_final.sort(reverse=True, key=lambda x: x[0])
             df = pd.DataFrame(sent_final)
@@ -168,9 +165,9 @@ def print_topic_search_weight(
                                             sents
                                         ]["raw"]
                                     )
-                                    + " "
+                                    + ". "
                                 )
-                        sent_current = " ".join(sent_current)
+                        sent_current = ". ".join(sent_current)
                         sent_current_2 = (
                             str(
                                 ohtm_file["weight"][archive][interview][chunks][
