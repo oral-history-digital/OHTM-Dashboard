@@ -1162,9 +1162,324 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                 )
             ]
         elif pathname == "/page-6":
-            return [
+            return[
+                dbc.Container(
+                    [
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                html.Div(
+                                    [
+                                        dbc.InputGroup(
+                                            [
+                                                dbc.InputGroupText("Topic"),
+                                                dbc.Input(
+                                                    id="topic_cv",
+                                                    placeholder="Topic",
+                                                    type="number",
+                                                ),
+                                            ],
+                                            className="mb-3",
+                                        ),
+                                        dbc.InputGroup(
+                                            [
+                                                dbc.InputGroupText("Weight"),
+                                                dbc.Input(
+                                                    id="topic_weight_cv",
+                                                    placeholder="Weight",
+                                                    type="number",
+                                                ),
+                                            ],
+                                            className="mb-3",
+                                        ),
+                                         dbc.InputGroup(
+                                            [
+                                                dbc.Button(
+                                                    "Search",
+                                                    id="start_search_cv",
+                                                    color="dark",
+                                                )
+                                            ],
+                                            className="mb-3",
+                                        ),
+                                    ]
+                                ),
+                            ],
+                            width=2,
+                        ),
+                        dbc.Col(
+                            [
+                                html.Div(
+                                    [
+                                        dbc.InputGroup(
+                                            [
+                                                dbc.InputGroupText("Topic 2"),
+                                                dbc.Input(
+                                                    id="topic_2_cv",
+                                                    placeholder="Topic",
+                                                    type="number",
+                                                ),
+                                            ],
+                                            className="mb-3",
+                                        ),
+                                        dbc.InputGroup(
+                                            [
+                                                dbc.InputGroupText("Weight 2"),
+                                                dbc.Input(
+                                                    id="topic_2_weight_cv2",
+                                                    placeholder="Weight",
+                                                    type="number",
+                                                ),
+                                            ],
+                                            className="mb-3",
+                                        ),
+                                    ]
+                                ),
+                            ],
+                            width=2,
+                        ),
+                        dbc.Col(
+                            [
+                                html.Div(
+                                    [
+                                        dbc.InputGroup(
+                                            [
+                                                dbc.InputGroupText("Topic_c 3"),
+                                                dbc.Input(
+                                                    id="topic_c_3",
+                                                    placeholder="Topic",
+                                                    type="number",
+                                                ),
+                                            ],
+                                            className="mb-3",
+                                        ),
+                                        dbc.InputGroup(
+                                            [
+                                                dbc.InputGroupText("Topic_c 4"),
+                                                dbc.Input(
+                                                    id="topic_c_4",
+                                                    placeholder="Topic",
+                                                    type="number",
+                                                ),
+                                            ],
+                                            className="mb-3",
+                                        ),
+                                    ]
+                                ),
+                            ],
+                            width=2,
+                        ),
+                    ]
+                ),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        dcc.Graph(
+                                            id="heat_map_cv",
+                                            figure={},
+                                            config={"responsive": True},
+                                            style={
+                                                "height": "100%",
+                                                "width": "100%",
+                                                "display": "flex",
+                                            },
+                                        )
+                                    ],
+                                    width=7,
+                                    style={"display": "flex"},
+                                ),
+                                dbc.Col(
+                                    [
+                                        dcc.Graph(
+                                            id="bar_cv",
+                                            figure={},
+                                            config={"responsive": True},
+                                            style={
+                                                "height": "100%",
+                                                "width": "100%",
+                                                "display": "flex",
+                                            },
+                                        )
+                                    ],
+                                    width=5,
+                                    style={"display": "flex"},
+                                ),
+                            ],
+                            style={"height": "40vh"},
+                        ),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        html.H5(
+                                            [
+                                                dbc.Badge(
+                                                    id="interview_titel_cv",
+                                                    children=["Interview"],
+                                                    color="dark",
+                                                    style={
+                                                        "font-size": "0.9vw",
+                                                        "display": "flex",
+                                                    },
+                                                )
+                                            ],
+                                            className="text-center",
+                                        ),
+                                    ],
+                                    width=2,
+                                    style={"display": "flex"},
+                                ),
+                                dbc.Col(
+                                    [
+                                        dbc.Checklist(
+                                            options=[
+                                                {
+                                                    "label": "Topic Filter",
+                                                    "value": "filter",
+                                                },
+                                                {
+                                                    "label": "Z Score",
+                                                    "value": "z_score",
+                                                },
+                                                {"label": "Marker", "value": "marker"},
+                                            ],
+                                            value=[],
+                                            id="switch_chronology_filter_cv",
+                                            switch=True,
+                                            inline=True,
+                                            style={
+                                                "font-size": "0.7vw",
+                                                "display": "flex",
+                                            },
+                                        ),
+                                    ],
+                                    width=2,
+                                    style={"display": "flex"},
+                                ),
+                                dbc.Col(
+                                    [
+                                        html.Div(
+                                            dbc.Input(
+                                                id="interview_manual_id_cv",
+                                                placeholder="Interview",
+                                                type="text",
+                                                style={
+                                                    "width": "100%",
+                                                    "font-size": "0.8vw",
+                                                    "display": "flex",
+                                                },
+                                            )
+                                        ),
+                                        html.Div(
+                                            dbc.Input(
+                                                id="threshold_top_filter_value",
+                                                placeholder="Top Filter Threshold",
+                                                type="number",
+                                                style={
+                                                    "width": "1%",
+                                                    "font-size": "0.8vw",
+                                                    "display": "flex",
+                                                },
+                                            )
+                                        ),
+                                        html.Div(
+                                            dbc.Input(
+                                                id="outlier_threshold_value",
+                                                placeholder="Outlier Threshold",
+                                                type="number",
+                                                style={
+                                                    "width": "1%",
+                                                    "font-size": "0.8vw",
+                                                    "display": "flex",
+                                                },
+                                            )
+                                        ),
+                                    ],
+                                    width=2,
+                                    style={"display": "flex"},
+                                ),
+                                dbc.Col([], width=2),
+                                dbc.Col(
+                                    [
+                                        html.H5(
+                                            [
+                                                dbc.Button(
+                                                    "<",
+                                                    id="-_button_frontpage_cv",
+                                                    color="dark",
+                                                    size="sm",
+                                                    style={"font-size": "0.5vw"},
+                                                ),
+                                                dbc.Badge(
+                                                    "chunk",
+                                                    id="sent_titel_cv",
+                                                    color="dark",
+                                                    style={
+                                                        "font-size": "0.5vw",
+                                                        "alignItems": "center",
+                                                    },
+                                                ),
+                                                dbc.Button(
+                                                    ">",
+                                                    id="+_button_frontpage_cv",
+                                                    color="dark",
+                                                    size="sm",
+                                                    style={"font-size": "0.5vw"},
+                                                ),
+                                            ],
+                                            style={"display": "flex"},
+                                        ),
+                                    ],
+                                    width=2,
+                                    style={"display": "flex"},
+                                ),
+                                dbc.Col([], width=2),
+                            ],
+                            style={"height": "5vh"},
+                        ),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        dcc.Graph(
+                                            id="heat_map_interview_cv",
+                                            figure={},
+                                            style={"height": "100%", "width": "100%"},
+                                            config={"responsive": True},
+                                        )
+                                    ],
+                                    width=6,
+                                    style={"display": "flex"},
+                                ),
+                                dbc.Col(
+                                    [
+                                        html.Div(
+                                            id="textarea_cv",
+                                            style={
+                                                "whiteSpace": "pre-line",
+                                                "display": "inline-block",
+                                                "height": "45vh",
+                                                "display": "block",
+                                                "font-size": "1vm",
+                                                "background-color": "rgb(249,249,249)",
+                                                "overflow": "auto",
+                                            },
+                                        ),
+                                    ],
+                                    width=6,
+                                    style={"display": "flex"},
+                                ),
+                            ],
+                            style={"height": "40vh"},
+                        ),
+                    ],
+                    fluid=True,
+                )
+            ] 
 
-            ]
+            
 
         # If the user tries to reach a different page, return a 404 message
         return dbc.Jumbotron(
