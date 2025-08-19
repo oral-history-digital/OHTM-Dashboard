@@ -158,6 +158,11 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                         href="/page-5",
                                         style={"font-size": "1vw"},
                                     ),
+                                    dbc.DropdownMenuItem(
+                                        "Chunk Analyzation",
+                                        href="/page-6",
+                                        style={"font-size": "1vw"},
+                                    ),
                                 ],
                                 label="Menu",
                                 color="dark",
@@ -1155,6 +1160,10 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                     ],
                     fluid=True,
                 )
+            ]
+        elif pathname == "/page-6":
+            return [
+
             ]
 
         # If the user tries to reach a different page, return a 404 message

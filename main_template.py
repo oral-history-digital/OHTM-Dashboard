@@ -11,7 +11,8 @@ input_folder = r"C:\Users\phili\sciebo - Bayerschmidt, Philipp (bayerschmidt@fer
 
 
 if __name__ == "__main__":
-    load_file_name = r"OHD_final_100c_100T_A5_final.ohtm"
+    load_file_name = "oht_final_remade_test.ohtm"
+    #load_file_name = "ohtm_100c_120T_final.ohtm"
     with open(os.path.join(input_folder, load_file_name)) as f:
         ohtm_file = json.load(f)
     chronologie_analyse = False
