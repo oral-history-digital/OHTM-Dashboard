@@ -20,7 +20,7 @@ global top_dic
 logo_image_filename = "dash_ohd_image.png"
 
 
-def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
+def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool = False):
     def b64_image(logo_image_filename):
         with open(logo_image_filename, "rb") as f:
             image = f.read()
@@ -61,6 +61,10 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         [
             dbc.Container(
                 [
+                    # Tooltips
+                    html.Div(id='tooltip_trigger', children='init', style={'display': 'none'}),
+                    html.Div(id = "tooltip", children=[]),
+                    # Stores for different Variables and States
                     dcc.Store(id="top_dic", data="", storage_type="session"),
                     dcc.Store(id="heat_dic", data={}, storage_type="session"),
                     dcc.Store(id="top_dic2", data={}, storage_type="session"),
@@ -704,11 +708,11 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                     fluid=True,
 
                 ),
-                html.Div( 
-                        dbc.Tooltip(
-                            "Noun: rare, " "the action or habit of estimating something as worthless.",
-                            target="Corpus_heatmap_page_1_header",
-        ),)
+        #             html.Div( 
+        #                 dbc.Tooltip(
+        #                     "Noun: rare, " "the action or habit of estimating something as worthless.",
+        #                     target="Corpus_heatmap_page_1_header",
+        # ),)
             ]
         elif pathname == "/page-1":
             return [
@@ -2163,6 +2167,25 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         elif button_id == "sort_topic_2_cv":
             return "Topic 2"
         return "Sort Filter"
+    
+    @app.callback(
+        Output("tooltip", "children"),
+        Input("tootltip_trigger", "value")
+    )
+    def cerate_tooltips(trigger):
+        if tooltip:
+            return dbc.Tooltip(
+                    "hello",
+                    target=target_id,
+                    id=tooltip_id,
+                    is_open=False
+            )
+        return  dbc.Tooltip(
+                "no",
+                target=target_id,
+                id=tooltip_id,
+                is_open=False
+    )
 
                 
 
