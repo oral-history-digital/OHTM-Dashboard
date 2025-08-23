@@ -14,7 +14,7 @@ def heatmap_corpus(
     z_score_global: str = "True",
     topic_filter_number: int = 0,
     topic_filter_threshold: float = 0,
-    topic_filter: str = "True",
+    topic_filter: str = "False",
 ):
     ohtm_file = convert_ohtm_file(ohtm_file)
 
@@ -121,7 +121,7 @@ def heatmap_corpus(
 """
 This function has to be tested in the dash. Because now it is really slow. With the chagen to possilbe different
 archive namens than the first 3 letters of the interview id, i had to find another way. Maye this function has to be
-improved. (17.1.2025)
+done: improved. (17.1.2025)
 
 
 """
@@ -215,3 +215,120 @@ def heatmap_interview_simple(
             print("No Topic Model trained")
     else:
         return no_update, no_update, no_update, no_update, no_update, no_update
+    
+
+def chunk_heatmap(
+    ohtm_file,
+    option_selected: str = "all",
+    show_fig: bool = True,
+    return_fig: bool = False,
+    topic_1_number: int = 0,
+    topic_1_weight: float = 0,
+    topic_2_number: int = 0,
+    topic_2_weight: float = 0,
+    correlation: list = "",
+    sort_filter: str = ""
+):
+    ohtm_file = convert_ohtm_file(ohtm_file)
+
+    if option_selected == "None":
+        option_selected = "all"
+    if topic_1_number == "None":
+        print("Select a Topic Numer first")
+    if topic_1_weight == "None":
+        print("Select Topic Weight first")
+    if ohtm_file["settings"]["topic_modeling"]["trained"] == "True":
+        heat_chunk_cv = {}
+        results = []
+        if option_selected == "all":
+            for archive in ohtm_file["weight"]:
+                for interview in ohtm_file["weight"][archive]:
+                    for chunks in ohtm_file["weight"][archive][interview]:
+                        chunk_name = str(interview) + "**" + str(chunks)
+                        if str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]) >= str(topic_1_weight):
+                            chunk_results = []
+                            if "e" in str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]):
+                                next
+                            else:
+                                heat_chunk_cv[chunk_name] = dict(ohtm_file["weight"][archive][interview][chunks])
+                                top_ts = ohtm_file["weight"][archive][interview][chunks]
+                                top_ts_sorted = sorted(top_ts.items(), key=lambda x: x[1], reverse=True)
+                                final_topic_list = []
+                                for entry in top_ts_sorted[:10]:
+                                    final_topic_list.append(str(entry[0]) + "," + str(entry[1]))
+                                chunk_results.append(str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]))
+                                chunk_results.append(interview)
+                                chunk_results.append(chunks)
+                                chunk_results.append(final_topic_list)
+                                final_chunk = chunks
+                                for all_chunk in ohtm_file["weight"][archive][interview]:
+                                    max_chunk = all_chunk
+                                chunk_percent = (int(final_chunk)/int(max_chunk))*100
+                                chunk_results.append(chunk_percent)
+                                results.append(chunk_results)
+        else:
+            archive = option_selected
+            for interview in ohtm_file["weight"][archive]:
+                for chunks in ohtm_file["weight"][archive][interview]:
+                        chunk_name = str(interview) + "**" + str(chunks)
+                        if str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]) >= str(topic_1_weight):
+                            chunk_results = []
+                            if "e" in str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]):
+                                next
+                            else:
+                                heat_chunk_cv[chunk_name] = dict(ohtm_file["weight"][archive][interview][chunks])
+                                top_ts = ohtm_file["weight"][archive][interview][chunks]
+                                top_ts_sorted = sorted(top_ts.items(), key=lambda x: x[1], reverse=True)
+                                final_topic_list = []
+                                for entry in top_ts_sorted[:10]:
+                                    final_topic_list.append(str(entry[0]) + "," + str(entry[1]))
+                                chunk_results.append(interview)
+                                chunk_results.append(archive)
+                                chunk_results.append(str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]))
+                                chunk_results.append(chunks)
+                                chunk_results.append(final_topic_list)
+                                final_chunk = chunks
+                                for all_chunk in ohtm_file["weight"][archive][interview]:
+                                    max_chunk = all_chunk
+                                chunk_percent = (int(final_chunk)/int(max_chunk))*100
+                                chunk_results.append(chunk_percent)
+                                results.append(chunk_results)
+        if "correlation_cv" in correlation:
+            heat_chunk_cv_2 = {}
+            results_2 = []
+            for entry in heat_chunk_cv:
+                if str(heat_chunk_cv[entry][str(topic_2_number)]) >=  str(topic_2_weight):
+                    heat_chunk_cv_2[entry] = heat_chunk_cv[entry]
+                    for data in results:
+                        if data[1] == entry.split("**")[0]:
+                            results_2.append(data)
+            heat_chunk_cv = dict(heat_chunk_cv_2)
+            results = results_2
+        df_heat_cv = pd.DataFrame.from_dict(heat_chunk_cv)
+        df_heat_cv = df_heat_cv.transpose()
+        if sort_filter == "sort_interview_cv":
+            df_heat_cv= df_heat_cv.sort_index()
+        if sort_filter == "sort_topic_1_cv":
+            df_heat_cv= df_heat_cv.sort_values(by=str(topic_1_number), ascending=False)
+        if sort_filter == "sort_topic_2_cv":
+            df_heat_cv=df_heat_cv.sort_values(by=str(topic_2_number), ascending=False)
+        else:
+            next
+
+        fig = px.imshow(df_heat_cv, color_continuous_scale="dense", aspect="auto")
+        fig.update_traces(
+            hovertemplate="Interview: %{y}"
+            "<br>Topic: %{x}"
+            "<br>Weight: %{z}<extra></extra>"
+        )
+        fig.update_layout(clickmode="event+select")
+        fig.update_layout(clickmode="event+select")
+        fig.update(layout_coloraxis_showscale=False)
+        fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+        if show_fig:
+            fig.show()
+        if return_fig:
+            return fig, results
+
+    else:
+        print("No Topic Model trained")

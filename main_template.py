@@ -7,7 +7,7 @@ import os
 
 from ohtm_dash_function import create_ohd_dash
 
-input_folder = r"C:\Users\bayerschmidt\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\Topic Modeling\ohtm_files"
+input_folder = r"C:\Users\phili\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\Topic Modeling\ohtm_files"
 
 
 if __name__ == "__main__":
