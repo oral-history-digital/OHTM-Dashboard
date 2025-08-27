@@ -16,6 +16,7 @@ from functions.print_functions.print_topics import print_all_topics, top_words
 from functions.print_functions.print_details_cv import print_details_cv_function
 
 global top_dic
+global tooltip
 
 logo_image_filename = "dash_ohd_image.png"
 
@@ -1310,7 +1311,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                             [
                                                 dbc.Badge(
                                                     id="cv_results",
-                                                    children=["0 Interviews"],
+                                                    children=["0 Chunks"],
                                                     color="dark",
                                                     style={
                                                         "font-size": "0.9vw",
@@ -1446,6 +1447,14 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                 ),
                                 dbc.Col(
                                     [
+                                    dbc.InputGroup([
+                                    dbc.Button(
+                                        "<", id="-_button_cv", color="dark", 
+                                    ),
+                                    ],
+                                        className="mb-3",
+                                        size="sm",
+                                    ),
                                         html.H5(
                                             [
                                                 dbc.Badge(
@@ -1459,6 +1468,14 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                                 )
                                             ],
                                             className="text-center",
+                                        ),
+                                        dbc.InputGroup([
+                                    dbc.Button(
+                                        ">", id="+_button_cv", color="dark",
+                                    ),
+                                        ],
+                                            className="mb-3",
+                                            size="sm",
                                         ),
                                     ],
                                     width=2,
@@ -1503,6 +1520,27 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                     width=6,
                                     style={"display": "flex"},
                                 ),
+                                 dbc.Col(
+                                    [
+                                    html.Div(
+                                    id="detail_info_cv_chunk",
+                                    style={
+                                        "whiteSpace": "pre-line",
+                                        "display": "inline-block",
+                                        "height": "45vh",
+                                        "width": "100%",
+                                        "display": "block",
+                                        "font-size": "1vm",
+                                        "background-color": "rgb(249,249,249)",
+                                        "overflow": "auto",
+                                    },
+                                ),
+                                    
+
+                                    ],
+                                    width=3,
+                                    style={"display": "flex"},
+                                ),
                                 dbc.Col(
                                     [
                                     html.Div(
@@ -1521,7 +1559,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                     
 
                                     ],
-                                    width=6,
+                                    width=3,
                                     style={"display": "flex"},
                                 ),
                             ],
@@ -2061,6 +2099,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
         Output("bar_cv", "figure"),
         Output("cv_results", "children"),
         Output("detail_info_cv", "children"),
+        Output("topic_info_cv", "children"),
         Input("topic_cv", "value"),
         Input("topic_weight_cv", "value"),
         Input("start_search_cv", "n_clicks"),
@@ -2096,7 +2135,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                 sort_filter=ctx.triggered[0]["prop_id"].split(".")[0]
             )
             results = fig_heat[1]
-            results_header = str(len(results)) + " Interviews"
+            results_header = str(len(results)) + " Chunks"
             detail_results_cv = print_details_cv_function(results)
             fig = fig_heat[0]
 
@@ -2112,23 +2151,30 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                 correlation= correlation
             )
             
-            return fig, fig_bar, results_header, detail_results_cv
+            return fig, fig_bar, results_header, detail_results_cv[0], detail_results_cv[1]
         else:
-            return [], [], "0 Interviews", []
+            return [], [], "0 CHunks", [], []
     
     @app.callback(
         Output("textarea_cv", "children"),
         Output("interview_titel_cv", "children"),
+        Output("detail_info_cv_chunk", "children"),
         Input("heat_map_cv", "clickData"),
+        Input("-_button_cv", "n_clicks"),
+        Input("+_button_cv", "n_clicks"),
         prevent_initial_call=True
     )
-    def chunk_view_text_print(click_data):
+    def chunk_view_text_print(click_data, minus_button, plus_button):
         chunk_text = chunk_sent_drawing_cv(
             ohtm_file = ohtm_file,
             click_data_input=click_data,
             )
-        interview = click_data["points"][0]["y"].split("**")[0]
-        return chunk_text, interview
+        interview = click_data["points"][0]["y"].split("**")[0] + "- Chunk: " + str(chunk_text[2])
+        return chunk_text[0], interview, chunk_text[1]
+
+
+
+
 
     @app.callback(
         Output("heat_map_cv_nr", "data"),
@@ -2176,16 +2222,16 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
         if tooltip:
             return dbc.Tooltip(
                     "hello",
-                    target=target_id,
+                    target=Corpus_heatmap_page_1_header,
                     id=tooltip_id,
-                    is_open=False
+                    is_open=True
             )
         return  dbc.Tooltip(
                 "no",
-                target=target_id,
+                target=Corpus_heatmap_page_1_header,
                 id=tooltip_id,
                 is_open=False
-    )
+             )
 
                 
 

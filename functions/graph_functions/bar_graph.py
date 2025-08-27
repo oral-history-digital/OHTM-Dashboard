@@ -132,19 +132,40 @@ def bar_graph_cv_function(
             archive = option_selected
             for interview in ohtm_file["weight"][archive]:
                     for chunks in ohtm_file["weight"][archive][interview]:
-                        if str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]) >= str(topic_1_weight):
-                            if "e" in str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]):
-                                next
-                            else:
-                                if archive not in heat_cv_dic:
-                                    heat_cv_dic[archive] = {}
-                                    heat_cv_dic[archive] = dict(ohtm_file["weight"][archive][interview][chunks])
+                        if "correlation_cv" in correlation:
+                            if str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]) >= str(topic_1_weight):
+                                    if "e" in str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]):
+                                        next
+                                    else:
+                                      if str(ohtm_file["weight"][archive][interview][chunks][str(topic_2_number)]) >= str(topic_2_weight):
+                                        if "e" in str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]):
+                                            next
+                                        else:
+                                            if archive not in heat_cv_dic:
+                                                heat_cv_dic[archive] = {}
+                                                heat_cv_dic[archive] = dict(ohtm_file["weight"][archive][interview][chunks])
+                                            else:
+                                                for topics in ohtm_file["weight"][archive][interview][chunks]:
+                                                    old_value = heat_cv_dic[archive][topics]
+                                                    heat_cv_dic[archive][topics] = float(old_value) + float(ohtm_file["weight"][archive][interview][chunks][topics])
+                        else:
+                            if str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]) >= str(topic_1_weight):
+                                if "e" in str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]):
+                                    next
                                 else:
-                                    for topics in ohtm_file["weight"][archive][interview][chunks]:
-                                        old_value = heat_cv_dic[archive][topics]
-                                        heat_cv_dic[archive][topics] = float(old_value) + float(ohtm_file["weight"][archive][interview][chunks][topics])
+                                    if archive not in heat_cv_dic:
+                                        heat_cv_dic[archive] = {}
+                                        heat_cv_dic[archive] = dict(ohtm_file["weight"][archive][interview][chunks])
+                                    else:
+                                        for topics in ohtm_file["weight"][archive][interview][chunks]:
+                                            old_value = heat_cv_dic[archive][topics]
+                                            heat_cv_dic[archive][topics] = float(old_value) + float(ohtm_file["weight"][archive][interview][chunks][topics])
+
         for entry in heat_cv_dic:
             heat_cv_dic[entry][str(topic_1_number)] = 0
+        if "correlation_cv" in correlation:
+            for entry in heat_cv_dic:
+                heat_cv_dic[entry][str(topic_2_number)] = 0 
         df_bar_cv = pd.DataFrame.from_dict(heat_cv_dic)
         min_val = df_bar_cv.min()
         max_val = df_bar_cv.max()

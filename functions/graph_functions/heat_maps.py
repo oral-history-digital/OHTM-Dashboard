@@ -1,6 +1,7 @@
 from builtins import print
 
 import pandas as pd
+import copy
 import plotly.express as px
 
 from functions.basic_functions.convert_ohtm_file import convert_ohtm_file
@@ -254,11 +255,12 @@ def chunk_heatmap(
                                 top_ts = ohtm_file["weight"][archive][interview][chunks]
                                 top_ts_sorted = sorted(top_ts.items(), key=lambda x: x[1], reverse=True)
                                 final_topic_list = []
-                                for entry in top_ts_sorted[:10]:
+                                for entry in top_ts_sorted[:5]:
                                     final_topic_list.append(str(entry[0]) + "," + str(entry[1]))
                                 chunk_results.append(str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]))
                                 chunk_results.append(interview)
                                 chunk_results.append(chunks)
+                                chunk_results.append(archive)
                                 chunk_results.append(final_topic_list)
                                 final_chunk = chunks
                                 for all_chunk in ohtm_file["weight"][archive][interview]:
@@ -280,12 +282,12 @@ def chunk_heatmap(
                                 top_ts = ohtm_file["weight"][archive][interview][chunks]
                                 top_ts_sorted = sorted(top_ts.items(), key=lambda x: x[1], reverse=True)
                                 final_topic_list = []
-                                for entry in top_ts_sorted[:10]:
+                                for entry in top_ts_sorted[:5]:
                                     final_topic_list.append(str(entry[0]) + "," + str(entry[1]))
-                                chunk_results.append(interview)
-                                chunk_results.append(archive)
                                 chunk_results.append(str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]))
+                                chunk_results.append(interview)
                                 chunk_results.append(chunks)
+                                chunk_results.append(archive)
                                 chunk_results.append(final_topic_list)
                                 final_chunk = chunks
                                 for all_chunk in ohtm_file["weight"][archive][interview]:
@@ -298,11 +300,14 @@ def chunk_heatmap(
             results_2 = []
             for entry in heat_chunk_cv:
                 if str(heat_chunk_cv[entry][str(topic_2_number)]) >=  str(topic_2_weight):
-                    heat_chunk_cv_2[entry] = heat_chunk_cv[entry]
+                    heat_chunk_cv_2[entry] = copy.deepcopy(heat_chunk_cv[entry])
                     for data in results:
                         if data[1] == entry.split("**")[0]:
-                            results_2.append(data)
+                            if data[2] == entry.split("**")[1]:
+                                data_append = copy.deepcopy(data)
+                                results_2.append(data_append)
             heat_chunk_cv = dict(heat_chunk_cv_2)
+
             results = results_2
         df_heat_cv = pd.DataFrame.from_dict(heat_chunk_cv)
         df_heat_cv = df_heat_cv.transpose()
