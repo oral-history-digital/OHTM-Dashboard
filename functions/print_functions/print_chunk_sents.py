@@ -146,16 +146,14 @@ def chunk_sent_drawing_cv(
         
         ohtm_file,
         click_data_input,
+        chunk_number,
         show_links: bool = True
 ):
     anonymized_status = False
-    chunks = int(click_data_input["points"][0]["y"].split("**")[1])
+    chunks = chunk_number
     interview = click_data_input["points"][0]["y"].split("**")[0]
 
-    if ctx.triggered[0]["prop_id"] == "+_button_cv.n_clicks":
-        chunks += 1
-    if ctx.triggered[0]["prop_id"] == "-_button_cv.n_clicks":
-        chunks -= 1
+
     
     chunks = str(chunks)
 

@@ -13,15 +13,16 @@ from functions.graph_functions.heat_maps import heatmap_corpus, heatmap_intervie
 from functions.print_functions.print_chunk_sents import chunk_sent_drawing, chunk_sent_drawing_cv
 from functions.print_functions.print_topic_search import print_topic_search_weight
 from functions.print_functions.print_topics import print_all_topics, top_words
+from functions.print_functions.print_sideboard_info import sideboard_info_function
 from functions.print_functions.print_details_cv import print_details_cv_function
-
+from functions.dash_board_functions.tooltip_function import tooltip_creation
 global top_dic
-global tooltip
+global tooltip_bool
 
 logo_image_filename = "dash_ohd_image.png"
 
 
-def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool = False):
+def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
     def b64_image(logo_image_filename):
         with open(logo_image_filename, "rb") as f:
             image = f.read()
@@ -63,8 +64,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
             dbc.Container(
                 [
                     # Tooltips
-                    html.Div(id='tooltip_trigger', children='init', style={'display': 'none'}),
-                    html.Div(id = "tooltip", children=[]),
+                    html.Div(id="tooltip_store"),
                     # Stores for different Variables and States
                     dcc.Store(id="top_dic", data="", storage_type="session"),
                     dcc.Store(id="heat_dic", data={}, storage_type="session"),
@@ -151,13 +151,17 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                         storage_type="session",
                     ),
                     dcc.Store(
-                        id="heat_map_cv_nr",
+                        id="heat_map_cv_topic_nr",
                         data="",
                         storage_type="session",
                     ),
                     dcc.Store(
-                        id="bar_graph_cv_nr",
+                        id="bar_graph_cv_topic_nr",
                         data="",
+                        storage_type="session",
+                    ),
+                    dcc.Store(
+                        id="chunk_number_cv",
                         storage_type="session",
                     ),
                     html.Img(
@@ -170,13 +174,13 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                             dbc.DropdownMenu(
                                 children=[
                                     dbc.DropdownMenuItem(
-                                        "Dash-Board",
+                                        "Overview",
                                         href="/",
                                         style={"font-size": "0.8vw"},
                                     ),
                                     dbc.DropdownMenuItem(
-                                        "Text Search",
-                                        href="/page-1",
+                                        "Chunk Analyzation",
+                                        href="/page-6",
                                         style={"font-size": "0.8vw"},
                                     ),
                                     dbc.DropdownMenuItem(
@@ -185,8 +189,18 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                         style={"font-size": "0.8vw"},
                                     ),
                                     dbc.DropdownMenuItem(
+                                        "Heatmap",
+                                        href="/page-5",
+                                        style={"font-size": "0.8vw"},
+                                    ),
+                                    dbc.DropdownMenuItem(
                                         "Interview Heatmap",
                                         href="/page-3",
+                                        style={"font-size": "0.8vw"},
+                                    ),
+                                    dbc.DropdownMenuItem(
+                                        "Text Search",
+                                        href="/page-1",
                                         style={"font-size": "0.8vw"},
                                     ),
                                     dbc.DropdownMenuItem(
@@ -194,16 +208,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                         href="/page-4",
                                         style={"font-size": "0.8vw"},
                                     ),
-                                    dbc.DropdownMenuItem(
-                                        "Heatmap",
-                                        href="/page-5",
-                                        style={"font-size": "0.8vw"},
-                                    ),
-                                    dbc.DropdownMenuItem(
-                                        "Chunk Analyzation",
-                                        href="/page-6",
-                                        style={"font-size": "0.8vw"},
-                                    ),
+
                                 ],
                                 label="Menu",
                                 color="dark",
@@ -301,6 +306,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                     ]
                                 ),
                                 title="Notizen",
+                                className="mb-3",
                             ),
                             # dbc.AccordionItem(html.Div([
                             #     dbc.Row([
@@ -340,7 +346,38 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                             # ),
                         ],
                         always_open=True,
+
                     ),
+                    html.Div(                         
+                                [
+                                    html.Hr(),
+                                    html.P("Topic Model Info", className="text-muted", style={"font-size": "0.6vw",
+                                                                                        "display": "flex"}),
+                                    html.Div(id="sidebar-info", children="[]", style={"whiteSpace": "pre-line",
+                                                                                      "font-size": "0.6vw",
+                                                                                        "display": "flex"}),
+                                    html.Hr(),
+                                    ]
+                                ),
+                    html.Div(
+                            [ 
+                                dbc.Checklist(
+                                    options=[
+                                        {"label": "Tooltips anzeigen", "value": "tooltip_on"}
+                                    ],
+                                    value=[],
+                                    id="tooltip_switch",
+                                    switch=True,
+                                    style={
+                                        "width": "100%",
+                                        "min-width": "150px",
+                                        "font-size": "0.8vw",
+                                        "display": "flex",
+                                    },
+                                ),
+                                    ]
+                                ),
+                    
                 ],
                 fluid=True,
             )
@@ -567,7 +604,8 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                                     size="sm",
                                                     style={"font-size": "0.6vw",
                                                            "alignItems": "center",
-                                                           "justifyContent": "center"},
+                                                           "justifyContent": "center",
+                                                           },
                                                 ),
                                                 dbc.Badge(
                                                     "Chunk",
@@ -576,7 +614,8 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                                     style={
                                                         "font-size": "0.6vw",
                                                         "alignItems": "center",
-                                                        "justifyContent": "center"
+                                                        "justifyContent": "center", 
+                                                        "margin": "0 auto"
                                                     },
                                                 ),
                                                 dbc.Button(
@@ -589,6 +628,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                                 ),
                                             ],
                                             style={"display": "flex"},
+                                            className="text-center",
                                         ),   
                                     ],
                                     width=2,
@@ -633,87 +673,10 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                             ],
                             style={"height": "35vh"},
                         ),
-                        # dbc.Row([
-                        #     dbc.Col([
-                        #         dbc.Row([
-                        #             dbc.Col([
-                        #                 html.H5([dbc.Badge(id="interview_titel", color="dark", style={"font-size":"0.5vw", "display": "flex"})], className="text-center")
-                        #             ]),
-                        #         ]),
-                        #         dbc.Row([
-                        #             dbc.Col([
-                        #                 dbc.Checklist(
-                        #                     options=[
-                        #                         {"label": "Topic Filter", "value": "filter"},
-                        #                         {"label": "Z Score", "value": "z_score"},
-                        #                         {"label": "Marker", "value": "marker"}
-                        #                     ],
-                        #                     value=[],
-                        #                     id="switch_chronology_filter",
-                        #                     switch=True,
-                        #                     inline=True,
-                        #                     style={"font-size": "0.5vw",
-                        #                            "display": "flex"}
-                        #                 ),
-                        #             ], style={"display": "flex"}),
-                        #             dbc.Col([
-                        #                 html.Div(dbc.Input(id='interview_manual_id', placeholder="Interview", type='text')),
-                        #             ], width=1, style={"display": "flex", "alignItems": "left"}),
-                        #             dbc.Col([
-                        #                 html.Div(dbc.Input(id='threshold_top_filter_value',
-                        #                                    placeholder="Top Filter Threshold", type='number')),
-                        #             ], width=1, style={"display": "flex", "alignItems": "left"}),
-                        #             dbc.Col([
-                        #                 html.Div(dbc.Input(id='outlier_threshold_value', placeholder="Outlier Threshold",
-                        #                                    type='number')),
-                        #             ], width=1, style={"display": "flex", "alignItems": "left"})
-                        #             ]),
-                        #     dbc.Row([
-                        #         dbc.Col([
-                        #             dcc.Graph(id='heat_map_interview', figure={}, style={"height": "100%", "width": "100%"},
-                        #                       config={"responsive": True})
-                        #         ], style={"display": "flex", "alignItems": "left"}),
-                        #     ]),
-                        # ], style={"display": "flex", "alignItems": "left"}),
-                        #
-                        #     dbc.Col([
-                        #         dbc.Row([
-                        #             html.H5([
-                        #                 dbc.Button("<", id="-_button_frontpage", color="dark", size="sm",
-                        #                            style={"font-size": "0.5vw", "display": "flex"}),
-                        #                 dbc.Badge("chunk", id="sent_titel", color="dark",
-                        #                           style={"font-size": "0.5vw", "display": "flex"}),
-                        #                 dbc.Button(">", id="+_button_frontpage", color="dark", size="sm",
-                        #                            style={"font-size": "0.5vw", "display": "flex"})
-                        #             ], style={"display": "flex", "alignItems": "left"}),
-                        #         ]),
-                        #         dbc.Row([
-                        #             dbc.Col([
-                        #                 dbc.Row([
-                        #                     html.Div(id='textarea',
-                        #                              style={
-                        #                                  'whiteSpace': 'pre-line',
-                        #                                  'display': 'inline-block',
-                        #                                  'height': '45vh',
-                        #                                  'display': 'block',
-                        #                                  'font-size': "1vm",
-                        #                                  'background-color': 'rgb(249,249,249)',
-                        #                                  "overflow": "auto",
-                        #                                     }),
-                        #                 ]),
-                        #             ], style={"display": "flex", "alignItems": "left"}),
-                        #             ]),
-                        #         ], style={"display": "flex", "alignItems": "left"}),
-                        # ]),
                     ],
                     fluid=True,
 
                 ),
-        #             html.Div( 
-        #                 dbc.Tooltip(
-        #                     "Noun: rare, " "the action or habit of estimating something as worthless.",
-        #                     target="Corpus_heatmap_page_1_header",
-        # ),)
             ]
         elif pathname == "/page-1":
             return [
@@ -1314,7 +1277,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                                     children=["0 Chunks"],
                                                     color="dark",
                                                     style={
-                                                        "font-size": "0.9vw",
+                                                        "font-size": "0.7vw",
                                                         "display": "flex",
                                                     },
                                                 )
@@ -1378,25 +1341,32 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                     ]
                                 ),
                             ],
-                            width=2,
+                            width=1,
                         ),
                             dbc.Col(
                                     [
                                         html.Div(
+                                            dbc.Badge(
+                                                id = "test",
+                                                children = ["Interview Results"],
+                                            )
+                                        ),
+                                        html.Div(
                                             id="topic_info_cv",
                                             style={
                                                 # "whiteSpace": "pre-line",
-                                                # "display": "inline-block",
-                                                # "height": "45vh",
-                                                # "display": "block",
-                                                # "font-size": "1vm",
-                                                # "background-color": "rgb(200,249,249)",
-                                                # "overflow": "auto",
+                                                "display": "inline-block",
+                                                "height": "15vh",
+                                                "display": "block",
+                                                "font-size": "0.5vm",
+                                                "background-color": "rgb(249,249,249)",
+                                                "overflow": "auto",
+                                                "display": "flex",
                                             },
                                         ),
                                     ],
-                                    width=2,
-                                    style={"display": "flex"},
+                                    width=4,
+                                    style={"display": "flex", "flexDirection": "column"},
                                 ),
                     ]
                 ),
@@ -1450,19 +1420,24 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                     dbc.InputGroup([
                                     dbc.Button(
                                         "<", id="-_button_cv", color="dark", 
+                                                style={
+                                                        "font-size": "0.7vw",
+                                                        "display": "flex",
+                                                    },
                                     ),
                                     ],
                                         className="mb-3",
                                         size="sm",
+              
                                     ),
                                         html.H5(
                                             [
                                                 dbc.Badge(
                                                     id="interview_titel_cv",
-                                                    children=["Interview"],
+                                                    children=["Interview ID - Chunk:"],
                                                     color="dark",
                                                     style={
-                                                        "font-size": "0.9vw",
+                                                        "font-size": "0.8vw",
                                                         "display": "flex",
                                                     },
                                                 )
@@ -1472,6 +1447,10 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                         dbc.InputGroup([
                                     dbc.Button(
                                         ">", id="+_button_cv", color="dark",
+                                        style={
+                                                        "font-size": "0.7vw",
+                                                        "display": "flex",
+                                                    },
                                     ),
                                         ],
                                             className="mb-3",
@@ -1489,14 +1468,31 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                     width=2,
                                     style={"display": "flex"},
                                 ),
-                                dbc.Col([], width=2),
+                                dbc.Col([
+                                    dbc.Badge(
+                                        id = "chunk_topic_info",
+                                        children = ["Chunk Topic Verteilung"],
+                                        style={
+                                                "font-size": "0.7vw",
+                                                "display": "flex",
+                                                    },
+                                    ),
+                                ], width=2),
+                                dbc.Col([], width = 1),
                                 dbc.Col(
                                     [
+                                    dbc.Badge(
+                                        id = "chunk_topic_info_all",
+                                        children = ["Top 5 Topics"],
+                                        style={
+                                                "font-size": "0.7vw",
+                                                "display": "flex",
+                                                    },
+                                    ),
                                     ],
                                     width=2,
-                                    style={"display": "flex"},
                                 ),
-                                dbc.Col([], width=2),
+
                             ],
                             style={"height": "5vh"},
                         ),
@@ -1530,7 +1526,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                         "height": "45vh",
                                         "width": "100%",
                                         "display": "block",
-                                        "font-size": "1vm",
+                                        "font-size": "0.6vm",
                                         "background-color": "rgb(249,249,249)",
                                         "overflow": "auto",
                                     },
@@ -1551,7 +1547,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                                         "height": "45vh",
                                         "width": "100%",
                                         "display": "block",
-                                        "font-size": "1vm",
+                                        "font-size": "0.6vm",
                                         "background-color": "rgb(249,249,249)",
                                         "overflow": "auto",
                                     },
@@ -1586,12 +1582,13 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
     # Dropboxmenue for corpus heatmap page 1
     @app.callback(
         Output("slct_archiv", "options"),
+        Output("slct_archiv", "value"),
         Input("top_dic", "data"),
         prevent_initial_call=False,
     )
     def create_dropdown_list_dash(data):
         drop_down_menu = create_dropdown_list(ohtm_file)
-        return drop_down_menu
+        return drop_down_menu, "all"
 
     # Bargraph on page 1
     @app.callback(
@@ -2046,8 +2043,8 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
         Input("bar_detail_topic_nr", "data"),
         Input("heatmap_corpus_topic_nr", "data"),
         Input("heatmap_corpus_detail_topic_nr", "data"),
-        Input("heat_map_cv_nr", "data"),
-        Input("bar_graph_cv_nr", "data"),
+        Input("heat_map_cv_topic_nr", "data"),
+        Input("bar_graph_cv_topic_nr", "data"),
         prevent_initial_call=True,
     )
     def df_input(value1, value2, value3, value4, value5, value6, value7, value8, value9):
@@ -2092,6 +2089,29 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
 
     # Funktions Page 6 Chunk-View
 
+    # Chunk-Number building and storage
+    @app.callback(
+        Output("chunk_number_cv", "data"),
+        Input("heat_map_cv", "clickData"),
+        Input("-_button_cv", "n_clicks"),
+        Input("+_button_cv", "n_clicks"),
+        State("chunk_number_cv", "data"),
+        prevent_initial_call = True,
+    )
+    def create_chunk_number(click_data_input, mins, plus, store):
+        if ctx.triggered[0]["prop_id"] == "+_button_cv.n_clicks":
+            number = int(store)
+            number += 1
+            return number
+        if ctx.triggered[0]["prop_id"] == "-_button_cv.n_clicks":
+            number = int(store)
+            number -= 1
+            return number
+        else:
+            number = click_data_input["points"][0]["y"].split("**")[1]
+            return number
+
+
     # Chunk_Heatmap
 
     @app.callback(
@@ -2120,6 +2140,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
                        topic_2, 
                        weight_2,
                        c1, c2, c3,):
+        import plotly.graph_objects as go
         if n_clicks:
             results = []
             fig_heat = chunk_heatmap(
@@ -2153,31 +2174,28 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
             
             return fig, fig_bar, results_header, detail_results_cv[0], detail_results_cv[1]
         else:
-            return [], [], "0 CHunks", [], []
+            return go.Figure(), go.Figure(), "0 Chunks", [], []
     
     @app.callback(
         Output("textarea_cv", "children"),
         Output("interview_titel_cv", "children"),
         Output("detail_info_cv_chunk", "children"),
         Input("heat_map_cv", "clickData"),
-        Input("-_button_cv", "n_clicks"),
-        Input("+_button_cv", "n_clicks"),
+        Input("chunk_number_cv", "data"),
         prevent_initial_call=True
     )
-    def chunk_view_text_print(click_data, minus_button, plus_button):
+    def chunk_view_text_print(click_data, chunk_nr):
         chunk_text = chunk_sent_drawing_cv(
             ohtm_file = ohtm_file,
             click_data_input=click_data,
+            chunk_number = chunk_nr
             )
         interview = click_data["points"][0]["y"].split("**")[0] + "- Chunk: " + str(chunk_text[2])
         return chunk_text[0], interview, chunk_text[1]
 
 
-
-
-
     @app.callback(
-        Output("heat_map_cv_nr", "data"),
+        Output("heat_map_cv_topic_nr", "data"),
         Input("heat_map_cv", "clickData"),
         prevent_initial_call=True,
     )
@@ -2187,7 +2205,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
             return topic
     
     @app.callback(
-        Output("bar_graph_cv_nr", "data"),
+        Output("bar_graph_cv_topic_nr", "data"),
         Input("bar_cv", "clickData"),
         prevent_initial_call=True,
     )
@@ -2212,29 +2230,30 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False, tooltip: bool 
             return "Topic 1"
         elif button_id == "sort_topic_2_cv":
             return "Topic 2"
-        return "Sort Filter"
-    
+        return "Sort Filter"       
+
     @app.callback(
-        Output("tooltip", "children"),
-        Input("tootltip_trigger", "value")
+        Output("sidebar-info", "children"),
+        Input("top_dic", "data"),
+        prevent_initial_call=False
     )
-    def cerate_tooltips(trigger):
-        if tooltip:
-            return dbc.Tooltip(
-                    "hello",
-                    target=Corpus_heatmap_page_1_header,
-                    id=tooltip_id,
-                    is_open=True
-            )
-        return  dbc.Tooltip(
-                "no",
-                target=Corpus_heatmap_page_1_header,
-                id=tooltip_id,
-                is_open=False
-             )
+    def sidebar_info_output(data):
+        output = sideboard_info_function(ohtm_file)
+    
+        return output
 
-                
+# Function to switch Tooltips on or off. The Tooltips are created in tooltip_function seperatly
 
+    @app.callback(
+        Output("tooltip_store", "children"),
+        Input("tooltip_switch", "value"),
+    )
+    def tooltip_showing(data):
+        if "tooltip_on" in data:
+            tooltip = tooltip_creation()
+            return tooltip
+        else:
+            return []
 
     # @app.callback(
     #     Output("correlation_output", "children"),

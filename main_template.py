@@ -12,10 +12,10 @@ input_folder = r"C:\Users\phili\sciebo - Bayerschmidt, Philipp (bayerschmidt@fer
 
 if __name__ == "__main__":
     load_file_name = "OHD_final_adg_sorted.ohtm"
-    #load_file_name = "ohtm_100c_120T_final.ohtm_pipeline"
+    # load_file_name = "ohtm_100c_130t.ohtm"
     with open(os.path.join(input_folder, load_file_name)) as f:
         ohtm_file = json.load(f)
     chronologie_analyse = False
-    tooltip = True
-    app = create_ohd_dash(ohtm_file, chronologie_analyse, tooltip)
-    app.run(debug=False, port=3002)
+    tooltip_bool = True
+    app = create_ohd_dash(ohtm_file, chronologie_analyse)
+    app.run(debug=True, port=3002)
