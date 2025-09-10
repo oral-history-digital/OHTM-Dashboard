@@ -33,7 +33,7 @@ jobs:
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
 
-          echo "Building image for version #VERSION"
+          echo "Building image for version $VERSION"
 
           docker build \
             --build-arg VERSION="$VERSION" \
