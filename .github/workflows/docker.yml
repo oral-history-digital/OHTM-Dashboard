@@ -2,7 +2,7 @@ name: Create Docker image and push to GHCR
 
 on:
   push:
-    branches: ["master"]
+    branches: ["main"]
 
 permissions:
   contents: read
