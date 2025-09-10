@@ -5,12 +5,12 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "dash>=3.0.2",
-    "dash-bootstrap-components>=2.0.0",
-    "seaborn>=0.13.2",
+    "dash~=3.2.0",
+    "dash-bootstrap-components~=2.0.4",
+    "seaborn~=0.13.2",
 ]
 
 [dependency-groups]
 prod = [
-    "gunicorn>=23.0.0",
+    "gunicorn~=23.0.0",
 ]
