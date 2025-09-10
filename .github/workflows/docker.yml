@@ -1,0 +1,33 @@
+name: Create Docker image and push to GHCR
+
+on:
+  push:
+    tags:
+      - 0.**
+      - 1.**
+      - 2.**
+
+permissions: write-all
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout repo
+        uses: actions/checkout@v4
+      -
+        name: Login to Github Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Build and push the image
+        run : |
+          docker build \
+            --build-arg VERSION=${{ github.ref_name }} \
+            --tag ghcr.io/oral-history-digital/ohtm-dashboard:${{ github.ref_name }} \
+            .
+          docker push ghcr.io/oral-history-digital/ohtm-dashboard:${{ github.ref_name }}
