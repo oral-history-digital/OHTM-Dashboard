@@ -36,3 +36,19 @@ or
 ```shell
 uv run main.py
 ```
+
+## Usage with Docker
+
+A public Docker image is built with every push to the master branch.
+
+Start the Docker container by running
+
+```shell
+./run-docker.sh
+```
+
+First adapt the volume option (the first part before the colon) so
+that it points to an ohtm file on your computer.
+
+With the container running, the dashboard should be available at
+http://localhost:8000
