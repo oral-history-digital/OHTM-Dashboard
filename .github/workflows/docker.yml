@@ -39,4 +39,6 @@ jobs:
             --build-arg VERSION="$VERSION" \
             --tag "ghcr.io/oral-history-digital/ohtm-dashboard:$VERSION" \
             .
+          docker tag "ghcr.io/oral-history-digital/ohtm-dashboard:$VERSION" "ghcr.io/oral-history-digital/ohtm-dashboard:latest"
           docker push "ghcr.io/oral-history-digital/ohtm-dashboard:$VERSION"
+          docker push "ghcr.io/oral-history-digital/ohtm-dashboard:latest"
