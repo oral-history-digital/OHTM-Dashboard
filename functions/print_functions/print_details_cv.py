@@ -127,12 +127,9 @@ def print_details_cv_function(data):
     detail_results_archive =[]
     total = 0
     for archive in sum:
-        detail_results_archive.append(archive + ": " + str(len(set(sum[archive]))) + "\n")
+        detail_results_archive.append(archive + ": " + str(len(set(sum[archive])))+ " ")
         total += len(set(sum[archive]))
-    detail_results_archive.append("Total: " + str(total))
+    detail_results_archive.append("Total: " + str(total)+ " ")
 
-    
-
-
-
-    return detail_results, detail_results_archive
+    detail_results_archive_sorted = sorted(detail_results_archive, key=lambda x: int(x.split(': ')[1]), reverse=True)
+    return detail_results, detail_results_archive_sorted
