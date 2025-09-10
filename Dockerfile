@@ -1,20 +1,9 @@
 # syntax=docker/dockerfile:1
 
-ARG VERSION="0.1.0"
-
 # Separate build image #################################################
 FROM python:3.13.7-slim-trixie AS build
 
 SHELL ["sh", "-exc"]
-
-RUN <<EOT
-apt-get update -qy
-apt-get install -qyy \
-    -o APT::Install-Recommends=false \
-    -o APT::Install-Suggests=false \
-    build-essential \
-    pkg-config
-EOT
 
 # Install and configure uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
@@ -32,6 +21,7 @@ RUN --mount=type=cache,target=/root/.cache \
     uv sync \
     --locked \
     --no-dev \
+    --group prod \
     --no-install-project
 
 ########################################################################
@@ -52,7 +42,9 @@ SHELL ["sh", "-exc"]
 
 ENV APPROOT="/app"
 ENV PATH=/app/bin:$PATH
-ENV PATH=/app/.venv/bin:$PATH
+ENV OHTM_FILE=/app/ohd.ohtm
+
+VOLUME /app/ohd.ohtm
 
 RUN <<EOT
 groupadd -r app
