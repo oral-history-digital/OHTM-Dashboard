@@ -2,12 +2,11 @@ name: Create Docker image and push to GHCR
 
 on:
   push:
-    tags:
-      - 0.**
-      - 1.**
-      - 2.**
+    branches: ["master"]
 
-permissions: write-all
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build_and_publish:
@@ -24,10 +23,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
+        name: Extract version from pyproject.toml
+        id: get_version
+        run: |
+          VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+      -
         name: Build and push the image
-        run : |
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+
+          echo "Building image for version #VERSION"
+
           docker build \
-            --build-arg VERSION=${{ github.ref_name }} \
-            --tag ghcr.io/oral-history-digital/ohtm-dashboard:${{ github.ref_name }} \
+            --build-arg VERSION="$VERSION" \
+            --tag "ghcr.io/oral-history-digital/ohtm-dashboard:$VERSION" \
             .
-          docker push ghcr.io/oral-history-digital/ohtm-dashboard:${{ github.ref_name }}
+          docker push "ghcr.io/oral-history-digital/ohtm-dashboard:$VERSION"
