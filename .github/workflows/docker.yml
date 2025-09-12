@@ -1,4 +1,4 @@
-name: Create Docker image and push to GHCR
+name: Build Docker image
 
 on:
   push:
@@ -38,7 +38,7 @@ jobs:
           docker build \
             --build-arg VERSION="$VERSION" \
             --tag "ghcr.io/oral-history-digital/ohtm-dashboard:$VERSION" \
+            --tag "ghcr.io/oral-history-digital/ohtm-dashboard:latest" \
             .
-          docker tag "ghcr.io/oral-history-digital/ohtm-dashboard:$VERSION" "ghcr.io/oral-history-digital/ohtm-dashboard:latest"
           docker push "ghcr.io/oral-history-digital/ohtm-dashboard:$VERSION"
           docker push "ghcr.io/oral-history-digital/ohtm-dashboard:latest"
