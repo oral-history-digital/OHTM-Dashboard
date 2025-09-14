@@ -1,4 +1,4 @@
-name: Create Docker image and push to GHCR
+name: Build Docker image
 
 on:
   push:
@@ -33,10 +33,12 @@ jobs:
         run: |
           VERSION="${{ steps.get_version.outputs.version }}"
 
-          echo "Building image for version #VERSION"
+          echo "Building image for version $VERSION"
 
           docker build \
             --build-arg VERSION="$VERSION" \
             --tag "ghcr.io/oral-history-digital/ohtm-dashboard:$VERSION" \
+            --tag "ghcr.io/oral-history-digital/ohtm-dashboard:latest" \
             .
           docker push "ghcr.io/oral-history-digital/ohtm-dashboard:$VERSION"
+          docker push "ghcr.io/oral-history-digital/ohtm-dashboard:latest"

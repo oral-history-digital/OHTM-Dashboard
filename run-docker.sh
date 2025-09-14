@@ -6,4 +6,4 @@ docker run \
     --volume ~/ohtm/ohd.ohtm:/app/ohd.ohtm \
     --publish 8000:8000 \
     --detach \
-    ohtm-dashboard:latest
+    ghcr.io/oral-history-digital/ohtm-dashboard:latest
