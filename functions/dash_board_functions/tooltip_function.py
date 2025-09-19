@@ -61,79 +61,88 @@ def tooltip_creation():
 
 
 def menu_tooltip(trigger):
-    if trigger[0]["prop_id"] == "tooltip_switch.value":
-        tooltip= html.Div([
-            dbc.Tooltip(
-                "Die Übersicht..",
-                target = "menu_selection_info",
-            ),         
-        ])
-        menu_label = "Overview"
-        return tooltip, menu_label
     if trigger[0]["prop_id"] == "overview.n_clicks":
         tooltip= html.Div([
             dbc.Tooltip(
-                "Die Übersicht..",
+                """Die Übersicht bietet einen detaillierten Blick in die verschiedenen Ebenen der
+                 Topic Modeling Ergebnisse. Durch die Auswahl von Interviews in der Heatmap können 
+                  die Interviews für die Detailansicht ausgewählt werden.""",
                 target = "menu_selection_info",
             ),         
         ])
-        menu_label = "Overview"
-        return tooltip, menu_label
+        return tooltip
     if trigger[0]["prop_id"] == "chunk_analyzation.n_clicks":
         tooltip= html.Div([
             dbc.Tooltip(
-                "Die Chunk Analyse..",
+                """Die Chunk Analyse bietet eine umfangreiche Möglichkeit, die Topic Verteilung 
+                innerhalb der einzelnen Chunks zu analysieren. Darüber hinaus können auch Korrelationen
+                mit anderen Topics untersucht werden.
+                """,
                 target = "menu_selection_info",
             ),         
         ])
-        menu_label = "Chunk Analyzation"
-        return tooltip, menu_label
+        return tooltip
     if trigger[0]["prop_id"] == "bar_graph.n_clicks":
         tooltip= html.Div([
             dbc.Tooltip(
-                "Das Balkendiagramm..",
+                "Das Balkendiagramm bietet eine grafische Darstellung der Topic Verteilung innerhalb des gesamten Korpus.",
                 target = "menu_selection_info",
             ),         
         ])
-        menu_label = "Bar Graph"
-        return tooltip, menu_label
+        return tooltip
     if trigger[0]["prop_id"] == "heatmap.n_clicks":
         tooltip= html.Div([
             dbc.Tooltip(
-                "Die Heatmap..",
+                "Die Heatmap repräsentiert die Topic Verteilung über die einzelnen Interviews.",
                 target = "menu_selection_info",
             ),         
         ])
-        menu_label = "Heatmap"
-        return tooltip, menu_label
+        return tooltip
     if trigger[0]["prop_id"] == "interview_heatmap.n_clicks":
         tooltip= html.Div([
             dbc.Tooltip(
-                "Die Interview Heatmap..",
+                "Die Interview Heatmap zeigt die Topic Verteilung innerhalb eines einzelnen Interviews.",
                 target = "menu_selection_info",
             ),         
         ])
-        menu_label = "Interview Heatmap"
-        return tooltip, menu_label
+        return tooltip
     if trigger[0]["prop_id"] == "text_search.n_clicks":
         tooltip= html.Div([
             dbc.Tooltip(
-                "Die Textsuche..",
+                "Die Textsuche bietet die Möglichkeit, nach Chunks mit gewisser Topic Gewichtung zu suchen. Die Ergebnisse werden direkt in Textform präsentiert",
                 target = "menu_selection_info",
             ),         
         ])
-        menu_label = "Chunk Suche"
-        return tooltip, menu_label
+        return tooltip
     if trigger[0]["prop_id"] == "topic_words.n_clicks":
         tooltip= html.Div([
             dbc.Tooltip(
-                "Die Topit Wörter..",
+                "Mit der Topic Wörter Funktion können Sie die einzelnen Worte jedes Topics anschauen.",
                 target = "menu_selection_info",
             ),         
         ])
+        return tooltip
+
+
+def menu_label_function(trigger):
+    if trigger[0]["prop_id"] == "overview.n_clicks":
+        menu_label = "Overview"
+        return menu_label
+    if trigger[0]["prop_id"] == "chunk_analyzation.n_clicks":
+        menu_label = "Chunk Analyzation"
+        return menu_label
+    if trigger[0]["prop_id"] == "bar_graph.n_clicks":
+        menu_label = "Bar Graph"
+        return menu_label
+    if trigger[0]["prop_id"] == "heatmap.n_clicks":
+        menu_label = "Heatmap"
+        return menu_label
+    if trigger[0]["prop_id"] == "interview_heatmap.n_clicks":
+        menu_label = "Interview Heatmap"
+        return menu_label
+    if trigger[0]["prop_id"] == "text_search.n_clicks":
+        menu_label = "Chunk Suche"
+        return menu_label
+    if trigger[0]["prop_id"] == "topic_words.n_clicks":
         menu_label = "Topic Wörter"
-        return tooltip, menu_label
-
-
-
-
+        return menu_label 

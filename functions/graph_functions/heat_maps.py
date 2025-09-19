@@ -3,6 +3,8 @@ from builtins import print
 import pandas as pd
 import copy
 import plotly.express as px
+import plotly.graph_objects as go
+import numpy as np
 
 from functions.basic_functions.convert_ohtm_file import convert_ohtm_file
 
@@ -13,6 +15,7 @@ def heatmap_corpus(
     show_fig: bool = True,
     return_fig: bool = False,
     z_score_global: str = "True",
+    options: list = "",
     topic_filter_number: int = 0,
     topic_filter_threshold: float = 0,
     topic_filter: str = "False",
@@ -91,21 +94,22 @@ def heatmap_corpus(
                     else:
                         heat_dic_2[interview] = heat_dic[interview]
             heat_dic = heat_dic_2
-
         df = pd.DataFrame.from_dict(heat_dic)
         if z_score:
             mean = df.mean()
             std_dev = df.std()
             z_scores = (df - mean) / std_dev
             df = z_scores
-
+        labels_list = ohtm_file["topic_labels"]["labels"]
         df = df.transpose()
-        fig = px.imshow(df, color_continuous_scale="dense", aspect="auto")
-        fig.update_traces(
-            hovertemplate="Interview: %{y}"
-            "<br>Topic: %{x}"
-            "<br>Weight: %{z}<extra></extra>"
-        )
+        if "topic_labels_on" in options:
+            print("not included yet")
+        else:
+            fig = px.imshow(df, color_continuous_scale="dense", aspect="auto")
+            fig.update_traces(
+                hovertemplate="Interview: %{y}" +
+                "<br>Topic: %{x}"+
+                "<br>Weight: %{z}<extra></extra>")
         fig.update_layout(clickmode="event+select")
         fig.update_layout(clickmode="event+select")
         fig.update(layout_coloraxis_showscale=False)

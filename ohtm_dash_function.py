@@ -23,7 +23,7 @@ from functions.print_functions.print_topics import print_all_topics, top_words
 from functions.print_functions.print_sideboard_info import sideboard_info_function
 from functions.print_functions.print_details_cv import print_details_cv_function
 from functions.dash_board_functions.tooltip_function import (
-    tooltip_creation,
+    tooltip_creation, menu_label_function,
     menu_tooltip,
 )
 
@@ -297,74 +297,74 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                     ),
                     dbc.Row([], style={"height": "0.5vh"}),
                     dbc.Row(html.Hr()),
-                    dbc.Accordion(
-                        [
-                            dbc.AccordionItem(
-                                html.Div(
-                                    [
-                                        dbc.Row(
-                                            [
-                                                dcc.Textarea(
-                                                    id="textarea-example",
-                                                    value="Hier können sie Notizen machen",
-                                                    style={
-                                                        "width": "95%",
-                                                        "height": "20%",
-                                                        "font-size": "0.8vm",
-                                                    },
-                                                ),
-                                            ],
-                                            style={
-                                                "display": "flex",
-                                                "alignItems": "center",
-                                            },
-                                        ),
-                                    ]
-                                ),
-                                title="Notizen",
-                                className="mb-3",
-                            ),
-                            # dbc.AccordionItem(html.Div([
-                            #     dbc.Row([
-                            #         dbc.RadioItems(
-                            #             options=[
-                            #                 {"label": "Horizontal", "value": 1},
-                            #                 {"label": "Vertikal", "value": 2},
-                            #             ],
-                            #             value=1,
-                            #             id="correlation_switch",
-                            #             inline=True,
-                            #         ),
-                            #     ]),
-                            #     dbc.Row([
-                            #         html.Div([
-                            #             dbc.Pagination(id="gross_nr_correlations_per_chunk_pagination",
-                            #                            max_value=4,
-                            #                            min_value=2,
-                            #                            size="sm")
-                            #         ]),
-                            #     ]),
-                            #     dbc.Row([
-                            #         html.Div(id="correlation_output",
-                            #                  style={
-                            #                      'height': '200px',
-                            #                      'width': '95%',
-                            #                      "padding": "1% 1%",
-                            #                      'whiteSpace': 'pre-line',
-                            #                      'display': 'inline-block',
-                            #                      'font-size': "15px",
-                            #                      'background-color': 'rgb(249,249,249)',
-                            #                      "overflow": "auto"}
-                            #                  ),
-                            #     ]),
-                            # ]),
-                            #     title="Correlation",
-                            # ),
-                        ],
-                        always_open=True,
-                        className="mb-3",
+                    # dbc.Accordion(
+                    #     [
+                    #         dbc.AccordionItem(
+                    #             html.Div(
+                    #                 [
+                    #                     dbc.Row(
+                    #                         [
+                    #                             dcc.Textarea(
+                    #                                 id="textarea-example",
+                    #                                 value="Hier können sie Notizen machen",
+                    #                                 style={
+                    #                                     "width": "95%",
+                    #                                     "height": "20%",
+                    #                                     "font-size": "0.8vm",
+                    #                                 },
+                    #                             ),
+                    #                         ],
+                    #                         style={
+                    #                             "display": "flex",
+                    #                             "alignItems": "center",
+                    #                         },
+                    #                     ),
+                    #                 ]
+                    #             ),
+                    #             title="Notizen",
+                    #             className="mb-3",
+                    #         ),
+                    #         # dbc.AccordionItem(html.Div([
+                    #         #     dbc.Row([
+                    #         #         dbc.RadioItems(
+                    #         #             options=[
+                    #         #                 {"label": "Horizontal", "value": 1},
+                    #         #                 {"label": "Vertikal", "value": 2},
+                    #         #             ],
+                    #         #             value=1,
+                    #         #             id="correlation_switch",
+                    #         #             inline=True,
+                    #         #         ),
+                    #         #     ]),
+                    #         #     dbc.Row([
+                    #         #         html.Div([
+                    #         #             dbc.Pagination(id="gross_nr_correlations_per_chunk_pagination",
+                    #         #                            max_value=4,
+                    #         #                            min_value=2,
+                    #         #                            size="sm")
+                    #         #         ]),
+                    #         #     ]),
+                    #         #     dbc.Row([
+                    #         #         html.Div(id="correlation_output",
+                    #         #                  style={
+                    #         #                      'height': '200px',
+                    #         #                      'width': '95%',
+                    #         #                      "padding": "1% 1%",
+                    #         #                      'whiteSpace': 'pre-line',
+                    #         #                      'display': 'inline-block',
+                    #         #                      'font-size': "15px",
+                    #         #                      'background-color': 'rgb(249,249,249)',
+                    #         #                      "overflow": "auto"}
+                    #         #                  ),
+                    #         #     ]),
+                    #         # ]),
+                    #         #     title="Correlation",
+                    #         # ),
+                    #     ],
+                    #     always_open=True,
+                    #     className="mb-3",
 
-                    ),
+                    # ),
                     html.Div(
                         [
                             html.Hr(),
@@ -392,10 +392,19 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                     {
                                         "label": "Tooltips anzeigen",
                                         "value": "tooltip_on",
-                                    }
+                                    },
+                                                                        {
+                                        "label": "Topic Labels",
+                                        "value": "topic_labels_on",
+                                    },
+                                                                        {
+                                        "label": "Topic Clusters",
+                                        "value": "topic_cluster_on",
+                                    },
                                 ],
+                                inline=False,
                                 value=[],
-                                id="tooltip_switch",
+                                id="side_bar_menu_switch",
                                 switch=True,
                                 style={
                                     "width": "100%",
@@ -1023,7 +1032,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                     dbc.Input(
                                         id="interview_manual_id_detail",
                                         placeholder="Interview",
-                                        type="word",
+                                        type="wod",
                                     )
                                 ),
                             ],
@@ -1631,8 +1640,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
     # Tooltip for the Menue Selection
     @app.callback(
         Output("tooltip_store_sidebar", "children"),
-        Output("menu_selection_info", "children"),
-        Input("tooltip_switch", "value"),
+        Input("side_bar_menu_switch", "value"),
         Input("overview", "n_clicks"),
         Input("chunk_analyzation", "n_clicks"),
         Input("bar_graph", "n_clicks"),
@@ -1643,11 +1651,31 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         prevent_inital_call=True,
     )
     def set_tooltip_for_menu(switch, m1, m2, m3, m4, m5, m6, m7):
-        if "tooltip_on" in switch:
-            tooltip = menu_tooltip(ctx.triggered)
-            return tooltip[0], tooltip[1]
-        else:
-            return [], "Overview"
+            if "tooltip_on" in switch:
+                tooltip = menu_tooltip(ctx.triggered)
+                return tooltip
+            else:
+                return []
+
+    # Menu Label for the Menue Selection
+    @app.callback(
+        Output("menu_selection_info", "children"),
+        Input("overview", "n_clicks"),
+        Input("chunk_analyzation", "n_clicks"),
+        Input("bar_graph", "n_clicks"),
+        Input("heatmap", "n_clicks"),
+        Input("interview_heatmap", "n_clicks"),
+        Input("text_search", "n_clicks"),
+        Input("topic_words", "n_clicks"),
+        prevent_inital_call=False,
+    )
+    def set_menu_label(m1, m2, m3, m4, m5, m6, m7):
+            if ctx.triggered:
+                menu_label = menu_label_function(ctx.triggered)
+                return menu_label
+            else:
+                return "Overview"
+
 
     # Page 1
 
@@ -1677,14 +1705,16 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         Output(component_id="heat_map", component_property="figure"),
         Input("slct_archiv", "value"),
         Input("switch_z_score_global_heatmap", "value"),
+        Input("side_bar_menu_switch", "value"),
     )
-    def update_graph(value, z_score_global):
+    def update_graph(value, z_score_global, options):
         fig = heatmap_corpus(
             ohtm_file,
             option_selected=str(value),
             z_score_global=z_score_global,
             show_fig=False,
             return_fig=True,
+            options=options
         )
         return fig
 
@@ -1913,6 +1943,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         Input("outlier_threshold_value_detail", "value"),
         Input("heat_map_interview_detail", "clickData"),
         Input("chunk_number_detail", "data"),
+        prevent_initial_call = True, 
     )
     def interview_heat_map_dash(
         interview_manual_id,
@@ -1975,6 +2006,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         State("interview_manual_id_detail", "value"),
         State("tc_indicator_detail", "data"),
         State("interview_heatmap_df_detail", "data"),
+        prevent_initial_call = True,
     )
     def sent_drawing_detail_dash(
         click_data,
@@ -2202,6 +2234,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         Input("sort_interview_cv", "n_clicks"),
         Input("sort_topic_1_cv", "n_clicks"),
         Input("sort_topic_2_cv", "n_clicks"),
+        Input("side_bar_menu_switch", "value"),
         prevent_initial_call=True,
     )
     def output_info_cv(
@@ -2215,6 +2248,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         c1,
         c2,
         c3,
+        options
     ):
         import plotly.graph_objects as go
 
@@ -2234,7 +2268,8 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
             )
             results = fig_heat[1]
             results_header = str(len(results)) + " Chunks"
-            detail_results_cv = print_details_cv_function(results)
+            detail_results_cv = print_details_cv_function(results, options=options, 
+                                                          labels=ohtm_file["topic_labels"]["labels"])
             fig = fig_heat[0]
 
             fig_bar = bar_graph_cv_function(
@@ -2265,11 +2300,13 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         Output("detail_info_cv_chunk", "children"),
         Input("heat_map_cv", "clickData"),
         Input("chunk_number_cv", "data"),
+        Input("side_bar_menu_switch", "value"),
         prevent_initial_call=True,
     )
-    def chunk_view_text_print(click_data, chunk_nr):
+    def chunk_view_text_print(click_data, chunk_nr, option):
         chunk_text = chunk_sent_drawing_cv(
-            ohtm_file=ohtm_file, click_data_input=click_data, chunk_number=chunk_nr
+            ohtm_file=ohtm_file, click_data_input=click_data, chunk_number=chunk_nr,
+            options=option,
         )
         interview = (
             click_data["points"][0]["y"].split("**")[0]
@@ -2330,7 +2367,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
 
     @app.callback(
         Output("tooltip_store", "children"),
-        Input("tooltip_switch", "value"),
+        Input("side_bar_menu_switch", "value"),
     )
     def tooltip_showing(data):
         if "tooltip_on" in data:
