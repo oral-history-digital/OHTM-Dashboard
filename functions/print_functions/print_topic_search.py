@@ -11,16 +11,14 @@ from dash import ctx, html
 def print_topic_search_weight(
     ohtm_file,
     interview_id,
-    t_1,
-    t_2,
-    t_3,
-    t_4,
     text_search_options,
     topic_print,
     weight_print,
+    options:list = ""
 ):
     anonymized_status = False
-    if ctx.triggered[0]["prop_id"] == "enter_print.n_clicks":
+    if (ctx.triggered[0]["prop_id"] == "enter_print.n_clicks" 
+        or ctx.triggered[0]["prop_id"] == "side_bar_menu_switch.value"):
         if text_search_options == "1":
             sent_final = []
             topic = topic_print
@@ -89,7 +87,10 @@ def print_topic_search_weight(
                                 top_ts_sorted = sorted(top_ts.items(), key=lambda x: x[1], reverse=True)
                                 final_topic_list = []
                                 for entry in top_ts_sorted[:5]:
-                                    final_topic_list.append(str(entry[0]) + ": " + str(entry[1]))
+                                    if "topic_labels_on" in options and ohtm_file["settings"]["labeling_options"]["labeling"] == True:
+                                        final_topic_list.append(str(entry[0]) + " " + ohtm_file["topic_labels"]["labels"][str(entry[0])] + ": " + str(entry[1]))
+                                    else:
+                                        final_topic_list.append(str(entry[0]) + ": " + str(entry[1]))
                                 final_topic_list = " | ".join(final_topic_list)
                                 if timcodes_available:
                                     sent_current += (

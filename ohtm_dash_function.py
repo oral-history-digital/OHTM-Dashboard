@@ -6,6 +6,7 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import Input, Output, State, ctx, dcc, html, no_update
 import copy
+# import dash_mantine_components
 
 from functions.dash_board_functions.dropdown_list import create_dropdown_list
 from functions.graph_functions.bar_graph import bar_graph_corpus, bar_graph_cv_function
@@ -18,6 +19,7 @@ from functions.print_functions.print_chunk_sents import (
     chunk_sent_drawing,
     chunk_sent_drawing_cv,
 )
+from dash.exceptions import PreventUpdate
 from functions.print_functions.print_topic_search import print_topic_search_weight
 from functions.print_functions.print_topics import print_all_topics, top_words
 from functions.print_functions.print_sideboard_info import sideboard_info_function
@@ -29,7 +31,6 @@ from functions.dash_board_functions.tooltip_function import (
 
 global top_dic
 global tooltip_bool
-
 logo_image_filename = "dash_ohd_image.png"
 
 
@@ -40,9 +41,8 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         return "data:image/png;base64," + base64.b64encode(image).decode("utf-8")
 
     if chronologie_analyse:
-        from interview_chronology_analysis.labels_interview_chronology_analysis_dash import (
-            chronology_matrix,
-        )
+        from functions.graph_functions.chronologie_heatmap_function import chronology_matrix
+
 
     app = dash.Dash(
         __name__,
@@ -58,6 +58,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         "left": 0,
         "bottom": 0,
         "width": "14%",
+        "hight": "100%",
         "padding": "2rem 1rem",
         "background-color": "#2B88AF",
     }
@@ -155,8 +156,8 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                     html.Img(
                         src=b64_image(logo_image_filename), style={"max-width": "100%"}
                     ),
-                    dbc.Row([], style={"height": "0.5vh"}),
-                    dbc.Row(html.Hr()),
+                    dbc.Row([], style={"height": "0.5vh", "display": "flex", "gap": "clamp(0.5em, 2vw, 2em)"}),
+                    dbc.Row(html.Hr(), style={"display": "flex", "gap": "clamp(0.5em, 2vw, 2em)"}),
                     dbc.Row(
                         [
                             dbc.Col(
@@ -225,7 +226,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                                 id="menu_selection_info",
                                                 children="Overview",
                                                 className="m-1",
-                                                color="dark",
+                                                color="secondary",
                                                 style={"font-size": "0.7vw"},
                                             ),
                                         ]
@@ -235,8 +236,8 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                         ],
                         style={"display": "flex", "flexDirection": "column"},
                     ),
-                    dbc.Row([], style={"height": "1vh"}),
-                    dbc.Row(html.Hr()),
+                    dbc.Row([], style={"height": "1vh", "display": "flex", "gap": "clamp(0.5em, 2vw, 2em)"}),
+                    dbc.Row(html.Hr(), style={"display": "flex", "gap": "clamp(0.5em, 2vw, 2em)"}),
                     dbc.Row(
                         [
                             html.H5(
@@ -246,7 +247,22 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                     color="dark",
                                     style={
                                         "width": "50%",
-                                        "font-size": "0.8vw",  # PRÄSENTATION 1
+                                        "font-size": "0.7vw",  # PRÄSENTATION 1
+                                    },
+                                )
+                            )
+                        ],
+                        style={"display": "flex"},
+                    ),
+                    dbc.Row(
+                        [
+                            html.H5(
+                                dbc.Badge(
+                                    id="topic_label_side_bar",
+                                    children="",
+                                    color="secondary",
+                                    style={
+                                        "font-size": "0.7vw",  # PRÄSENTATION 1
                                     },
                                 )
                             )
@@ -259,7 +275,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                 id="input",
                                 placeholder="Topic Nummer eingeben",
                                 type="number",
-                                size="m",
+                                size="sm",
                                 min=0,
                                 max=100 - 1,
                                 step=1,
@@ -295,8 +311,6 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                         ],
                         style={"display": "flex", "alignItems": "center"},
                     ),
-                    dbc.Row([], style={"height": "0.5vh"}),
-                    dbc.Row(html.Hr()),
                     # dbc.Accordion(
                     #     [
                     #         dbc.AccordionItem(
@@ -368,6 +382,54 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                     html.Div(
                         [
                             html.Hr(),
+                            dbc.Checklist(
+                                options=[
+                                    {
+                                        "label": "Tooltips anzeigen",
+                                        "value": "tooltip_on",
+                                    },
+                                                                        {
+                                        "label": "Topic Labels",
+                                        "value": "topic_labels_on",
+                                    },
+                                                                        {
+                                        "label": "Topic Clusters",
+                                        "value": "topic_cluster_on",
+                                    },
+                                ],
+                                value=[],
+                                id="side_bar_menu_switch",
+                                switch=True,
+                                style={
+                                    "width": "100%",
+                                    "min-width": "150px",
+                                    "font-size": "0.8vw",
+                                    "display": "flex",
+                                    "flex-direction": "column",
+                                },
+                            ),
+                        ]
+                    ),
+                    html.Div([
+                        dbc.Toast(
+                            "Test", 
+                            header ="Information",
+                            id="warning",
+                            is_open=False,
+                            dismissable=True,
+                            icon="danger",
+                            style={
+                                    "position": "fixed",
+                                    "bottom": 40,    # Abstand von unten
+                                    "left": 20,      # Abstand von links
+                                    "width": 200,
+                                    "zIndex": 9999,  # ganz nach vorne
+                                },
+                                  )
+                    ]),
+                    html.Div(
+                        [
+                            html.Hr(),
                             html.P(
                                 "Topic Model Info",
                                 className="text-muted",
@@ -385,36 +447,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                             html.Hr(),
                         ]
                     ),
-                    html.Div(
-                        [
-                            dbc.Checklist(
-                                options=[
-                                    {
-                                        "label": "Tooltips anzeigen",
-                                        "value": "tooltip_on",
-                                    },
-                                                                        {
-                                        "label": "Topic Labels",
-                                        "value": "topic_labels_on",
-                                    },
-                                                                        {
-                                        "label": "Topic Clusters",
-                                        "value": "topic_cluster_on",
-                                    },
-                                ],
-                                inline=False,
-                                value=[],
-                                id="side_bar_menu_switch",
-                                switch=True,
-                                style={
-                                    "width": "100%",
-                                    "min-width": "150px",
-                                    "font-size": "0.8vw",
-                                    "display": "flex",
-                                },
-                            ),
-                        ]
-                    ),
+
                 ],
                 fluid=True,
             )
@@ -595,18 +628,18 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                         "justifyContent": "center",
                                     },
                                 ),
+                                # dbc.Col(
+                                #     [
+                                #     dcc.Input(
+                                #     id = "range",
+                                #     type = "range",
+                                #     min = 0,
+                                #     max = 1, 
+                                # )], width = 1),
                                 dbc.Col(
                                     [
                                         dbc.Checklist(
                                             options=[
-                                                {
-                                                    "label": "Topic Filter",
-                                                    "value": "filter",
-                                                },
-                                                {
-                                                    "label": "Z-Score",
-                                                    "value": "z_score",
-                                                },
                                                 {"label": "Marker", "value": "marker"},
                                             ],
                                             value=[],
@@ -637,7 +670,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                             )
                                         ),
                                     ],
-                                    width=2,
+                                    width=1,
                                     style={"display": "flex"},
                                 ),
                                 dbc.Col([], width=2),
@@ -758,17 +791,6 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                             ],
                                             className="mb-3",
                                         ),
-                                        dbc.InputGroup(
-                                            [
-                                                dbc.InputGroupText("Interview ID"),
-                                                dbc.Input(
-                                                    id="interview_id_search",
-                                                    placeholder="Interview ID",
-                                                    type="text",
-                                                ),
-                                            ],
-                                            className="mb-3",
-                                        ),
                                     ]
                                 ),
                             ],
@@ -780,22 +802,11 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                     [
                                         dbc.InputGroup(
                                             [
-                                                dbc.InputGroupText("Topic_c 1"),
+                                                dbc.InputGroupText("Interview ID"),
                                                 dbc.Input(
-                                                    id="topic_c_1",
-                                                    placeholder="Topic",
-                                                    type="number",
-                                                ),
-                                            ],
-                                            className="mb-3",
-                                        ),
-                                        dbc.InputGroup(
-                                            [
-                                                dbc.InputGroupText("Topic_c 2"),
-                                                dbc.Input(
-                                                    id="topic_c_2",
-                                                    placeholder="Topic",
-                                                    type="number",
+                                                    id="interview_id_search",
+                                                    placeholder="Interview ID",
+                                                    type="text",
                                                 ),
                                             ],
                                             className="mb-3",
@@ -829,28 +840,6 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                             [
                                 html.Div(
                                     [
-                                        dbc.InputGroup(
-                                            [
-                                                dbc.InputGroupText("Topic_c 3"),
-                                                dbc.Input(
-                                                    id="topic_c_3",
-                                                    placeholder="Topic",
-                                                    type="number",
-                                                ),
-                                            ],
-                                            className="mb-3",
-                                        ),
-                                        dbc.InputGroup(
-                                            [
-                                                dbc.InputGroupText("Topic_c 4"),
-                                                dbc.Input(
-                                                    id="topic_c_4",
-                                                    placeholder="Topic",
-                                                    type="number",
-                                                ),
-                                            ],
-                                            className="mb-3",
-                                        ),
                                         dbc.InputGroup(
                                             [
                                                 dbc.Button(
@@ -1033,30 +1022,6 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                         id="interview_manual_id_detail",
                                         placeholder="Interview",
                                         type="wod",
-                                    )
-                                ),
-                            ],
-                            width=1,
-                        ),
-                        dbc.Col(
-                            [
-                                html.Div(
-                                    dbc.Input(
-                                        id="threshold_top_filter_value_detail",
-                                        placeholder="Top Filter Threshold",
-                                        type="number",
-                                    )
-                                ),
-                            ],
-                            width=1,
-                        ),
-                        dbc.Col(
-                            [
-                                html.Div(
-                                    dbc.Input(
-                                        id="outlier_threshold_value_detail",
-                                        placeholder="Outlier Threshold",
-                                        type="number",
                                     )
                                 ),
                             ],
@@ -1660,22 +1625,33 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
     # Menu Label for the Menue Selection
     @app.callback(
         Output("menu_selection_info", "children"),
-        Input("overview", "n_clicks"),
-        Input("chunk_analyzation", "n_clicks"),
-        Input("bar_graph", "n_clicks"),
-        Input("heatmap", "n_clicks"),
-        Input("interview_heatmap", "n_clicks"),
-        Input("text_search", "n_clicks"),
-        Input("topic_words", "n_clicks"),
+        Input("url", "pathname"),
         prevent_inital_call=False,
     )
-    def set_menu_label(m1, m2, m3, m4, m5, m6, m7):
-            if ctx.triggered:
-                menu_label = menu_label_function(ctx.triggered)
-                return menu_label
-            else:
-                return "Overview"
+    def set_menu_label(pathname):
+        menu_label = menu_label_function(pathname)
+        return menu_label
 
+    @app.callback(
+            Output("warning", "is_open"),
+            Output("warning", "children"),
+            Input("side_bar_menu_switch", "value"),
+    )
+    def label_test(options):
+        if "topic_labels_on" in options:
+            try:
+                if ohtm_file["settings"]["labeling_options"]["labeling"] == False:
+                    return True, "This file has no labels. To add labels, see the documentation"
+            except KeyError:
+                return True, "This file has no labels. To add labels, see the documentation"
+        elif "topic_cluster_on" in options:
+            try:
+                if ohtm_file["settings"]["labeling_options"]["clustering"] == False:
+                    return True, "This file has no clusters. To add clusters, see the documentation"
+            except KeyError:
+                return True, "This file has no clusters. To add clusters, see the documentation"
+        else:
+            return False, "no warning"
 
     # Page 1
 
@@ -1694,10 +1670,11 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
     @app.callback(
         Output(component_id="bar", component_property="figure"),
         Input("top_dic", "data"),
+        Input("side_bar_menu_switch", "value"),
         prevent_initial_call=False,
     )
-    def bar_map(data):
-        fig = bar_graph_corpus(ohtm_file, show_fig=False, return_fig=True)
+    def bar_map(data, options_list):
+        fig = bar_graph_corpus(ohtm_file, show_fig=False, return_fig=True, options=options_list)
         return fig
 
     # Corpusheatmap page 1
@@ -1731,6 +1708,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         Input("interview_manual_id", "value"),
         Input("heat_map_interview", "clickData"),
         Input("chunk_number_frontpage", "data"),
+        Input("side_bar_menu_switch", "value"),
     )
     def interview_heat_map_dash(
         click_data,
@@ -1738,6 +1716,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         interview_manual_id,
         click_data_2,
         chunk_number_storage,
+        option_list
     ):
         if chronologie_analyse:
             chronologie_heatmap = chronology_matrix(
@@ -1747,9 +1726,8 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                 ctx_triggered=ctx.triggered,
                 interview_manual_id=interview_manual_id,
                 heatmap_filter=heatmap_filter,
-                threshold_top_filter=top_filter_th,
-                outlier_threshold=outlier_th,
                 chunk_number_storage=chunk_number_storage,
+                options=option_list,
             )
 
             if chronologie_heatmap is not None:
@@ -1780,6 +1758,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                 chunk_number_storage=chunk_number_storage,
                 heatmap_filter=heatmap_filter,
                 interview_manual_id=interview_manual_id,
+                options = option_list
             )
             fig = interview_heatmap[0]
             title = interview_heatmap[1]
@@ -1860,22 +1839,16 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         Input("enter_print", "n_clicks"),
         Input("interview_id_search", "value"),
         Input("text_search_options", "value"),
-        Input("topic_c_1", "value"),
-        Input("topic_c_2", "value"),
-        Input("topic_c_3", "value"),
-        Input("topic_c_4", "value"),
         Input("topic_print", "value"),
+        Input("side_bar_menu_switch", "value")
     )
     def text_search_detail(
         weight_print,
         n_clicks,
         interview_id,
         text_search_options,
-        t_1,
-        t_2,
-        t_3,
-        t_4,
         topic_print,
+        option_list
     ):
         search_results = print_topic_search_weight(
             ohtm_file=ohtm_file,
@@ -1883,10 +1856,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
             weight_print=weight_print,
             interview_id=interview_id,
             text_search_options=text_search_options,
-            t_1=t_1,
-            t_2=t_2,
-            t_3=t_3,
-            t_4=t_4,
+            options=option_list
         )
         return search_results
 
@@ -1895,10 +1865,11 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
     @app.callback(
         Output(component_id="bar2", component_property="figure"),
         Input("top_dic2", "data"),
+        Input("side_bar_menu_switch", "value"),
         prevent_initial_call=False,
     )
-    def bar_map2(data):
-        fig = bar_graph_corpus(ohtm_file, show_fig=False, return_fig=True)
+    def bar_map2(data, option_list):
+        fig = bar_graph_corpus(ohtm_file, show_fig=False, return_fig=True, options=option_list)
         return fig
 
     # Print the topics on the single_bar_side page 3
@@ -1939,19 +1910,17 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         Output("interview_heatmap_df_detail", "data"),
         Input("interview_manual_id_detail", "value"),
         Input("switch_chronology_filter_detail", "value"),
-        Input("threshold_top_filter_value_detail", "value"),
-        Input("outlier_threshold_value_detail", "value"),
         Input("heat_map_interview_detail", "clickData"),
         Input("chunk_number_detail", "data"),
+        Input("side_bar_menu_switch", "value"),
         prevent_initial_call = True, 
     )
     def interview_heat_map_dash(
         interview_manual_id,
         heatmap_filter,
-        top_filter_th,
-        outlier_th,
         click_data_2,
         chunk_number_storage,
+        option_list
     ):
         if chronologie_analyse:
             chronologie_heatmap = chronology_matrix(
@@ -1961,8 +1930,6 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                 ctx_triggered=ctx.triggered,
                 interview_manual_id=interview_manual_id,
                 heatmap_filter=heatmap_filter,
-                threshold_top_filter=top_filter_th,
-                outlier_threshold=outlier_th,
                 chunk_number_storage=chunk_number_storage,
             )
             if chronologie_heatmap is not None:
@@ -1985,6 +1952,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                 chunk_number_storage=chunk_number_storage,
                 heatmap_filter=heatmap_filter,
                 interview_manual_id=interview_manual_id,
+                options=option_list,
             )
             fig = interview_heatmap[0]
             title = interview_heatmap[1]
@@ -2041,9 +2009,10 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         Output("topic_table", "children"),
         Input("word_number", "value"),
         Input("enter_print_topics", "n_clicks"),
+        Input("side_bar_menu_switch", "value"),
     )
-    def print_all_topics_dash(words, n_clicks):
-        table = print_all_topics(words, n_clicks, ohtm_file)
+    def print_all_topics_dash(words, n_clicks, options_list):
+        table = print_all_topics(words, n_clicks, ohtm_file, options=options_list)
         return table
 
     # Function to identifie which topic is clicked in any graph. The information is than returned and the first words
@@ -2140,6 +2109,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
     @app.callback(
         Output("topics", "children"),
         Output("topic_number_sidebar_1", "children"),
+        Output("topic_label_side_bar", "children"),
         Input("input", "value"),
         Input("heatmap_interview_topic_nr", "data"),
         Input("heatmap_interview_detail_topic_nr", "data"),
@@ -2149,18 +2119,25 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         Input("heatmap_corpus_detail_topic_nr", "data"),
         Input("heat_map_cv_topic_nr", "data"),
         Input("bar_graph_cv_topic_nr", "data"),
+        Input("side_bar_menu_switch", "value"),
         prevent_initial_call=True,
     )
     def df_input(
-        value1, value2, value3, value4, value5, value6, value7, value8, value9
+        value1, value2, value3, value4, value5, value6, value7, value8, value9, option_list
     ):
         if ctx.triggered[0]["value"] != None:
+            if ctx.triggered[0]["prop_id"] == "side_bar_menu_switch.value":
+                raise PreventUpdate      
             topic_value = ctx.triggered[0]["value"]
             entry = top_words(topic_value, ohtm_file)
             topic_entry = "Topic: " + str(topic_value)
-            return entry, topic_entry
+            if "topic_labels_on" in option_list:
+                topic_label = ohtm_file["topic_labels"]["labels"][str(topic_value)]
+                return entry, topic_entry, topic_label
+            else:
+                return entry, topic_entry, ""
         else:
-            return no_update, no_update
+            return no_update, no_update, no_update
 
     # Corpusheatmap page 5
     @app.callback(
@@ -2169,8 +2146,9 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         Input("z_score_corpus_heatmap_detail", "value"),
         Input("corpus_heatmap_detail_topic", "value"),
         Input("corpus_heatmap_detail_threshold", "value"),
+        Input("side_bar_menu_switch", "value"),
     )
-    def update_graph(value, z_score_global, topic, threshold):
+    def update_graph(value, z_score_global, topic, threshold, options_list):
         fig = heatmap_corpus(
             ohtm_file,
             option_selected=str(value),
@@ -2179,18 +2157,20 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
             return_fig=True,
             topic_filter_number=topic,
             topic_filter_threshold=threshold,
+            options=options_list
         )
         return fig
 
     # Dropboxmenue for corpus heatmap page 1 and page 6
     @app.callback(
         Output("slct_archiv_heat_map_corpus_detail", "options"),
+        Output("slct_archiv_heat_map_corpus_detail", "value"),
         Input("top_dic", "data"),
         prevent_initial_call=False,
     )
     def create_dropdown_list_dash(data):
         drop_down_menu = create_dropdown_list(ohtm_file)
-        return drop_down_menu
+        return drop_down_menu, "all"
 
     # Funktions Page 6 Chunk-View
 
@@ -2248,7 +2228,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         c1,
         c2,
         c3,
-        options
+        option_list
     ):
         import plotly.graph_objects as go
 
@@ -2265,10 +2245,11 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                 topic_2_weight=weight_2,
                 correlation=correlation,
                 sort_filter=ctx.triggered[0]["prop_id"].split(".")[0],
+                options=option_list
             )
             results = fig_heat[1]
             results_header = str(len(results)) + " Chunks"
-            detail_results_cv = print_details_cv_function(results, options=options, 
+            detail_results_cv = print_details_cv_function(results, options=option_list, 
                                                           labels=ohtm_file["topic_labels"]["labels"])
             fig = fig_heat[0]
 
@@ -2282,6 +2263,7 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                 topic_2_number=topic_2,
                 topic_2_weight=weight_2,
                 correlation=correlation,
+                options=option_list
             )
 
             return (

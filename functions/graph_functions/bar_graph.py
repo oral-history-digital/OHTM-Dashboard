@@ -1,8 +1,10 @@
 import pandas as pd
 import plotly.express as px
 from functions.basic_functions.convert_ohtm_file import convert_ohtm_file
+from functions.basic_functions.create_clusters import df_regroup_clusters_bar
 
-def bar_graph_corpus(ohtm_file, show_fig: bool = True, return_fig: bool = False):
+
+def bar_graph_corpus(ohtm_file, show_fig: bool = True, return_fig: bool = False, options: list = ""):
     ohtm_file = convert_ohtm_file(ohtm_file)
     if ohtm_file["settings"]["topic_modeling"]["trained"] == "True":
         interview_dic = {}
@@ -58,9 +60,46 @@ def bar_graph_corpus(ohtm_file, show_fig: bool = True, return_fig: bool = False)
         min_val = df.min()
         max_val = df.max()
         normalized_data = (df - min_val) / (max_val - min_val)
-        df.index = pd.to_numeric(df.index)
 
-        fig = px.bar(df, color_discrete_sequence=px.colors.qualitative.G10)
+        if "topic_cluster_on" in options and ohtm_file["settings"]["labeling_options"]["clustering"] == True:
+            df.index = pd.to_numeric(df.index)
+            new_df = df_regroup_clusters_bar(df, ohtm_file["topic_labels"]["clusters"])
+            new_df.index = pd.to_numeric(new_df.index)
+            
+            fig = px.bar(new_df, color_discrete_sequence=px.colors.qualitative.G10, custom_data=["Label"])
+            for trace in fig.data:
+                trace.hovertemplate="<br>".join([
+                    "Cluster: %{x}",
+                    "%{customdata}",
+                    "Weight: %{y}",
+                    f"Archiv: {trace.name}",
+                    "<extra></extra>"
+                ])
+        
+        elif "topic_labels_on" in options and ohtm_file["settings"]["labeling_options"]["labeling"] == True:
+            labels_dict = ohtm_file["topic_labels"]["labels"]  
+            df["Label"] = df.index.map(lambda x: labels_dict.get(str(x), "unknown"))
+            df.index = pd.to_numeric(df.index)
+            fig = px.bar(df, color_discrete_sequence=px.colors.qualitative.G10, custom_data=["Label"])
+            for trace in fig.data:
+                trace.hovertemplate="<br>".join([
+                    "Topics: %{x}",
+                    "Label: %{customdata}",
+                    "Weight: %{y}",
+                    f"Archiv: {trace.name}",
+                    "<extra></extra>"
+                ])
+
+        else:
+            df.index = pd.to_numeric(df.index)
+            fig = px.bar(df, color_discrete_sequence=px.colors.qualitative.G10)
+            for trace in fig.data:
+                trace.hovertemplate="<br>".join([
+                    "Topics: %{x}",
+                    "Weight: %{y}",
+                    f"Archiv: {trace.name}",
+                    "<extra></extra>"
+            ])
         fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
         fig.update_layout(
             xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
@@ -83,7 +122,8 @@ def bar_graph_cv_function(
     topic_1_weight: float = 0,
     topic_2_number: int = 0,
     topic_2_weight: float = 0,
-    correlation: list = ""
+    correlation: list = "",
+    options: list = "",
 ):
     if option_selected == "None":
         option_selected = "all"
@@ -171,8 +211,43 @@ def bar_graph_cv_function(
         max_val = df_bar_cv.max()
         normalized_data = (df_bar_cv - min_val) / (max_val - min_val)
 
-        df_bar_cv.index = pd.to_numeric(df_bar_cv.index)
-        fig = px.bar(df_bar_cv, color_discrete_sequence=px.colors.qualitative.G10)
+        if "topic_cluster_on" in options and ohtm_file["settings"]["labeling_options"]["clustering"] == True:
+            df_bar_cv.index = pd.to_numeric(df_bar_cv.index)
+            new_df = df_regroup_clusters_bar(df_bar_cv, ohtm_file["topic_labels"]["clusters"])
+            new_df.index = pd.to_numeric(new_df.index)
+            fig = px.bar(new_df, color_discrete_sequence=px.colors.qualitative.G10, custom_data=["Label"])
+            for trace in fig.data:
+                trace.hovertemplate="<br>".join([
+                    "Cluster: %{x}",
+                    "%{customdata}",
+                    "Weight: %{y}",
+                    f"Archiv: {trace.name}",
+                    "<extra></extra>"
+                ])
+
+        elif "topic_labels_on" in options and ohtm_file["settings"]["labeling_options"]["labeling"] == True:
+            labels_dict = ohtm_file["topic_labels"]["labels"]  
+            df_bar_cv["Label"] = df_bar_cv.index.map(lambda x: labels_dict.get(str(x), "unknown"))
+            df_bar_cv.index = pd.to_numeric(df_bar_cv.index)
+            fig = px.bar(df_bar_cv, color_discrete_sequence=px.colors.qualitative.G10, custom_data=["Label"])
+            for trace in fig.data:
+                trace.hovertemplate="<br>".join([
+                    "Topics: %{x}",
+                    "Label: %{customdata}",
+                    "Weight: %{y}",
+                    f"Archiv: {trace.name}",
+                    "<extra></extra>"
+                ])
+        else:
+            df_bar_cv.index = pd.to_numeric(df_bar_cv.index)
+            fig = px.bar(df_bar_cv, color_discrete_sequence=px.colors.qualitative.G10)
+            for trace in fig.data:
+                trace.hovertemplate="<br>".join([
+                    "Topics: %{x}",
+                    "Weight: %{y}",
+                    f"Archiv: {trace.name}",
+                    "<extra></extra>"
+            ])
         fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
         fig.update_layout(
             xaxis_title=None,  # Entfernt die X-Achsenbeschriftung

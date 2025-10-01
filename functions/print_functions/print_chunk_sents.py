@@ -135,7 +135,6 @@ def chunk_sent_drawing(
 
 
     sent_id = "Chunk: " + str(chunk_id)
-    print(link)
     return sent_example, sent_id, chunk_id
 
 

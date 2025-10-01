@@ -125,24 +125,24 @@ def menu_tooltip(trigger):
 
 
 def menu_label_function(trigger):
-    if trigger[0]["prop_id"] == "overview.n_clicks":
+    if trigger == "/":
         menu_label = "Overview"
         return menu_label
-    if trigger[0]["prop_id"] == "chunk_analyzation.n_clicks":
+    if trigger == "/page-6":
         menu_label = "Chunk Analyzation"
         return menu_label
-    if trigger[0]["prop_id"] == "bar_graph.n_clicks":
+    if trigger == "/page-2":
         menu_label = "Bar Graph"
         return menu_label
-    if trigger[0]["prop_id"] == "heatmap.n_clicks":
+    if trigger == "/page-5":
         menu_label = "Heatmap"
         return menu_label
-    if trigger[0]["prop_id"] == "interview_heatmap.n_clicks":
+    if trigger == "/page-3":
         menu_label = "Interview Heatmap"
         return menu_label
-    if trigger[0]["prop_id"] == "text_search.n_clicks":
+    if trigger == "/page-1":
         menu_label = "Chunk Suche"
         return menu_label
-    if trigger[0]["prop_id"] == "topic_words.n_clicks":
+    if trigger == "/page-4":
         menu_label = "Topic Wörter"
         return menu_label 

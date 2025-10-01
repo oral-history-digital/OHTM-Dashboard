@@ -1,4 +1,5 @@
 dash==3.0.2
 dash-bootstrap-components==2.0.0
+dash_mantine_components
 gunicorn==23.0.0
 seaborn==0.13.2

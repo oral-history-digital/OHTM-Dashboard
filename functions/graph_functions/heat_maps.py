@@ -5,6 +5,10 @@ import copy
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
+import ast
+from dash import no_update
+from functions.graph_functions.heatmap_marker import heatmap_marker_creation_normal
+from functions.basic_functions.create_clusters import df_regroup_clusters_heat
 
 from functions.basic_functions.convert_ohtm_file import convert_ohtm_file
 
@@ -100,20 +104,50 @@ def heatmap_corpus(
             std_dev = df.std()
             z_scores = (df - mean) / std_dev
             df = z_scores
-        labels_list = ohtm_file["topic_labels"]["labels"]
         df = df.transpose()
-        if "topic_labels_on" in options:
-            print("not included yet")
+        if "topic_cluster_on" in options and ohtm_file["settings"]["labeling_options"]["clustering"] == True:
+            cluster_data = df_regroup_clusters_heat(df, ohtm_file["topic_labels"]["clusters"])
+            df_heat = cluster_data[0]
+            labels = cluster_data[1]
+            fig = px.imshow(df_heat, color_continuous_scale="dense", aspect="auto")
+            fig.update_traces(
+                hovertemplate="Interview: %{y}"
+                "<br>Topic: %{x}"
+                "<br>Weight: %{z}<extra></extra>"
+            )
+            fig.update_layout(clickmode="event+select")
+            fig.update_layout(clickmode="event+select")
+            fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+            hover_text = [
+                    [labels[str(col)] for col in df_heat.columns]  # Labels pro Column
+                    for _ in df_heat.index
+                ]
+            fig.update_traces(
+                    text=hover_text,
+                    hovertemplate="Interview: %{y}<br>Cluster: %{x}<br>Label: %{text}<br>Value: %{z}<extra></extra>"
+                    )
+            fig.update(layout_coloraxis_showscale=False)
         else:
             fig = px.imshow(df, color_continuous_scale="dense", aspect="auto")
             fig.update_traces(
                 hovertemplate="Interview: %{y}" +
                 "<br>Topic: %{x}"+
                 "<br>Weight: %{z}<extra></extra>")
-        fig.update_layout(clickmode="event+select")
-        fig.update_layout(clickmode="event+select")
-        fig.update(layout_coloraxis_showscale=False)
-        fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+            fig.update_layout(clickmode="event+select")
+            fig.update_layout(clickmode="event+select")
+            fig.update(layout_coloraxis_showscale=False)
+            fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+
+            if "topic_labels_on" in options and ohtm_file["settings"]["labeling_options"]["labeling"] == True:
+                # Build a custome Data, with the same order, that will be put intu the Hovertemplate
+                label_dict = ohtm_file["topic_labels"]["labels"] 
+                x_labels = [label_dict[c] for c in df.columns] 
+                customdata = np.tile(x_labels, (len(df.index), 1))
+                fig.data[0].update(
+                    customdata=customdata,
+                    hovertemplate="Interview: %{y}<br>Topic: %{customdata}<br>Weight: %{z}<extra></extra>"
+                )
+
         if show_fig:
             fig.show()
         if return_fig:
@@ -121,18 +155,6 @@ def heatmap_corpus(
 
     else:
         print("No Topic Model trained")
-
-
-"""
-This function has to be tested in the dash. Because now it is really slow. With the chagen to possilbe different
-archive namens than the first 3 letters of the interview id, i had to find another way. Maye this function has to be
-done: improved. (17.1.2025)
-
-
-"""
-from dash import no_update
-
-from functions.graph_functions.heatmap_marker import heatmap_marker_creation_normal
 
 
 def heatmap_interview_simple(
@@ -143,6 +165,7 @@ def heatmap_interview_simple(
     chunk_number_storage,
     heatmap_filter: list = "",
     interview_manual_id: str = "",
+    options: list = ""
 ):
     interview_id = None
     if click_data == "off":
@@ -179,17 +202,52 @@ def heatmap_interview_simple(
                 z_scores = (df - mean) / std_dev
                 df = z_scores
                 df.index = pd.to_numeric(df.index)
+            if "topic_cluster_on" in options and ohtm_file["settings"]["labeling_options"]["clustering"] == True:
+                groups = ohtm_file["topic_labels"]["clusters"]
 
-            fig = px.imshow(df, color_continuous_scale="dense")
-            fig.update_traces(
-                hovertemplate="Chunk: %{x}"
-                "<br>Topic: %{y}"
-                "<br>Weight: %{z}<extra></extra>"
-            )
-            fig.update_traces(showlegend=False)
-            fig.update_traces(showscale=False)
-            fig.update(layout_coloraxis_showscale=False)
-            fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+                grouped = pd.DataFrame({
+                        key: df.loc[ast.literal_eval(rows) if isinstance(rows, str) else rows].sum(axis=0)
+                        for key, (_, rows) in groups.items()
+                    }).T
+                hover_labels = {
+                        key: f"{label} | Topics: {rows}"
+                        for key, (label, rows) in groups.items()
+                    }
+                customdata = np.array([hover_labels[r] for r in grouped.index])[:, None]
+                customdata = np.tile(customdata, (1, grouped.shape[1]))
+                grouped.index = pd.to_numeric(grouped.index)
+                fig = px.imshow(grouped, color_continuous_scale="dense")
+                fig.data[0].update(
+                    customdata=customdata,
+                    hovertemplate="Cluster: %{y}<br>Label: %{customdata}<br>Column: %{x}<br>Value: %{z}<extra></extra>"
+                )
+                fig.update_traces(showlegend=False)
+                fig.update_traces(showscale=False)
+                fig.update(layout_coloraxis_showscale=False)
+                fig.update_layout(margin=dict(l=20, r=20, t=20, b=20)
+                )
+
+            else:
+                fig = px.imshow(df, color_continuous_scale="dense")
+                fig.update_traces(
+                    hovertemplate="Chunk: %{x}"
+                    "<br>Topic: %{y}"
+                    "<br>Weight: %{z}<extra></extra>"
+                )
+                fig.update_traces(showlegend=False)
+                fig.update_traces(showscale=False)
+                fig.update(layout_coloraxis_showscale=False)
+                fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+
+                if "topic_labels_on" in options and ohtm_file["settings"]["labeling_options"]["labeling"] == True:
+                    # Build a custome Data, with the same order, that will be put intu the Hovertemplate
+                    label_dict = ohtm_file["topic_labels"]["labels"] 
+                    y_labels = [label_dict[str(r)] for r in df.index]  
+                    customdata = np.tile(np.array(y_labels)[:, None], (1, len(df.columns)))
+                    fig.data[0].update(
+                        customdata=customdata,
+                        hovertemplate="Topic: %{customdata}<br>Chunk: %{x}<br>Weight: %{z}<extra></extra>"
+                    )
             if ctx_triggered[0]["prop_id"] == "heat_map.clickData":
                 title = "Interview " + interview_id
             elif ctx_triggered[0]["prop_id"] == "interview_manual_id.value":
@@ -232,7 +290,8 @@ def chunk_heatmap(
     topic_2_number: int = 0,
     topic_2_weight: float = 0,
     correlation: list = "",
-    sort_filter: str = ""
+    sort_filter: str = "",
+    options: list = ""
 ):
     ohtm_file = convert_ohtm_file(ohtm_file)
 
@@ -323,17 +382,60 @@ def chunk_heatmap(
             df_heat_cv=df_heat_cv.sort_values(by=str(topic_2_number), ascending=False)
         else:
             next
+        if "topic_cluster_on" in options and ohtm_file["settings"]["labeling_options"]["clustering"] == True:
+            cluster_data = df_regroup_clusters_heat(df_heat_cv, ohtm_file["topic_labels"]["clusters"])
+            df_heat_cv = cluster_data[0]
+            labels = cluster_data[1]
+            fig = px.imshow(df_heat_cv, color_continuous_scale="dense", aspect="auto")
+            fig.update_traces(
+                hovertemplate="Interview: %{y}"
+                "<br>Topic: %{x}"
+                "<br>Weight: %{z}<extra></extra>"
+            )
+            fig.update_layout(clickmode="event+select")
+            fig.update_layout(clickmode="event+select")
+            fig.update(layout_coloraxis_showscale=False)
+            fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+            hover_text = [
+                    [labels[str(col)] for col in df_heat_cv.columns]  # Labels pro Column
+                    for _ in df_heat_cv.index
+                ]
+            fig.update_traces(
+                    text=hover_text,
+                    hovertemplate="Interview: %{y}<br>Cluster: %{x}<br>Label: %{text}<br>Value: %{z}<extra></extra>"
+                    )
+        elif "topic_labels_on" in options and ohtm_file["settings"]["labeling_options"]["labeling"] == True:
+            fig = px.imshow(df_heat_cv, color_continuous_scale="dense", aspect="auto")
+            fig.update_traces(
+                hovertemplate="Interview: %{y}"
+                "<br>Topic: %{x}"
+                "<br>Weight: %{z}<extra></extra>"
+            )
+            fig.update_layout(clickmode="event+select")
+            fig.update_layout(clickmode="event+select")
+            fig.update(layout_coloraxis_showscale=False)
+            fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+            # Builds a custome Data, with the same order, that will be put intu the Hovertemplate
+            label_dict = ohtm_file["topic_labels"]["labels"] 
+            x_labels = [label_dict[c] for c in df_heat_cv.columns] 
+            customdata = np.tile(x_labels, (len(df_heat_cv.index), 1))
+            fig.data[0].update(
+                customdata=customdata,
+                hovertemplate="Interview: %{y}<br>Topic: %{customdata}<br>Weight: %{z}<extra></extra>"
+            )
 
-        fig = px.imshow(df_heat_cv, color_continuous_scale="dense", aspect="auto")
-        fig.update_traces(
-            hovertemplate="Interview: %{y}"
-            "<br>Topic: %{x}"
-            "<br>Weight: %{z}<extra></extra>"
-        )
-        fig.update_layout(clickmode="event+select")
-        fig.update_layout(clickmode="event+select")
-        fig.update(layout_coloraxis_showscale=False)
-        fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+        else:
+            fig = px.imshow(df_heat_cv, color_continuous_scale="dense", aspect="auto")
+            fig.update_traces(
+                hovertemplate="Interview: %{y}"
+                "<br>Topic: %{x}"
+                "<br>Weight: %{z}<extra></extra>"
+            )
+            fig.update_layout(clickmode="event+select")
+            fig.update_layout(clickmode="event+select")
+            fig.update(layout_coloraxis_showscale=False)
+            fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+
         if show_fig:
             fig.show()
         if return_fig:
