@@ -7,12 +7,12 @@ import os
 
 from ohtm_dash_function import create_ohd_dash
 
-input_folder = r"C:\Users\phili\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\Topic Modeling\ohtm_files"
+#Set input_folder to the path, where the ohtm_file is
+input_folder = r"path_to_ohtm_file"
 
 
 if __name__ == "__main__":
-    load_file_name = "OHD_final_100c_100T_A5_final.ohtm"
-    # load_file_name = "med_ovgu_45T_a5_ohne_adoption_ohne_lem.ohtm"
+    load_file_name = "ohtm_file_name"
     with open(os.path.join(input_folder, load_file_name)) as f:
         ohtm_file = json.load(f)
     chronologie_analyse = False
