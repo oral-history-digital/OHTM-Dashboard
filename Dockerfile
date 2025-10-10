@@ -1,7 +1,9 @@
 # syntax=docker/dockerfile:1
 
+ARG PYTHON_VERSION="3.13.8"
+
 # Separate build image #################################################
-FROM python:3.13.7-slim-trixie AS build
+FROM python:"${PYTHON_VERSION}"-slim-trixie AS build
 
 SHELL ["sh", "-exc"]
 
@@ -27,7 +29,7 @@ RUN --mount=type=cache,target=/root/.cache \
 ########################################################################
 
 
-FROM python:3.13.7-slim-trixie
+FROM python:"${PYTHON_VERSION}"-slim-trixie
 
 ARG VERSION="0.1.0"
 
