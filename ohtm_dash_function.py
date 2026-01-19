@@ -1001,11 +1001,23 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                     [
                         dbc.Col(
                             [
+                                html.Div(
+                                    dbc.Input(
+                                        id="interview_manual_id_detail",
+                                        placeholder="Interview",
+                                        type="wod",
+                                    )
+                                ),
+                            ],
+                            width=1,
+                        ),
+                        dbc.Col(
+                            [
                                 dbc.Checklist(
                                     options=[
-                                        {"label": "Topic Filter", "value": "filter"},
                                         {"label": "Z Score", "value": "z_score"},
                                         {"label": "Marker", "value": "marker"},
+                                        {"label": "IHC", "value": "ihc"},
                                     ],
                                     value=[],
                                     id="switch_chronology_filter_detail",
@@ -1013,16 +1025,48 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                                     inline=True,
                                 ),
                             ],
-                            width=3,
+                            width=4,
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Checklist(
+                                    options=[
+                                        {"label": "Topic Filter", "value": "topic_filter"},
+                                    ],
+                                    value=[],
+                                    id="topic_filter_switch_detail",
+                                    switch=True,
+                                    inline=True,
+                                    style={"display": "none"},
+
+                                ),
+                            ],
+                            width=2,
                         ),
                         dbc.Col(
                             [
                                 html.Div(
                                     dbc.Input(
-                                        id="interview_manual_id_detail",
-                                        placeholder="Interview",
-                                        type="wod",
-                                    )
+                                        placeholder="outlier_threshold",
+                                        type="floag",
+                                        id="ihc_outlier_threshold_value",
+                                    ),
+                                    id="ihc_outlier_threshold",
+                                    style={"display": "none"},
+                                ),
+                            ],
+                            width=1,
+                        ),
+                        dbc.Col(
+                            [
+                                html.Div(
+                                    dbc.Input(
+                                        id="ihc_threshold_top_filter_value",
+                                        placeholder="threshold_top_filter",
+                                        type="float",
+                                    ), 
+                                    id="ihc_threshold_top_filter",
+                                    style={"display": "none"},
                                 ),
                             ],
                             width=1,
@@ -1903,6 +1947,21 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
     # Page 4
     # Deatil Interview Heatmap page 4
     @app.callback(
+        Output("ihc_outlier_threshold", "style"),
+        Output("ihc_threshold_top_filter", "style"),
+        Output("topic_filter_switch_detail", "style"),
+        Input("switch_chronology_filter_detail", "value"),         
+    )
+    def topic_filter_input_regulator(value):
+        if chronologie_analyse == True:
+            if "ihc" in value:
+                return {"display": "block"}, {"display": "block"}, {"display": "block"}
+            else:
+                return {"display": "none"}, {"display": "none"}, {"display": "none"}
+        if chronologie_analyse == False:
+            return {"display": "none"}, {"display": "none"}, {"display": "none"}
+
+    @app.callback(
         Output(component_id="heat_map_interview_detail", component_property="figure"),
         Output("interview_title_detail", "children"),
         Output("interview_id_storage_detail", "data"),
@@ -1913,6 +1972,9 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         Input("heat_map_interview_detail", "clickData"),
         Input("chunk_number_detail", "data"),
         Input("side_bar_menu_switch", "value"),
+        Input("topic_filter_switch_detail", "value"),
+        Input("ihc_outlier_threshold_value", "value"),
+        Input("ihc_threshold_top_filter_value", "value"),
         prevent_initial_call = True, 
     )
     def interview_heat_map_dash(
@@ -1920,9 +1982,12 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
         heatmap_filter,
         click_data_2,
         chunk_number_storage,
-        option_list
+        option_list,
+        ihf_topic_filter_on_off,
+        threshold_top_filter,
+        outlier_threshold
     ):
-        if chronologie_analyse:
+        if chronologie_analyse and "ihc" in heatmap_filter:
             chronologie_heatmap = chronology_matrix(
                 data=ohtm_file,
                 click_data="",
@@ -1930,6 +1995,9 @@ def create_ohd_dash(ohtm_file, chronologie_analyse: bool = False):
                 ctx_triggered=ctx.triggered,
                 interview_manual_id=interview_manual_id,
                 heatmap_filter=heatmap_filter,
+                outlier_threshold=outlier_threshold,
+                threshold_top_filter=threshold_top_filter,
+                topic_filtering=ihf_topic_filter_on_off,
                 chunk_number_storage=chunk_number_storage,
             )
             if chronologie_heatmap is not None:

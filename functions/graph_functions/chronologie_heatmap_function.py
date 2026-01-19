@@ -67,6 +67,7 @@ def chronology_matrix(data,
                       return_data: bool = False,
                       threshold_top_filter: float=0,
                       outlier_threshold: float=0,
+                      topic_filtering: bool = False,
                       options:list = "",
                       ):
 
@@ -89,6 +90,9 @@ def chronology_matrix(data,
             threshold_top_filter = 0
         if outlier_threshold is None:
             outlier_threshold = 0
+        
+        print(threshold_top_filter)
+        print(outlier_threshold)
 
         ohtm_file = data
 
@@ -105,7 +109,7 @@ def chronology_matrix(data,
         else:
             z_score = False
 
-        if "filter" in heatmap_filter:
+        if "filter" in topic_filtering:
             topic_filter = True
         else:
             topic_filter = False

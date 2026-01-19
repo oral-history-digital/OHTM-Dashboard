@@ -7,15 +7,13 @@ import os
 
 from ohtm_dash_function import create_ohd_dash
 
-#Set input_folder to the path, where the ohtm_file is
-input_folder = r"path_to_ohtm_file"
+input_folder = r"C:\Users\phili\sciebo - Bayerschmidt, Philipp (bayerschmidt@fernuni-hagen.de)@fernuni-hagen.sciebo.de\Topic Modeling\ohtm_files"
 
 
 if __name__ == "__main__":
-    load_file_name = "ohtm_file_name"
+    load_file_name = "OHD_final_100c_100T_A5_final_label_test.ohtm"
     with open(os.path.join(input_folder, load_file_name)) as f:
         ohtm_file = json.load(f)
-    chronologie_analyse = False
-    tooltip_bool = True
+    chronologie_analyse = True
     app = create_ohd_dash(ohtm_file, chronologie_analyse)
-    app.run(debug=True, port=3002)
+    app.run(debug=False, port=3002)
