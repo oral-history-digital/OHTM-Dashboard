@@ -23,6 +23,7 @@ def heatmap_corpus(
     topic_filter_number: int = 0,
     topic_filter_threshold: float = 0,
     topic_filter: str = "False",
+    axis_titel_option: bool = True,
 ):
     ohtm_file = convert_ohtm_file(ohtm_file)
 
@@ -105,8 +106,13 @@ def heatmap_corpus(
             z_scores = (df - mean) / std_dev
             df = z_scores
         df = df.transpose()
-        if "topic_cluster_on" in options and ohtm_file["settings"]["labeling_options"]["clustering"] == True:
-            cluster_data = df_regroup_clusters_heat(df, ohtm_file["topic_labels"]["clusters"])
+        if (
+            "topic_cluster_on" in options
+            and ohtm_file["settings"]["labeling_options"]["clustering"] == True
+        ):
+            cluster_data = df_regroup_clusters_heat(
+                df, ohtm_file["topic_labels"]["clusters"]
+            )
             df_heat = cluster_data[0]
             labels = cluster_data[1]
             fig = px.imshow(df_heat, color_continuous_scale="dense", aspect="auto")
@@ -119,34 +125,50 @@ def heatmap_corpus(
             fig.update_layout(clickmode="event+select")
             fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
             hover_text = [
-                    [labels[str(col)] for col in df_heat.columns]  # Labels pro Column
-                    for _ in df_heat.index
-                ]
+                [labels[str(col)] for col in df_heat.columns]  # Labels pro Column
+                for _ in df_heat.index
+            ]
             fig.update_traces(
-                    text=hover_text,
-                    hovertemplate="Interview: %{y}<br>Cluster: %{x}<br>Label: %{text}<br>Value: %{z}<extra></extra>"
-                    )
+                text=hover_text,
+                hovertemplate="Interview: %{y}<br>Cluster: %{x}<br>Label: %{text}<br>Value: %{z}<extra></extra>",
+            )
             fig.update(layout_coloraxis_showscale=False)
         else:
             fig = px.imshow(df, color_continuous_scale="dense", aspect="auto")
             fig.update_traces(
-                hovertemplate="Interview: %{y}" +
-                "<br>Topic: %{x}"+
-                "<br>Weight: %{z}<extra></extra>")
+                hovertemplate="Interview: %{y}"
+                + "<br>Topic: %{x}"
+                + "<br>Weight: %{z}<extra></extra>"
+            )
             fig.update_layout(clickmode="event+select")
             fig.update_layout(clickmode="event+select")
             fig.update(layout_coloraxis_showscale=False)
             fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
 
-            if "topic_labels_on" in options and ohtm_file["settings"]["labeling_options"]["labeling"] == True:
+            if (
+                "topic_labels_on" in options
+                and ohtm_file["settings"]["labeling_options"]["labeling"] == True
+            ):
                 # Build a custome Data, with the same order, that will be put intu the Hovertemplate
-                label_dict = ohtm_file["topic_labels"]["labels"] 
-                x_labels = [label_dict[c] for c in df.columns] 
+                label_dict = ohtm_file["topic_labels"]["labels"]
+                x_labels = [label_dict[c] for c in df.columns]
                 customdata = np.tile(x_labels, (len(df.index), 1))
                 fig.data[0].update(
                     customdata=customdata,
-                    hovertemplate="Interview: %{y}<br>Topic: %{customdata}<br>Weight: %{z}<extra></extra>"
+                    hovertemplate="Interview: %{y}<br>Topic: %{customdata}<br>Weight: %{z}<extra></extra>",
                 )
+        if axis_titel_option:
+            fig.update_layout(
+                xaxis_title="Topics",  # Entfernt die X-Achsenbeschriftung
+                yaxis_title="Interviews",  # Entfernt die Y-Achsenbeschriftung
+                xaxis_title_font=dict(size=10),
+                yaxis_title_font=dict(size=10),
+        )
+        else:
+            fig.update_layout(
+                xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
+                yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung  
+        )
 
         if show_fig:
             fig.show()
@@ -165,7 +187,8 @@ def heatmap_interview_simple(
     chunk_number_storage,
     heatmap_filter: list = "",
     interview_manual_id: str = "",
-    options: list = ""
+    options: list = "",
+    axis_titel_option: bool = True,
 ):
     interview_id = None
     if click_data == "off":
@@ -202,30 +225,36 @@ def heatmap_interview_simple(
                 z_scores = (df - mean) / std_dev
                 df = z_scores
                 df.index = pd.to_numeric(df.index)
-            if "topic_cluster_on" in options and ohtm_file["settings"]["labeling_options"]["clustering"] == True:
+            if (
+                "topic_cluster_on" in options
+                and ohtm_file["settings"]["labeling_options"]["clustering"] == True
+            ):
                 groups = ohtm_file["topic_labels"]["clusters"]
 
-                grouped = pd.DataFrame({
-                        key: df.loc[ast.literal_eval(rows) if isinstance(rows, str) else rows].sum(axis=0)
+                grouped = pd.DataFrame(
+                    {
+                        key: df.loc[
+                            ast.literal_eval(rows) if isinstance(rows, str) else rows
+                        ].sum(axis=0)
                         for key, (_, rows) in groups.items()
-                    }).T
-                hover_labels = {
-                        key: f"{label} | Topics: {rows}"
-                        for key, (label, rows) in groups.items()
                     }
+                ).T
+                hover_labels = {
+                    key: f"{label} | Topics: {rows}"
+                    for key, (label, rows) in groups.items()
+                }
                 customdata = np.array([hover_labels[r] for r in grouped.index])[:, None]
                 customdata = np.tile(customdata, (1, grouped.shape[1]))
                 grouped.index = pd.to_numeric(grouped.index)
                 fig = px.imshow(grouped, color_continuous_scale="dense")
                 fig.data[0].update(
                     customdata=customdata,
-                    hovertemplate="Cluster: %{y}<br>Label: %{customdata}<br>Column: %{x}<br>Value: %{z}<extra></extra>"
+                    hovertemplate="Cluster: %{y}<br>Label: %{customdata}<br>Column: %{x}<br>Value: %{z}<extra></extra>",
                 )
                 fig.update_traces(showlegend=False)
                 fig.update_traces(showscale=False)
                 fig.update(layout_coloraxis_showscale=False)
-                fig.update_layout(margin=dict(l=20, r=20, t=20, b=20)
-                )
+                fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
 
             else:
                 fig = px.imshow(df, color_continuous_scale="dense")
@@ -239,14 +268,19 @@ def heatmap_interview_simple(
                 fig.update(layout_coloraxis_showscale=False)
                 fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
 
-                if "topic_labels_on" in options and ohtm_file["settings"]["labeling_options"]["labeling"] == True:
+                if (
+                    "topic_labels_on" in options
+                    and ohtm_file["settings"]["labeling_options"]["labeling"] == True
+                ):
                     # Build a custome Data, with the same order, that will be put intu the Hovertemplate
-                    label_dict = ohtm_file["topic_labels"]["labels"] 
-                    y_labels = [label_dict[str(r)] for r in df.index]  
-                    customdata = np.tile(np.array(y_labels)[:, None], (1, len(df.columns)))
+                    label_dict = ohtm_file["topic_labels"]["labels"]
+                    y_labels = [label_dict[str(r)] for r in df.index]
+                    customdata = np.tile(
+                        np.array(y_labels)[:, None], (1, len(df.columns))
+                    )
                     fig.data[0].update(
                         customdata=customdata,
-                        hovertemplate="Topic: %{customdata}<br>Chunk: %{x}<br>Weight: %{z}<extra></extra>"
+                        hovertemplate="Topic: %{customdata}<br>Chunk: %{x}<br>Weight: %{z}<extra></extra>",
                     )
             if ctx_triggered[0]["prop_id"] == "heat_map.clickData":
                 title = "Interview " + interview_id
@@ -272,13 +306,25 @@ def heatmap_interview_simple(
             df = (
                 df.to_json()
             )  # dash only can store json, so this df has to be converted
+            if axis_titel_option:
+                fig.update_layout(
+                    xaxis_title="Chunks",  # Entfernt die X-Achsenbeschriftung
+                    yaxis_title="Topics",  # Entfernt die Y-Achsenbeschriftung
+                    xaxis_title_font=dict(size=10),
+                    yaxis_title_font=dict(size=10),
+            )
+            else:
+                fig.update_layout(
+                    xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
+                    yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung  
+            )
             return fig, title, interview_id, chunk_number_storage, tc_indicator, df
 
         else:
             print("No Topic Model trained")
     else:
         return no_update, no_update, no_update, no_update, no_update, no_update
-    
+
 
 def chunk_heatmap(
     ohtm_file,
@@ -291,7 +337,8 @@ def chunk_heatmap(
     topic_2_weight: float = 0,
     correlation: list = "",
     sort_filter: str = "",
-    options: list = ""
+    options: list = "",
+    axis_titel_option: bool = True,
 ):
     ohtm_file = convert_ohtm_file(ohtm_file)
 
@@ -309,60 +356,106 @@ def chunk_heatmap(
                 for interview in ohtm_file["weight"][archive]:
                     for chunks in ohtm_file["weight"][archive][interview]:
                         chunk_name = str(interview) + "**" + str(chunks)
-                        if str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]) >= str(topic_1_weight):
+                        if str(
+                            ohtm_file["weight"][archive][interview][chunks][
+                                str(topic_1_number)
+                            ]
+                        ) >= str(topic_1_weight):
                             chunk_results = []
-                            if "e" in str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]):
+                            if "e" in str(
+                                ohtm_file["weight"][archive][interview][chunks][
+                                    str(topic_1_number)
+                                ]
+                            ):
                                 next
                             else:
-                                heat_chunk_cv[chunk_name] = dict(ohtm_file["weight"][archive][interview][chunks])
+                                heat_chunk_cv[chunk_name] = dict(
+                                    ohtm_file["weight"][archive][interview][chunks]
+                                )
                                 top_ts = ohtm_file["weight"][archive][interview][chunks]
-                                top_ts_sorted = sorted(top_ts.items(), key=lambda x: x[1], reverse=True)
+                                top_ts_sorted = sorted(
+                                    top_ts.items(), key=lambda x: x[1], reverse=True
+                                )
                                 final_topic_list = []
                                 for entry in top_ts_sorted[:5]:
-                                    final_topic_list.append(str(entry[0]) + "," + str(entry[1]))
-                                chunk_results.append(str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]))
+                                    final_topic_list.append(
+                                        str(entry[0]) + "," + str(entry[1])
+                                    )
+                                chunk_results.append(
+                                    str(
+                                        ohtm_file["weight"][archive][interview][chunks][
+                                            str(topic_1_number)
+                                        ]
+                                    )
+                                )
                                 chunk_results.append(interview)
                                 chunk_results.append(chunks)
                                 chunk_results.append(archive)
                                 chunk_results.append(final_topic_list)
                                 final_chunk = chunks
-                                for all_chunk in ohtm_file["weight"][archive][interview]:
+                                for all_chunk in ohtm_file["weight"][archive][
+                                    interview
+                                ]:
                                     max_chunk = all_chunk
-                                chunk_percent = (int(final_chunk)/int(max_chunk))*100
+                                chunk_percent = (
+                                    int(final_chunk) / int(max_chunk)
+                                ) * 100
                                 chunk_results.append(chunk_percent)
                                 results.append(chunk_results)
         else:
             archive = option_selected
             for interview in ohtm_file["weight"][archive]:
                 for chunks in ohtm_file["weight"][archive][interview]:
-                        chunk_name = str(interview) + "**" + str(chunks)
-                        if str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]) >= str(topic_1_weight):
-                            chunk_results = []
-                            if "e" in str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]):
-                                next
-                            else:
-                                heat_chunk_cv[chunk_name] = dict(ohtm_file["weight"][archive][interview][chunks])
-                                top_ts = ohtm_file["weight"][archive][interview][chunks]
-                                top_ts_sorted = sorted(top_ts.items(), key=lambda x: x[1], reverse=True)
-                                final_topic_list = []
-                                for entry in top_ts_sorted[:5]:
-                                    final_topic_list.append(str(entry[0]) + "," + str(entry[1]))
-                                chunk_results.append(str(ohtm_file["weight"][archive][interview][chunks][str(topic_1_number)]))
-                                chunk_results.append(interview)
-                                chunk_results.append(chunks)
-                                chunk_results.append(archive)
-                                chunk_results.append(final_topic_list)
-                                final_chunk = chunks
-                                for all_chunk in ohtm_file["weight"][archive][interview]:
-                                    max_chunk = all_chunk
-                                chunk_percent = (int(final_chunk)/int(max_chunk))*100
-                                chunk_results.append(chunk_percent)
-                                results.append(chunk_results)
+                    chunk_name = str(interview) + "**" + str(chunks)
+                    if str(
+                        ohtm_file["weight"][archive][interview][chunks][
+                            str(topic_1_number)
+                        ]
+                    ) >= str(topic_1_weight):
+                        chunk_results = []
+                        if "e" in str(
+                            ohtm_file["weight"][archive][interview][chunks][
+                                str(topic_1_number)
+                            ]
+                        ):
+                            next
+                        else:
+                            heat_chunk_cv[chunk_name] = dict(
+                                ohtm_file["weight"][archive][interview][chunks]
+                            )
+                            top_ts = ohtm_file["weight"][archive][interview][chunks]
+                            top_ts_sorted = sorted(
+                                top_ts.items(), key=lambda x: x[1], reverse=True
+                            )
+                            final_topic_list = []
+                            for entry in top_ts_sorted[:5]:
+                                final_topic_list.append(
+                                    str(entry[0]) + "," + str(entry[1])
+                                )
+                            chunk_results.append(
+                                str(
+                                    ohtm_file["weight"][archive][interview][chunks][
+                                        str(topic_1_number)
+                                    ]
+                                )
+                            )
+                            chunk_results.append(interview)
+                            chunk_results.append(chunks)
+                            chunk_results.append(archive)
+                            chunk_results.append(final_topic_list)
+                            final_chunk = chunks
+                            for all_chunk in ohtm_file["weight"][archive][interview]:
+                                max_chunk = all_chunk
+                            chunk_percent = (int(final_chunk) / int(max_chunk)) * 100
+                            chunk_results.append(chunk_percent)
+                            results.append(chunk_results)
         if "correlation_cv" in correlation:
             heat_chunk_cv_2 = {}
             results_2 = []
             for entry in heat_chunk_cv:
-                if str(heat_chunk_cv[entry][str(topic_2_number)]) >=  str(topic_2_weight):
+                if str(heat_chunk_cv[entry][str(topic_2_number)]) >= str(
+                    topic_2_weight
+                ):
                     heat_chunk_cv_2[entry] = copy.deepcopy(heat_chunk_cv[entry])
                     for data in results:
                         if data[1] == entry.split("**")[0]:
@@ -375,15 +468,20 @@ def chunk_heatmap(
         df_heat_cv = pd.DataFrame.from_dict(heat_chunk_cv)
         df_heat_cv = df_heat_cv.transpose()
         if sort_filter == "sort_interview_cv":
-            df_heat_cv= df_heat_cv.sort_index()
+            df_heat_cv = df_heat_cv.sort_index()
         if sort_filter == "sort_topic_1_cv":
-            df_heat_cv= df_heat_cv.sort_values(by=str(topic_1_number), ascending=False)
+            df_heat_cv = df_heat_cv.sort_values(by=str(topic_1_number), ascending=False)
         if sort_filter == "sort_topic_2_cv":
-            df_heat_cv=df_heat_cv.sort_values(by=str(topic_2_number), ascending=False)
+            df_heat_cv = df_heat_cv.sort_values(by=str(topic_2_number), ascending=False)
         else:
             next
-        if "topic_cluster_on" in options and ohtm_file["settings"]["labeling_options"]["clustering"] == True:
-            cluster_data = df_regroup_clusters_heat(df_heat_cv, ohtm_file["topic_labels"]["clusters"])
+        if (
+            "topic_cluster_on" in options
+            and ohtm_file["settings"]["labeling_options"]["clustering"] == True
+        ):
+            cluster_data = df_regroup_clusters_heat(
+                df_heat_cv, ohtm_file["topic_labels"]["clusters"]
+            )
             df_heat_cv = cluster_data[0]
             labels = cluster_data[1]
             fig = px.imshow(df_heat_cv, color_continuous_scale="dense", aspect="auto")
@@ -397,14 +495,17 @@ def chunk_heatmap(
             fig.update(layout_coloraxis_showscale=False)
             fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
             hover_text = [
-                    [labels[str(col)] for col in df_heat_cv.columns]  # Labels pro Column
-                    for _ in df_heat_cv.index
-                ]
+                [labels[str(col)] for col in df_heat_cv.columns]  # Labels pro Column
+                for _ in df_heat_cv.index
+            ]
             fig.update_traces(
-                    text=hover_text,
-                    hovertemplate="Interview: %{y}<br>Cluster: %{x}<br>Label: %{text}<br>Value: %{z}<extra></extra>"
-                    )
-        elif "topic_labels_on" in options and ohtm_file["settings"]["labeling_options"]["labeling"] == True:
+                text=hover_text,
+                hovertemplate="Interview: %{y}<br>Cluster: %{x}<br>Label: %{text}<br>Value: %{z}<extra></extra>",
+            )
+        elif (
+            "topic_labels_on" in options
+            and ohtm_file["settings"]["labeling_options"]["labeling"] == True
+        ):
             fig = px.imshow(df_heat_cv, color_continuous_scale="dense", aspect="auto")
             fig.update_traces(
                 hovertemplate="Interview: %{y}"
@@ -416,12 +517,12 @@ def chunk_heatmap(
             fig.update(layout_coloraxis_showscale=False)
             fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
             # Builds a custome Data, with the same order, that will be put intu the Hovertemplate
-            label_dict = ohtm_file["topic_labels"]["labels"] 
-            x_labels = [label_dict[c] for c in df_heat_cv.columns] 
+            label_dict = ohtm_file["topic_labels"]["labels"]
+            x_labels = [label_dict[c] for c in df_heat_cv.columns]
             customdata = np.tile(x_labels, (len(df_heat_cv.index), 1))
             fig.data[0].update(
                 customdata=customdata,
-                hovertemplate="Interview: %{y}<br>Topic: %{customdata}<br>Weight: %{z}<extra></extra>"
+                hovertemplate="Interview: %{y}<br>Topic: %{customdata}<br>Weight: %{z}<extra></extra>",
             )
 
         else:
@@ -435,6 +536,19 @@ def chunk_heatmap(
             fig.update_layout(clickmode="event+select")
             fig.update(layout_coloraxis_showscale=False)
             fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+
+        if axis_titel_option:
+            fig.update_layout(
+                xaxis_title="Chunks",  # Entfernt die X-Achsenbeschriftung
+                yaxis_title="Topics",  # Entfernt die Y-Achsenbeschriftung
+                xaxis_title_font=dict(size=10),
+                yaxis_title_font=dict(size=10),
+        )
+        else:
+            fig.update_layout(
+                xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
+                yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung  
+        )
 
         if show_fig:
             fig.show()

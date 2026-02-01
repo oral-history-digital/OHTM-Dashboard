@@ -8,7 +8,6 @@ import ast
 import pandas as pd
 
 
-
 def df_regroup_clusters_bar(df, ohtm_cluster):
     groups_raw = []
     for entry in ohtm_cluster:
@@ -26,24 +25,28 @@ def df_regroup_clusters_bar(df, ohtm_cluster):
     labels_dict = ohtm_cluster
     new_df["Label"] = new_df.index.map(lambda x: labels_dict.get(str(x), "unknown"))
 
-    return new_df 
+    return new_df
 
 
 def df_regroup_clusters_heat(df, ohtm_cluster):
-
     groups = ohtm_cluster
-    grouped = pd.DataFrame({
-        key: df[[str(c) for c in (cols if isinstance(cols, list) else ast.literal_eval(cols))]].sum(axis=1)
-        for key, (_, cols) in groups.items()
-    })
+    grouped = pd.DataFrame(
+        {
+            key: df[
+                [
+                    str(c)
+                    for c in (
+                        cols if isinstance(cols, list) else ast.literal_eval(cols)
+                    )
+                ]
+            ].sum(axis=1)
+            for key, (_, cols) in groups.items()
+        }
+    )
 
-    # Separate labels for hovertext 
-    labels = {key: f"{label} | Topics: {rows}"
-                        for key, (label, rows) in groups.items()
-                    }
+    # Separate labels for hovertext
+    labels = {key: f"{label} | Topics: {rows}" for key, (label, rows) in groups.items()}
 
-
-    new_df = grouped 
-
+    new_df = grouped
 
     return new_df, labels

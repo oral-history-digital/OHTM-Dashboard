@@ -1,8 +1,12 @@
-'''Funktion to create links to oral_history_digital'''
+"""Funktion to create links to oral_history_digital"""
 
 
-def create_link(archive: str ="", interview_id: str = "", chunk_start_time: str = "False",
-                link_tape: str = "1", ):
+def create_link(
+    archive: str = "",
+    interview_id: str = "",
+    chunk_start_time: str = "False",
+    link_tape: str = "1",
+):
     link_available = False
     if archive.lower() == "adg":
         https = "https://deutsches-gedaechtnis.fernuni-hagen.de/de/interviews/adg"
@@ -24,17 +28,21 @@ def create_link(archive: str ="", interview_id: str = "", chunk_start_time: str 
         link_available = True
     if link_available:
         if chunk_start_time == "False":
-            link = (https + interview_id[3:])
+            link = https + interview_id[3:]
         else:
-            link = (https + interview_id[3:]
-            + "?tape=" + str(link_tape)
-            + "&time=" + str(chunk_start_time.split(":")[0][1]) + "h"
-            + str(chunk_start_time.split(":")[1]) + "m"
-            + str(chunk_start_time.split(":")[2].split(".")[0]) + "s"
+            link = (
+                https
+                + interview_id[3:]
+                + "?tape="
+                + str(link_tape)
+                + "&time="
+                + str(chunk_start_time.split(":")[0][1])
+                + "h"
+                + str(chunk_start_time.split(":")[1])
+                + "m"
+                + str(chunk_start_time.split(":")[2].split(".")[0])
+                + "s"
             )
     else:
         link = "Not online available"
     return link
-
-
-

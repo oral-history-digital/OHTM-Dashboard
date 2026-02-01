@@ -8,9 +8,11 @@ from dash import ctx
 import ast
 
 
-
-def print_all_topics(words, nClicks, ohtm_file, options:list = ""):
-    if ctx.triggered[0]["prop_id"] == "enter_print_topics.n_clicks" or "side_bar_menu_switch.value":
+def print_all_topics(words, nClicks, ohtm_file, options: list = ""):
+    if (
+        ctx.triggered[0]["prop_id"] == "enter_print_topics.n_clicks"
+        or "side_bar_menu_switch.value"
+    ):
         number_of_words = words
         data = []
         for topic in ohtm_file["words"]:
@@ -23,7 +25,10 @@ def print_all_topics(words, nClicks, ohtm_file, options:list = ""):
         df = pd.DataFrame(data)
         df.columns = ["Topic", "Words"]
 
-        if "topic_cluster_on" in options and ohtm_file["settings"]["labeling_options"]["clustering"] == True:
+        if (
+            "topic_cluster_on" in options
+            and ohtm_file["settings"]["labeling_options"]["clustering"] == True
+        ):
             topic_groups = ohtm_file["topic_labels"]["clusters"]
             rows = []
             for _, (category, topics_str) in topic_groups.items():
@@ -40,8 +45,12 @@ def print_all_topics(words, nClicks, ohtm_file, options:list = ""):
 
             # Neues DataFrame
             df = pd.DataFrame(rows)
-        if "topic_labels_on" in options and ohtm_file["settings"]["labeling_options"]["labeling"] == True:
+        if (
+            "topic_labels_on" in options
+            and ohtm_file["settings"]["labeling_options"]["labeling"] == True
+        ):
             topic_labels = ohtm_file["topic_labels"]["labels"]
+
             def map_topic(value):
                 try:
                     # Versuch, den Wert als int zu interpretieren
