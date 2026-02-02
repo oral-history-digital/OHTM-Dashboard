@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG PYTHON_VERSION="3.13.8"
+ARG PYTHON_VERSION="3.13.11"
 
 # Separate build image #################################################
 FROM python:"${PYTHON_VERSION}"-slim-trixie AS build
