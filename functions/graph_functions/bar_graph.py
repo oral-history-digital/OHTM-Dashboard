@@ -5,7 +5,10 @@ from functions.basic_functions.create_clusters import df_regroup_clusters_bar
 
 
 def bar_graph_corpus(
-    ohtm_file, show_fig: bool = True, return_fig: bool = False, options: list = "",
+    ohtm_file,
+    show_fig: bool = True,
+    return_fig: bool = False,
+    options: list = "",
     axis_titel_option: bool = False,
 ):
     ohtm_file = convert_ohtm_file(ohtm_file)
@@ -126,16 +129,16 @@ def bar_graph_corpus(
         fig.update_layout(margin=dict(l=20, r=20, t=20, b=20))
         if axis_titel_option:
             fig.update_layout(
-                    xaxis_title="Topics",  # Entfernt die X-Achsenbeschriftung
-                    yaxis_title="Weight",  # Entfernt die Y-Achsenbeschriftung
-                    xaxis_title_font=dict(size=10),
-                    yaxis_title_font=dict(size=10),
-        )
+                xaxis_title="Topics",  # Entfernt die X-Achsenbeschriftung
+                yaxis_title="Weight",  # Entfernt die Y-Achsenbeschriftung
+                xaxis_title_font=dict(size=10),
+                yaxis_title_font=dict(size=10),
+            )
         else:
             fig.update_layout(
                 xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
-                yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung  
-        )
+                yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung
+            )
         if show_fig:
             fig.show()
         if return_fig:
@@ -412,12 +415,12 @@ def bar_graph_cv_function(
                 yaxis_title="Weight",  # Entfernt die Y-Achsenbeschriftung
                 xaxis_title_font=dict(size=10),
                 yaxis_title_font=dict(size=10),
-        )
+            )
         else:
             fig.update_layout(
                 xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
-                yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung  
-        )
+                yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung
+            )
         if show_fig:
             fig.show()
         if return_fig:

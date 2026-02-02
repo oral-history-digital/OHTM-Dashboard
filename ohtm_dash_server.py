@@ -14,6 +14,12 @@ ohtm_file = os.environ.get("OHTM_FILE")
 if ohtm_file:
     with open(Path(ohtm_file)) as f:
         ohtm_json = json.load(f)
-        app = create_ohd_dash(ohtm_json)
+
+        app = create_ohd_dash(
+            ohtm_file=ohtm_json,
+            chronologie_analyse=True,
+            pop_up_window=True,
+            axis_titel_option=True,
+        )
         # gunicorn ohtm_dash_server:server
         server = app.server

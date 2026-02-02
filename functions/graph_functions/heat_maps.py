@@ -163,12 +163,12 @@ def heatmap_corpus(
                 yaxis_title="Interviews",  # Entfernt die Y-Achsenbeschriftung
                 xaxis_title_font=dict(size=10),
                 yaxis_title_font=dict(size=10),
-        )
+            )
         else:
             fig.update_layout(
                 xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
-                yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung  
-        )
+                yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung
+            )
 
         if show_fig:
             fig.show()
@@ -312,12 +312,12 @@ def heatmap_interview_simple(
                     yaxis_title="Topics",  # Entfernt die Y-Achsenbeschriftung
                     xaxis_title_font=dict(size=10),
                     yaxis_title_font=dict(size=10),
-            )
+                )
             else:
                 fig.update_layout(
                     xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
-                    yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung  
-            )
+                    yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung
+                )
             return fig, title, interview_id, chunk_number_storage, tc_indicator, df
 
         else:
@@ -543,12 +543,12 @@ def chunk_heatmap(
                 yaxis_title="Topics",  # Entfernt die Y-Achsenbeschriftung
                 xaxis_title_font=dict(size=10),
                 yaxis_title_font=dict(size=10),
-        )
+            )
         else:
             fig.update_layout(
                 xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
-                yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung  
-        )
+                yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung
+            )
 
         if show_fig:
             fig.show()

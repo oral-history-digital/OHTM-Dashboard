@@ -14,8 +14,11 @@ if __name__ == "__main__":
     load_file_name = ""
     with open(os.path.join(input_folder, load_file_name)) as f:
         ohtm_file = json.load(f)
-    chronologie_analyse = False
-    pop_up_window = False
-    axis_titel_option = False
-    app = create_ohd_dash(ohtm_file, chronologie_analyse, pop_up_window, axis_titel_option)
+
+    app = create_ohd_dash(
+        ohtm_file=ohtm_file,
+        chronologie_analyse=False,
+        pop_up_window=False,
+        axis_titel_option=False,
+    )
     app.run(debug=False, port=3002)

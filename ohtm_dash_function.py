@@ -29,8 +29,14 @@ from functions.dash_board_functions.tooltip_function import (
     menu_label_function,
     menu_tooltip,
 )
-from functions.textfiles_functions.impressum_text_file import impressum_titel_text, impressum_text
-from functions.textfiles_functions.glossar_text_file import glossar_titel_text, glossar_text
+from functions.textfiles_functions.impressum_text_file import (
+    impressum_titel_text,
+    impressum_text,
+)
+from functions.textfiles_functions.glossar_text_file import (
+    glossar_titel_text,
+    glossar_text,
+)
 from functions.dash_board_functions.option_switch_sidebar import (
     option_switch_sidebar_function,
 )
@@ -42,7 +48,9 @@ logo_image_filename = "dash_ohd_image.png"
 
 
 def create_ohd_dash(
-    ohtm_file, chronologie_analyse: bool = False, pop_up_window: bool = False,
+    ohtm_file,
+    chronologie_analyse: bool = False,
+    pop_up_window: bool = False,
     axis_titel_option: bool = False,
 ):
     def b64_image(logo_image_filename):
@@ -417,7 +425,8 @@ def create_ohd_dash(
                                 impressum_text,
                                 style={
                                     "whiteSpace": "pre-line",
-                                    "font-size": "0.8vw",},
+                                    "font-size": "0.8vw",
+                                },
                             ),
                             id="offcanvas",
                             title=impressum_titel_text,
@@ -443,7 +452,8 @@ def create_ohd_dash(
                                 glossar_text,
                                 style={
                                     "whiteSpace": "pre-line",
-                                    "font-size": "0.8vw",},
+                                    "font-size": "0.8vw",
+                                },
                             ),
                             id="offcanvas_glossar",
                             title=glossar_titel_text,
@@ -1736,7 +1746,10 @@ def create_ohd_dash(
     )
     def bar_map(data, options_list):
         fig = bar_graph_corpus(
-            ohtm_file, show_fig=False, return_fig=True, options=options_list,
+            ohtm_file,
+            show_fig=False,
+            return_fig=True,
+            options=options_list,
             axis_titel_option=axis_titel_option,
         )
         return fig
@@ -1937,7 +1950,10 @@ def create_ohd_dash(
     )
     def bar_map2(data, option_list):
         fig = bar_graph_corpus(
-            ohtm_file, show_fig=False, return_fig=True, options=option_list, 
+            ohtm_file,
+            show_fig=False,
+            return_fig=True,
+            options=option_list,
             axis_titel_option=axis_titel_option,
         )
         return fig
@@ -2123,8 +2139,8 @@ def create_ohd_dash(
                 topic = click_data["points"][0]["y"]
                 topic = topic.split(" - ")[0]
             else:
-                topic = click_data["points"][0]["y"] 
-            return topic 
+                topic = click_data["points"][0]["y"]
+            return topic
 
     @app.callback(
         Output("heatmap_interview_detail_topic_nr", "data"),
@@ -2138,8 +2154,8 @@ def create_ohd_dash(
                 topic = click_data["points"][0]["y"]
                 topic = topic.split(" - ")[0]
             else:
-                topic = click_data["points"][0]["y"]         
-            return topic   
+                topic = click_data["points"][0]["y"]
+            return topic
 
     @app.callback(
         Output("bar_topic_nr", "data"),
@@ -2460,7 +2476,8 @@ def create_ohd_dash(
                     impressum_text,
                     style={
                         "whiteSpace": "pre-line",
-                        "font-size": "0.8vw",},
+                        "font-size": "0.8vw",
+                    },
                 ),
                 id="offcanvas",
                 title=impressum_titel_text,
@@ -2468,6 +2485,7 @@ def create_ohd_dash(
                 style={"width": "40vw"},
             ),
         )
+
     # Glossar Function
     @app.callback(
         Output("glossar", "children"),
@@ -2480,7 +2498,8 @@ def create_ohd_dash(
                     glossar_text,
                     style={
                         "whiteSpace": "pre-line",
-                        "font-size": "0.8vw",},
+                        "font-size": "0.8vw",
+                    },
                 ),
                 id="offcanvas_glossar",
                 title=glossar_titel_text,
