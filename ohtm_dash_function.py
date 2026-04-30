@@ -1063,7 +1063,7 @@ def create_ohd_dash(
                                 html.Div(
                                     dbc.Input(
                                         placeholder="outlier_threshold",
-                                        type="floag",
+                                        type="float",
                                         id="ihc_outlier_threshold_value",
                                     ),
                                     id="ihc_outlier_threshold",

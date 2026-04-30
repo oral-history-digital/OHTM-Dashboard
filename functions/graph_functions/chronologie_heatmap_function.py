@@ -121,8 +121,8 @@ def chronology_matrix(
         chunk_counter = 0
         chunk_set = 0
         transfer = []
-        threshold_top_filter = threshold_top_filter  # @Philipp ggf. als Regler
-        outlier_threshold = outlier_threshold  # @Philipp ggf. als Regler
+        threshold_top_filter = float(threshold_top_filter)  # @Philipp ggf. als Regler
+        outlier_threshold = float(outlier_threshold)  # @Philipp ggf. als Regler
         top_filter = []
 
         for archive in ohtm_file["corpus"]:
