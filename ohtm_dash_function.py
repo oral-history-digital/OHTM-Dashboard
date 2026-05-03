@@ -1064,9 +1064,9 @@ def create_ohd_dash(
                                     dbc.Input(
                                         placeholder="outlier_threshold",
                                         type="float",
-                                        id="ihc_outlier_threshold_value",
+                                        id="ica_outlier_threshold_value",
                                     ),
-                                    id="ihc_outlier_threshold",
+                                    id="ica_outlier_threshold",
                                     style={"display": "none"},
                                 ),
                             ],
@@ -1076,11 +1076,11 @@ def create_ohd_dash(
                             [
                                 html.Div(
                                     dbc.Input(
-                                        id="ihc_threshold_top_filter_value",
+                                        id="ica_threshold_top_filter_value",
                                         placeholder="threshold_top_filter",
                                         type="float",
                                     ),
-                                    id="ihc_threshold_top_filter",
+                                    id="ica_threshold_top_filter",
                                     style={"display": "none"},
                                 ),
                             ],
@@ -1796,7 +1796,7 @@ def create_ohd_dash(
         chunk_number_storage,
         option_list,
     ):
-        if chronologie_analyse and "ihc" in option_list:
+        if chronologie_analyse and "ica" in option_list:
             chronologie_heatmap = chronology_matrix(
                 data=ohtm_file,
                 click_data=click_data,
@@ -1989,14 +1989,14 @@ def create_ohd_dash(
     # Page 4
     # Deatil Interview Heatmap page 4
     @app.callback(
-        Output("ihc_outlier_threshold", "style"),
-        Output("ihc_threshold_top_filter", "style"),
+        Output("ica_outlier_threshold", "style"),
+        Output("ica_threshold_top_filter", "style"),
         Output("topic_filter_switch_detail", "style"),
         Input("side_bar_menu_switch", "value"),
     )
     def topic_filter_input_regulator(value):
         if chronologie_analyse == True:
-            if "ihc" in value:
+            if "ica" in value:
                 return {"display": "block"}, {"display": "block"}, {"display": "block"}
             else:
                 return {"display": "none"}, {"display": "none"}, {"display": "none"}
@@ -2014,8 +2014,8 @@ def create_ohd_dash(
         Input("heat_map_interview_detail", "clickData"),
         Input("chunk_number_detail", "data"),
         Input("side_bar_menu_switch", "value"),
-        Input("ihc_outlier_threshold_value", "value"),
-        Input("ihc_threshold_top_filter_value", "value"),
+        Input("ica_outlier_threshold_value", "value"),
+        Input("ica_threshold_top_filter_value", "value"),
         prevent_initial_call=True,
     )
     def interview_heat_map_dash(
@@ -2027,7 +2027,7 @@ def create_ohd_dash(
         threshold_top_filter,
         outlier_threshold,
     ):
-        if chronologie_analyse and "ihc" in option_list:
+        if chronologie_analyse and "ica" in option_list:
             chronologie_heatmap = chronology_matrix(
                 data=ohtm_file,
                 click_data="",
@@ -2135,7 +2135,7 @@ def create_ohd_dash(
     )
     def gloabl_topic_nr_update(click_data, sidebar_options):
         if click_data != None:
-            if chronologie_analyse and "ihc" in sidebar_options:
+            if chronologie_analyse and "ica" in sidebar_options:
                 topic = click_data["points"][0]["y"]
                 topic = topic.split(" - ")[0]
             else:
@@ -2150,7 +2150,7 @@ def create_ohd_dash(
     )
     def gloabl_topic_nr_update(click_data, sidebar_options):
         if click_data != None:
-            if chronologie_analyse and "ihc" in sidebar_options:
+            if chronologie_analyse and "ica" in sidebar_options:
                 topic = click_data["points"][0]["y"]
                 topic = topic.split(" - ")[0]
             else:

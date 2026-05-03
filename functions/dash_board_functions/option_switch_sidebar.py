@@ -14,8 +14,8 @@ def option_switch_sidebar_function(chronologie_analyse):
                 "value": "topic_cluster_on",
             },
             {
-                "label": "IHC",
-                "value": "ihc",
+                "label": "ICA",
+                "value": "ica",
             },
         ]
 
