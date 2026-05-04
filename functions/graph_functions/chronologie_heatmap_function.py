@@ -752,7 +752,7 @@ def chronology_matrix(
                 )
             title = "Interview " + interview_id
         doc_tops_heatmap = (
-            chronology_df.to_json()
+            chronology_df.to_dict("records")
         )  # dash only can store json, so this df has to be converted
         return (
             fig,

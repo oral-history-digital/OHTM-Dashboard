@@ -30,14 +30,14 @@ def chunk_sent_drawing(
         chunk_id = int(chunk_number) - 1
     else:
         if tc_indicator:
-            chronology_df = pd.read_json(chronology_df, orient="records")
+            chronology_df = pd.DataFrame(chronology_df)  
             time_id = click_data_input["points"][0]["x"]
             try:
                 row_index = chronology_df.index.get_loc(
                     chronology_df[chronology_df["minute"] == time_id].index[0]
                 )
             except IndexError:
-                # If due to rownding errors, the value is not found, we search for the next value near to the one.
+                # If due to rounding errors, the value is not found, we search for the next value near to the one.
                 closest_match = chronology_df.iloc[
                     (chronology_df["minute"] - time_id).abs().argmin()
                 ].name
