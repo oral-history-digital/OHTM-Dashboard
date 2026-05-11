@@ -7,8 +7,9 @@ def create_link(
     chunk_start_time: str = "False",
     link_tape: str = "1",
 ):
+    adg_list = ['lusir', 'dve', 'eee', 'uk', 'kdu', 'hui', 'zgd', 'vhss', 'slb', 'vj', 'bus', 'dek', 'dfb', 'slj', 'nnrw', 'wh', 'bdd', 'dkp', 'tb', 'kk', 'gfu', 'nac', 'pdg', 'f24', 'gmb']
     link_available = False
-    if archive.lower() == "adg":
+    if archive.lower() in adg_list:
         https = "https://deutsches-gedaechtnis.fernuni-hagen.de/de/interviews/adg"
         link_available = True
     if archive.lower() == "zwa":
