@@ -200,20 +200,28 @@ def tooltip_creation():
                 target="enter_print_topics",
             ),
             dbc.Tooltip(
-                "???",
-                target="???",
+                "Zeigt die Interview-ID des ausgewählten Interviews an.",
+                target="interview_titel",
             ),
             dbc.Tooltip(
-                "???",
-                target="???",
+                "Mit dem Marker können Sie sich den ausgewählten Chunk farblich in der Heatmap anzeigen lassen.",
+                target="switch_chronology_filter"
             ),
             dbc.Tooltip(
-                "???",
-                target="???",
+                "Geben Sie hier manuell die Interview-ID des Interviews ein, dass sie angezeigt bekommen wollen.",
+                target="interview_manual_id",
             ),
             dbc.Tooltip(
-                "???",
-                target="???",
+                "Zeigt die Chunknummer des ausgewählten Chunks an.",
+                target="sent_titel",
+            ),
+            dbc.Tooltip(
+                "Schaltet zum vorangehenden Chunk des ausgewählten Interviews.",
+                target="-_button_frontpage",
+            ),
+            dbc.Tooltip(
+                "Schaltet zum nächsten Chunk des ausgewählten Interviews.",
+                target="+_button_frontpage",
             ),
             dbc.Tooltip(
                 "???",

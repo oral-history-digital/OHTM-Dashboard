@@ -52,6 +52,7 @@ def create_ohd_dash(
     chronologie_analyse: bool = False,
     pop_up_window: bool = False,
     axis_titel_option: bool = False,
+    sideboard_start_settings: bool = False,
 ):
     def b64_image(logo_image_filename):
         with open(logo_image_filename, "rb") as f:
@@ -63,6 +64,12 @@ def create_ohd_dash(
             chronology_matrix,
         )
     sideboard_options = option_switch_sidebar_function(chronologie_analyse)
+
+    # set the sideboard starting settings
+    if sideboard_start_settings == True: 
+        sideboard_start_options = ["topic_labels_on", "tooltip_on"]
+    else:
+        sideboard_start_options = [] 
 
     app = dash.Dash(
         __name__,
@@ -356,7 +363,7 @@ def create_ohd_dash(
                             html.Hr(),
                             dbc.Checklist(
                                 options=sideboard_options,
-                                value=[],
+                                value=sideboard_start_options,
                                 id="side_bar_menu_switch",
                                 switch=True,
                                 style={
@@ -411,7 +418,7 @@ def create_ohd_dash(
                     html.Div(
                         [
                             dbc.Button(
-                                "Impressum",
+                                "Info", # hier vorher Impressum
                                 id="impressum_button",
                                 color="light",
                                 size="sm",
@@ -1672,7 +1679,7 @@ def create_ohd_dash(
         Input("interview_heatmap", "n_clicks"),
         Input("text_search", "n_clicks"),
         Input("topic_words", "n_clicks"),
-        prevent_inital_call=True,
+        prevent_inital_call=False,
     )
     def set_tooltip_for_menu(switch, m1, m2, m3, m4, m5, m6, m7):
         if "tooltip_on" in switch:
@@ -2456,6 +2463,7 @@ def create_ohd_dash(
     @app.callback(
         Output("tooltip_store", "children"),
         Input("side_bar_menu_switch", "value"),
+        prevent_initial_call=False,
     )
     def tooltip_showing(data):
         if "tooltip_on" in data:

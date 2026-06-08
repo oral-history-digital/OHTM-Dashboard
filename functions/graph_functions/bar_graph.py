@@ -139,6 +139,9 @@ def bar_graph_corpus(
                 xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
                 yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung
             )
+        fig.update_layout(
+                    legend_title_text="Sammlungen"
+                )
         if show_fig:
             fig.show()
         if return_fig:
@@ -421,6 +424,9 @@ def bar_graph_cv_function(
                 xaxis_title=None,  # Entfernt die X-Achsenbeschriftung
                 yaxis_title=None,  # Entfernt die Y-Achsenbeschriftung
             )
+        fig.update_layout(
+            legend_title_text="Sammlungen"
+        )
         if show_fig:
             fig.show()
         if return_fig:
