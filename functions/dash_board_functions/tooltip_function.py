@@ -7,7 +7,7 @@ def tooltip_creation():
         [
             # Page 1 - Overview
             dbc.Tooltip(
-                "Die Corpus Heatmap zeigt die Topic Verteilung pro Interview. Dabei wird ein Durchschnittswert aus allen Chunks gebildet. Durch klicken auf ein Interview kann die Detailansicht ausgewählt werden",
+                "Die Corpus Heatmap zeigt die Topic-Verteilung pro Interview. Dabei wird ein Durchschnittswert aus allen Chunks gebildet. Durch klicken auf ein Interview kann die Detailansicht ausgewählt werden",
                 target="Corpus_heatmap_page_1_header",
             ),
             dbc.Tooltip(
@@ -15,52 +15,52 @@ def tooltip_creation():
                 target="bargraph_page_1_header",
             ),
             dbc.Tooltip(
-                "Hier können die einzelnen Archive für die Corpus Heatmap ausgewählt werden",
+                "Hier können die einzelnen Archive für die Corpus-Heatmap ausgewählt werden",
                 target="slct_archiv",
             ),
             dbc.Tooltip(
-                "Der Z-Score berechnet eine Standartverteilung der Heatmap, um eine bessere Darstellung zu bekommen.",
+                "Der Z-Score berechnet eine Standardverteilung der Heatmap, um eine bessere Darstellung zu bekommen.",
                 target="switch_z_score_global_heatmap",
             ),
             # Page 2 -Chunk Analyzation
             dbc.Tooltip(
-                "In wievieln einzelnen Interviews sind Suchergebnisse gefunden worden.",
+                "In wie vielen einzelnen Interviews sind Suchergebnisse gefunden worden?",
                 target="interview_results_header",
             ),
             dbc.Tooltip(
-                "Sortiert die Heatmap entweder nach dem Interviewnamen, oder den Werten von Topic 1 oder Topic 2",
+                "Sortiert die Heatmap entweder nach dem Interviewnamen oder den Werten von Topic 1 und Topic 2",
                 target="dropdown_sort",
             ),
             dbc.Tooltip(
-                "Wählen sie ein Topic aus, indem sie die Nummer eintragen.",
+                "Wählen Sie ein Topic aus, indem sie die Nummer eintragen.",
                 target="topic_cv",
             ),
             dbc.Tooltip(
-                "Wählen sie ein Gewicht aus, über dem das gesucht Topic 1 liegen soll. Der Wert muss unter 1 liegen.",
+                "Wählen Sie ein Gewicht aus, über dem das gesuchte Topic 1 liegen soll. Der Wert muss unter 1 liegen.",
                 target="topic_weight_cv",
             ),
             dbc.Tooltip(
-                "Wenn sie mindestens ein Topic und ein Gewicht ausgewählt haben, drücken sie auf diesen Button, um die Suche zu starten.",
+                "Wenn Sie mindestens ein Topic und ein Gewicht ausgewählt haben, drücken Sie auf diesen Button, um die Suche zu starten.",
                 target="start_search_cv",
             ),
             dbc.Tooltip(
-                "Wählen sie ein zweites Topic aus, um nach einer Korrelation zwischen Topic 1 und 2 zu suchen. Vorher müssen sie die Korrelation über den Correlation Button auswählen.",
+                "Wählen Sie ein zweites Topic aus, um nach einer Korrelation zwischen Topic 1 und 2 zu suchen. Vorher müssen Sie die Korrelation über den Correlation-Button auswählen.",
                 target="topic_2_cv",
             ),
             dbc.Tooltip(
-                "Wählen sie ein Gewicht aus, über dem das gesucht Topic 2 liegen soll. Der Wert muss unter 1 liegen.",
+                "Wählen Sie ein Gewicht aus, über dem das gesuchte Topic 2 liegen soll. Der Wert muss unter 1 liegen.",
                 target="topic_2_weight_cv2",
             ),
             dbc.Tooltip(
-                "Wenn sie mindestens ein Topic und ein Gewicht ausgewählt haben, drücken sie auf diesen Button, um die Suche zu starten.",
+                "Wenn Sie mindestens ein Topic und ein Gewicht ausgewählt haben, drücken sie auf diesen Button, um die Suche zu starten.",
                 target="correlation_cv",
             ),
             dbc.Tooltip(
-                "Die Heatmap zeigt die Topic Verteilung innerhalb der einzelnen Chunks an.",
+                "Die Heatmap zeigt die Topic-Verteilung innerhalb der einzelnen Chunks an.",
                 target="heat_map_cv",
             ),
             dbc.Tooltip(
-                "Das Balkendiagramm zeigt gesamtverteilung innerhalb der gefundenen Chunks an.",
+                "Das Balkendiagramm zeigt die Gesamtverteilung innerhalb der gefundenen Chunks an.",
                 target="bar_cv",
             ),
             dbc.Tooltip(
@@ -72,15 +72,15 @@ def tooltip_creation():
                 target="+_button_cv",
             ),
             dbc.Tooltip(
-                "Zeigt die Interview ID und den Chunk des ausgewählten Interviews an.",
+                "Zeigt die Interview-ID und den Chunk des ausgewählten Interviews an.",
                 target="interview_titel_cv",
             ),
             dbc.Tooltip(
-                "Zeigt die Topic Verteilung im ausgwählten Chunk an.",
+                "Zeigt die Topic-Verteilung im ausgwählten Chunk an.",
                 target="chunk_topic_info",
             ),
             dbc.Tooltip(
-                "Zeigt die summierten Top 5 Topics aller gefundenen Chunks an.",
+                "Zeigt die summierten Top-5-Topics aller gefundenen Chunks an.",
                 target="chunk_topic_info_all",
             ),
             dbc.Tooltip(
@@ -89,72 +89,72 @@ def tooltip_creation():
             ),
             # Page 3 -Bar Graph
             dbc.Tooltip(
-                "Zeigt die Topic Verteilung im gesamten Korpus. Die verschiedenen Farben repräsentieren die einzelnen Archive des Korpus",
+                "Zeigt die Topic-Verteilung im gesamten Korpus. Die verschiedenen Farben repräsentieren die einzelnen Archive des Korpus.",
                 target="bar2",
             ),
             dbc.Tooltip(
-                "Geben Sie hier eine gewünschte Nummer des Topics ein, dass sie Näher betrachten wollen. Anschließend werden die ersten 20 Worte des Topics unterhalb ausgegeben.",
+                "Geben Sie hier eine gewünschte Nummer des Topics ein, das sie näher betrachten möchten. Anschließend werden die ersten 20 Worte des Topics unterhalb ausgegeben.",
                 target="input1",
             ),
             dbc.Tooltip(
-                "Geben Sie hier eine gewünschte Nummer des Topics ein, dass sie Näher betrachten wollen. Anschließend werden die ersten 20 Worte des Topics unterhalb ausgegeben.",
+                "Geben Sie hier eine gewünschte Nummer des Topics ein, das sie näher betrachten möchten. Anschließend werden die ersten 20 Worte des Topics unterhalb ausgegeben.",
                 target="input2",
             ),
             dbc.Tooltip(
-                "Geben Sie hier eine gewünschte Nummer des Topics ein, dass sie Näher betrachten wollen. Anschließend werden die ersten 20 Worte des Topics unterhalb ausgegeben.",
+                "Geben Sie hier eine gewünschte Nummer des Topics ein, das sie näher betrachten möchten. Anschließend werden die ersten 20 Worte des Topics unterhalb ausgegeben.",
                 target="input3",
             ),
             # Page 4 -Heatmap
             dbc.Tooltip(
-                "Wählen sie ein Archiv aus, um die Heatmap des Korpus für das ausgewählte Archiv anzuzeigen.",
+                "Wählen Sie ein Archiv aus, um die Korpus-Heatmap für dieses Archiv anzuzeigen.",
                 target="slct_archiv_heat_map_corpus_detail",
             ),
             dbc.Tooltip(
-                "Wählen Sie aus, ob sie den Z-Score des Heatmap berechnen und anzeigen lassen wollen. Mit Topic Filter können sie die Funktion aktivieren, nachdem sie die Interviews nach ausgewählten Topics und ihrem Gewicht filtern.",
+                "Wählen Sie aus, ob Sie den Z-Score für die Heatmap berechnen und anzeigen lassen möchten. Mit 'Topic Filter' können Sie die Funktion aktivieren, nachdem Sie die Interviews nach ausgewählten Topics und ihrem Gewicht filtern.",
                 target="z_score_corpus_heatmap_detail",
             ),
             dbc.Tooltip(
-                "Geben Sie hier die Nummer eines Topics ein, nach welchem Sie die Heatmap filtern wollen. Funktioniert nur bei aktiviertem Filer Button.",
+                "Geben Sie hier die Nummer eines Topics ein, nach welchem Sie die Heatmap filtern möchten. Funktioniert nur bei aktiviertem Filter-Button.",
                 target="corpus_heatmap_detail_topic",
             ),
             dbc.Tooltip(
-                "Geben sie hier ein Treshold ein, über dem die gefilterten Topics und Interviews angezeigt werden sollen. Funktioniert nur bei aktiviertem Filer Button.",
+                "Geben Sie hier einen Threshold ein, über dem die gefilterten Topics und Interviews angezeigt werden sollen. Funktioniert nur bei aktiviertem Filter-Button.",
                 target="corpus_heatmap_detail_threshold",
             ),
             dbc.Tooltip(
-                "Die Heatmap zeigt die durchschnittliche Topic Verteilung pro Interview im ausgewählten Korpus an.",
+                "Die Heatmap zeigt die durchschnittliche Topic-Verteilung pro Interview im ausgewählten Korpus an.",
                 target="heat_map_corpus_detail",
             ),
             # Page 5 - Interview Heatmap
             dbc.Tooltip(
-                "Geben Sie hier die Interview ID des Interveiws ein, welches Sie analysieren wollen.",
+                "Geben Sie hier die Interview-ID des Interveiws ein, das Sie analysieren möchten.",
                 target="interview_manual_id_detail",
             ),
             dbc.Tooltip(
                 """
-                    Mit dem Z-Score schalter können sie eine Standardverteilung der Heatmap berechnen lassen, um eine bessere Darstellung zu bekommen. \n
-                    Mit dem Marker können Sie sich den ausgewählten Chunk farblich in der Heatmap anzeigen lassen. \n
+                    Mit dem Z-Score-Schalter können sie eine Standardverteilung der Heatmap berechnen lassen, um eine bessere Darstellung zu bekommen. \n
+                    Mit dem Marker können Sie den ausgewählten Chunk in der Heatmap hervorheben. \n
                     """,
                 target="switch_chronology_filter_detail",
             ),
             dbc.Tooltip(
-                "Aktivieren sie den 'Topic Filter' um die Heatmap nach gewissen Schwellenwerten zu filtern.",
+                "Aktivieren Sie den 'Topic Filter' um die Heatmap nach gewissen Schwellenwerten zu filtern.",
                 target="topic_filter_switch_detail",
             ),
             dbc.Tooltip(
-                "To DO",
+                "To Do",
                 target="ihc_threshold_top_filter",
             ),
             dbc.Tooltip(
-                "To DO",
+                "To Do",
                 target="ihc_outlier_threshold",
             ),
             dbc.Tooltip(
-                "Ausgewählte Interview",
+                "Ausgewähltes Interview",
                 target="interview_title_detail",
             ),
             dbc.Tooltip(
-                "Die Heatmap zeigt die Topic Verteilung der einzelnen Chunks des ausgewählten Interviews an. Die Chunks sind dabei in chronologischer Reihenfolge auf der X-Achse angebracht. Wenn sie auf einen Chunks klicken, wird der Text unterhalb angezeigt.",
+                "Die Heatmap zeigt die Topic-Verteilung der einzelnen Chunks des ausgewählten Interviews an. Die Chunks sind dabei in chronologischer Reihenfolge auf der X-Achse angebracht. Wenn Sie auf einen Chunk klicken, wird der Text unterhalb angezeigt.",
                 target="heat_map_interview_detail",
             ),
             dbc.Tooltip(
@@ -171,19 +171,19 @@ def tooltip_creation():
             ),
             # Page 6 -Chunk Suche
             dbc.Tooltip(
-                "Geben Sie die Nummer des Topics ein, nach dem sie das Korpus analysieren wollen.",
+                "Geben Sie die Nummer des Topics ein, nach dem Sie das Korpus analysieren möchten.",
                 target="topic_print",
             ),
             dbc.Tooltip(
-                "Geben Sie hier den Schwellenwert ein, über dem die Topic Gewichte liegen müssen, um in der Analyse berücksichtigt zu werden. Der Wert muss unter 1 liegen.",
+                "Geben Sie hier den Schwellenwert ein, über dem die Topic-Gewichte liegen müssen, um in der Analyse berücksichtigt zu werden. Der Wert muss unter 1 liegen.",
                 target="weight_print",
             ),
             dbc.Tooltip(
-                "Geben Sie hier die Interview ID ein, innerhalb der Sie die Chunks durchsuchen wollen. Das funktioniert nur bei ausgewähltern Intverview Search.",
+                "Geben Sie hier die Interview-ID ein, innerhalb der Sie die Chunks durchsuchen möchten. Das funktioniert nur bei ausgewählter 'Interview Search'.",
                 target="interview_id_search",
             ),
             dbc.Tooltip(
-                "Wählen Sie aus, ob sie die Topic Suche innerhalb des Korpus 'Korpus Search', oder innerhalb eines Interveiws 'Interview Search' durchführen wollen.",
+                "Wählen Sie aus, ob Sie die Topic Suche innerhalb des Korpus ('Korpus Search'), oder innerhalb eines Interviews ('Interview Search') durchführen möchten.",
                 target="text_search_options",
             ),
             dbc.Tooltip(
@@ -192,7 +192,7 @@ def tooltip_creation():
             ),
             # Page 7 -Topic Wörter
             dbc.Tooltip(
-                "Geben Sie die Anzahl der Worte ein, die Sie für jedes Topic angezeigt bekommen wollen. Maximal bis 999",
+                "Geben Sie die Anzahl der Worte ein, die Sie für jedes Topic angezeigt bekommen möchten. Maximal bis 999",
                 target="word_number",
             ),
             dbc.Tooltip(
@@ -208,7 +208,7 @@ def tooltip_creation():
                 target="switch_chronology_filter"
             ),
             dbc.Tooltip(
-                "Geben Sie hier manuell die Interview-ID des Interviews ein, dass sie angezeigt bekommen wollen.",
+                "Geben Sie hier manuell die Interview-ID des Interviews ein, das Sie angezeigt bekommen möchten.",
                 target="interview_manual_id",
             ),
             dbc.Tooltip(
