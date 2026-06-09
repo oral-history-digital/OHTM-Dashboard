@@ -2474,7 +2474,6 @@ def create_ohd_dash(
     def tooltip_showing(data):
         if "tooltip_on" in data:
             tooltip = tooltip_creation()
-            print("activated")
             return tooltip
         else:
             return []

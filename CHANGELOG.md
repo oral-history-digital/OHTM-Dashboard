@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2026-06-09
+
+### New Features
+
+- **Configurable start settings** — Added a `sideboard_start_settings` parameter to `create_ohd_dash`. When enabled, the dashboard starts with topic labels and tooltips switched on by default.
+- **Linked logo** — The sidebar logo is now a clickable link to the Oral History Digital project.
+- **Bar graph legend titles** — The corpus and chunk-view bar graphs now show "Sammlungen" as the legend title.
+
+### Improvements
+
+- **Reworked Info/Impressum page** — Rewrote the notice text with an updated project description (681 interviews across 24 collections), anonymization note, ICA mention, and project credits. Moved the collection abbreviations here (sorted alphabetically) and added links to the Archiv "Deutsches Gedächtnis", the interview portal, the project, and the legal notice. The "Impressum" button is now labeled "Info".
+- **Reworked Glossar page** — Replaced the abbreviation list with explanations of the core concepts (Topic Modeling, Topic, Corpus, Sammlung, Chunk, Topic-Wort-Verteilung, Topic-Dokument-Verteilung).
+- **Tooltip overhaul** — Corrected spelling, grammar, and hyphenation across all tooltips (e.g. "Topic-Verteilung"), switched to formal "Sie", and filled in the remaining placeholder/"To DO" tooltips, including the ICA threshold/outlier tooltips and new tooltips for the front-page chunk navigation.
+- **UI styling** — Recolored the sidebar and content panels to a light theme (`#e6f0f1`), grouped the Info and Glossar buttons in a single row, and adjusted sidebar font sizes.
+
+### Bug Fixes
+
+- **ICA tooltip targets** — Fixed mismatched tooltip targets (`ihc_*` → `ica_*`) so the ICA threshold and outlier tooltips display correctly.
+- **Tooltips on initial load** — Tooltips now render on first load instead of only after a switch toggle.
+
 ## [0.3.1] - 2026-05-13
 
 ### New Features
