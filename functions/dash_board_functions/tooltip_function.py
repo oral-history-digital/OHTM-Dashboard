@@ -142,12 +142,12 @@ def tooltip_creation():
                 target="topic_filter_switch_detail",
             ),
             dbc.Tooltip(
-                "To Do",
-                target="ihc_threshold_top_filter",
+                "Der Threshold bestimmt die Schwelle, oberhalb der Topics in der Heatmap angezeigt werden. Ein höherer Threshold reduziert die angezeigten Topics (Y-Achse).",
+                target="ica_threshold_top_filter",
             ),
             dbc.Tooltip(
-                "To Do",
-                target="ihc_outlier_threshold",
+                "Über den Outlier-Threshold kontrolliert man die Schwelle für Topics, die insgesamt wenig Gewicht im Interviewverlauf haben, aber in einzelnen Chunks stark vertreten sind. Mit einem niedrigen Outlier-Threshold können solche unterrepräsentierten Topics angezeigt werden.",
+                target="ica_outlier_threshold",
             ),
             dbc.Tooltip(
                 "Ausgewähltes Interview",
@@ -241,9 +241,8 @@ def menu_tooltip(trigger):
         tooltip = html.Div(
             [
                 dbc.Tooltip(
-                    """Die Übersicht bietet einen detaillierten Blick in die verschiedenen Ebenen der
-                 Topic Modeling Ergebnisse. Durch die Auswahl von Interviews in der Heatmap können 
-                  die Interviews für die Detailansicht ausgewählt werden.""",
+                    """Die Übersicht bietet eine detaillierte Analyse der Topic-Modeling-Ergebnisse mithilfe verschiedener Ebenen. Durch die Auswahl von Interviews in der Heatmap können 
+                  diese für die Detailansicht ausgewählt werden.""",
                     target="menu_selection_info",
                 ),
             ]
@@ -253,7 +252,7 @@ def menu_tooltip(trigger):
         tooltip = html.Div(
             [
                 dbc.Tooltip(
-                    """Die Chunk Analyse bietet eine umfangreiche Möglichkeit, die Topic Verteilung 
+                    """Die Chunk-Analyse bietet eine umfangreiche Möglichkeit, die Topic-Verteilung 
                 innerhalb der einzelnen Chunks zu analysieren. Darüber hinaus können auch Korrelationen
                 mit anderen Topics untersucht werden.
                 """,
@@ -266,7 +265,7 @@ def menu_tooltip(trigger):
         tooltip = html.Div(
             [
                 dbc.Tooltip(
-                    "Das Balkendiagramm bietet eine grafische Darstellung der Topic Verteilung innerhalb des gesamten Korpus.",
+                    "Das Balkendiagramm bietet eine grafische Darstellung der Topic-Verteilung innerhalb des gesamten Korpus.",
                     target="menu_selection_info",
                 ),
             ]
@@ -276,7 +275,7 @@ def menu_tooltip(trigger):
         tooltip = html.Div(
             [
                 dbc.Tooltip(
-                    "Die Heatmap repräsentiert die Topic Verteilung über die einzelnen Interviews.",
+                    "Die Heatmap repräsentiert die Topic-Verteilung über die einzelnen Interviews.",
                     target="menu_selection_info",
                 ),
             ]
@@ -286,7 +285,7 @@ def menu_tooltip(trigger):
         tooltip = html.Div(
             [
                 dbc.Tooltip(
-                    "Die Interview Heatmap zeigt die Topic Verteilung innerhalb eines einzelnen Interviews.",
+                    "Die Interview Heatmap zeigt die Topic-Verteilung innerhalb eines einzelnen Interviews.",
                     target="menu_selection_info",
                 ),
             ]
@@ -296,7 +295,7 @@ def menu_tooltip(trigger):
         tooltip = html.Div(
             [
                 dbc.Tooltip(
-                    "Die Textsuche bietet die Möglichkeit, nach Chunks mit gewisser Topic Gewichtung zu suchen. Die Ergebnisse werden direkt in Textform präsentiert",
+                    "Die Textsuche bietet die Möglichkeit, nach Chunks mit bestimmter Topic-Gewichtung zu suchen. Die Ergebnisse werden direkt in Textform präsentiert.",
                     target="menu_selection_info",
                 ),
             ]
@@ -306,7 +305,7 @@ def menu_tooltip(trigger):
         tooltip = html.Div(
             [
                 dbc.Tooltip(
-                    "Mit der Topic Wörter Funktion können Sie die einzelnen Worte jedes Topics anschauen.",
+                    "Mit der Topic-Wörter-Funktion können Sie die einzelnen Wörter jedes Topics anschauen.",
                     target="menu_selection_info",
                 ),
             ]

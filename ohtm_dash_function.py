@@ -87,7 +87,7 @@ def create_ohd_dash(
         "width": "14%",
         "hight": "100%",
         "padding": "2rem 1rem",
-        "background-color": "#2B88AF",
+        "background-color": "#e6f0f1"#"#2B88AF",
     }
 
     # padding for the page content
@@ -106,6 +106,7 @@ def create_ohd_dash(
                     html.Div(id="tooltip_store"),
                     html.Div(id="tooltip_store_sidebar"),
                     # Stores for different Variables and States
+                    
                     dcc.Store(id="top_dic", data="", storage_type="session"),
                     dcc.Store(id="heat_dic", data={}, storage_type="session"),
                     dcc.Store(id="top_dic2", data={}, storage_type="session"),
@@ -180,8 +181,12 @@ def create_ohd_dash(
                         id="chunk_number_cv",
                         storage_type="session",
                     ),
+                    html.A(
                     html.Img(
                         src=b64_image(logo_image_filename), style={"max-width": "100%"}
+                    ),
+                    href = "https://www.oral-history.digital/",
+                    target="_blank",
                     ),
                     dbc.Row(
                         [],
@@ -346,8 +351,8 @@ def create_ohd_dash(
                                 ],
                                 id="topics",
                                 style={
-                                    "height": "20%",
-                                    "width": "95%",
+                                    "height": "90%",
+                                    "width": "100%",
                                     "padding": "1% 1%",
                                     "display": "block",
                                     "font-size": "0.8vw",  # PRÄSENTATION 1
@@ -369,12 +374,12 @@ def create_ohd_dash(
                                 style={
                                     "width": "100%",
                                     "min-width": "150px",
-                                    "font-size": "0.8vw",
                                     "display": "flex",
                                     "flex-direction": "column",
                                 },
                             ),
-                        ]
+                        ],
+                         style={"fontSize": "0.7vw"},
                     ),
                     # Informs the user, if Labels or clusters are missing
                     html.Div(
@@ -417,14 +422,26 @@ def create_ohd_dash(
                     ),
                     html.Div(
                         [
-                            dbc.Button(
-                                "Info", # hier vorher Impressum
-                                id="impressum_button",
-                                color="light",
-                                size="sm",
-                                style={"font-size": "0.5vw"},
-                            )
+                            html.Div(
+                                dbc.Button(
+                                    "Info",
+                                    id="impressum_button",
+                                    color="dark",
+                                    size="sm",
+                                    style={"font-size": "0.5vw"},
+                                ),
+                            ),
+                            html.Div(
+                                dbc.Button(
+                                    "Glossar",
+                                    id="glossar_button",
+                                    color="dark",
+                                    size="sm",
+                                    style={"font-size": "0.5vw"},
+                                ),
+                            ),
                         ],
+                        style={"display": "flex", "flexDirection": "row", "gap": "0.3vw"},
                     ),
                     html.Div(
                         dbc.Offcanvas(
@@ -441,17 +458,6 @@ def create_ohd_dash(
                             style={"width": "40vw"},
                         ),
                         id="impressum",
-                    ),
-                    html.Div(
-                        [
-                            dbc.Button(
-                                "Glossar",
-                                id="glossar_button",
-                                color="light",
-                                size="sm",
-                                style={"font-size": "0.5vw"},
-                            )
-                        ],
                     ),
                     html.Div(
                         dbc.Offcanvas(
@@ -767,7 +773,7 @@ def create_ohd_dash(
                                                 "height": "45vh",
                                                 "display": "block",
                                                 "font-size": "1vm",
-                                                "background-color": "rgb(249,249,249)",
+                                                "background-color": "#e6f0f1",
                                                 "overflow": "auto",
                                             },
                                         ),
@@ -969,7 +975,7 @@ def create_ohd_dash(
                                                 "padding": "5% 5%",
                                                 "display": "block",
                                                 "font-size": "0.8vw",  # PRÄSENTATION 1
-                                                "background-color": "rgb(249,249,249)",
+                                                "background-color": "#e6f0f1",
                                                 "overflow": "off",
                                             },
                                         )
@@ -986,7 +992,7 @@ def create_ohd_dash(
                                                 "padding": "5% 5%",
                                                 "display": "block",
                                                 "font-size": "0.8vw",  # PRÄSENTATION 1
-                                                "background-color": "rgb(249,249,249)",
+                                                "background-color": "#e6f0f1",
                                                 "overflow": "off",
                                             },
                                         )
@@ -1003,7 +1009,7 @@ def create_ohd_dash(
                                                 "padding": "5% 5%",
                                                 "display": "block",
                                                 "font-size": "0.8vw",  # PRÄSENTATION 1
-                                                "background-color": "rgb(249,249,249)",
+                                                "background-color": "#e6f0f1",
                                                 "overflow": "off",
                                             },
                                         )
@@ -1141,7 +1147,7 @@ def create_ohd_dash(
                                 "height": "400px",
                                 "display": "block",
                                 "font-size": "15px",
-                                "background-color": "rgb(249,249,249)",
+                                "background-color": "#e6f0f1",
                                 "overflow": "auto",
                             },
                         ),
@@ -1450,7 +1456,7 @@ def create_ohd_dash(
                                                 "height": "15vh",
                                                 "display": "block",
                                                 "font-size": "0.5vm",
-                                                "background-color": "rgb(249,249,249)",
+                                                "background-color": "#e6f0f1",
                                                 "overflow": "auto",
                                                 "display": "flex",
                                             },
@@ -1605,7 +1611,7 @@ def create_ohd_dash(
                                                 "height": "45vh",
                                                 "display": "block",
                                                 "font-size": "1vm",
-                                                "background-color": "rgb(249,249,249)",
+                                                "background-color": "#e6f0f1",
                                                 "overflow": "auto",
                                             },
                                         ),
@@ -1624,7 +1630,7 @@ def create_ohd_dash(
                                                 "width": "100%",
                                                 "display": "block",
                                                 "font-size": "0.6vm",
-                                                "background-color": "rgb(249,249,249)",
+                                                "background-color": "#e6f0f1",#"rgb(249,249,249)",
                                                 "overflow": "auto",
                                             },
                                         ),
@@ -1643,7 +1649,7 @@ def create_ohd_dash(
                                                 "width": "100%",
                                                 "display": "block",
                                                 "font-size": "0.6vm",
-                                                "background-color": "rgb(249,249,249)",
+                                                "background-color": "#e6f0f1",
                                                 "overflow": "auto",
                                             },
                                         ),
@@ -2468,6 +2474,7 @@ def create_ohd_dash(
     def tooltip_showing(data):
         if "tooltip_on" in data:
             tooltip = tooltip_creation()
+            print("activated")
             return tooltip
         else:
             return []
