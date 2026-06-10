@@ -85,7 +85,8 @@ def create_ohd_dash(
         "width": "14%",
         "hight": "100%",
         "padding": "2rem 1rem",
-        "background-color": "#e6f0f1"#"#2B88AF",
+        "background-color": "#e6f0f1",#"#2B88AF",
+        "overflowY":"auto",
     }
 
     # padding for the page content
@@ -191,12 +192,13 @@ def create_ohd_dash(
                         style={
                             "height": "0.5vh",
                             "display": "flex",
-                            "gap": "clamp(0.5em, 2vw, 2em)",
                         },
+                        className = "mb-0"
                     ),
                     dbc.Row(
                         html.Hr(),
-                        style={"display": "flex", "gap": "clamp(0.5em, 2vw, 2em)"},
+                        style={"display": "flex"},
+                        className = "mb-0"
                     ),
                     dbc.Row(
                         [
@@ -249,7 +251,6 @@ def create_ohd_dash(
                                         ],
                                         label="Menu",
                                         color="dark",
-                                        className="m-1",
                                         toggle_style={
                                             "font-size": "0.8vw"
                                         },  # PRÄSENTATION 1
@@ -265,8 +266,7 @@ def create_ohd_dash(
                                             dbc.Badge(
                                                 id="menu_selection_info",
                                                 children="Overview",
-                                                className="m-1",
-                                                color="secondary",
+                                                className="m-0",
                                                 style={"font-size": "0.7vw"},
                                             ),
                                         ]
@@ -275,18 +275,20 @@ def create_ohd_dash(
                             ),
                         ],
                         style={"display": "flex", "flexDirection": "column"},
+                        className="m-0",
                     ),
                     dbc.Row(
                         [],
                         style={
                             "height": "1vh",
                             "display": "flex",
-                            "gap": "clamp(0.5em, 2vw, 2em)",
                         },
+                        className="m-0",
                     ),
                     dbc.Row(
                         html.Hr(),
-                        style={"display": "flex", "gap": "clamp(0.5em, 2vw, 2em)"},
+                        style={"display": "flex"},
+                        className="m-0",
                     ),
                     dbc.Row(
                         [
@@ -303,8 +305,27 @@ def create_ohd_dash(
                             )
                         ],
                         style={"display": "flex"},
+                        className="m-0",
                     ),
                     dbc.Row(
+                        [
+                            html.H5(
+                                dbc.Badge(
+                                    id="topic_label_side_bar",
+                                    children="",
+                                    color="secondary",
+                                    style={
+                                        "font-size": "0.7vw",
+                                        "whiteSpace":"normal",
+                                        "wordBreak":"break-word",  # PRÄSENTATION 1
+                                    },
+                                )
+                            )
+                        ],
+                        style={"display": "flex", "flexWrap":"wrap"},
+                        className="m-0",
+                    ),
+                    dbc.Row(                    dbc.Row(
                         [
                             html.H5(
                                 dbc.Badge(
@@ -318,8 +339,8 @@ def create_ohd_dash(
                             )
                         ],
                         style={"display": "flex"},
+                        className="m-0",
                     ),
-                    dbc.Row(
                         [
                             dbc.Input(
                                 id="input",
@@ -330,9 +351,10 @@ def create_ohd_dash(
                                 max=100 - 1,
                                 step=1,
                             ),
-                        ]
+                        ],
+                        className="m-0",                        
                     ),
-                    dbc.Row(html.Hr()),
+                    dbc.Row(html.Hr(), className="m-0",),
                     dbc.Row(
                         [
                             html.Div(
@@ -360,6 +382,7 @@ def create_ohd_dash(
                             )
                         ],
                         style={"display": "flex", "alignItems": "center"},
+                        className="m-0",
                     ),
                     html.Div(
                         [
@@ -378,6 +401,7 @@ def create_ohd_dash(
                             ),
                         ],
                          style={"fontSize": "0.7vw"},
+                         className="m-0"
                     ),
                     # Informs the user, if Labels or clusters are missing
                     html.Div(
@@ -416,7 +440,8 @@ def create_ohd_dash(
                                 },
                             ),
                             html.Hr(),
-                        ]
+                        ],
+                        className="m-0"
                     ),
                     html.Div(
                         [
@@ -427,6 +452,7 @@ def create_ohd_dash(
                                     color="dark",
                                     size="sm",
                                     style={"font-size": "0.5vw"},
+                                    className="m-0"
                                 ),
                             ),
                             html.Div(
@@ -436,6 +462,7 @@ def create_ohd_dash(
                                     color="dark",
                                     size="sm",
                                     style={"font-size": "0.5vw"},
+                                    className="m-0"
                                 ),
                             ),
                         ],

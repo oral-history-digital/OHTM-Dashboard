@@ -21,7 +21,7 @@ def tooltip_creation(trigger):
                     target="bargraph_page_1_header",
                 ),
                 dbc.Tooltip(
-                    "Hier können die einzelnen Archive für die Corpus-Heatmap ausgewählt werden",
+                    "Hier können die einzelnen Sammlungen für die Corpus-Heatmap ausgewählt werden",
                     target="slct_archiv",
                 ),
                 dbc.Tooltip(
@@ -41,12 +41,16 @@ def tooltip_creation(trigger):
                     target="+_button_frontpage",
                 ),
                 dbc.Tooltip(
-                    "???",
-                    target="???",
+                    "Geben Sie hier manuell die Interview-ID des Interviews ein, das Sie angezeigt bekommen möchten.",
+                    target="interview_manual_id",
                 ),
                 dbc.Tooltip(
-                    "???",
-                    target="???",
+                    "Zeigt die Interview-ID des ausgewählten Interviews an.",
+                    target="interview_titel",
+                ),
+                dbc.Tooltip(
+                    "Mit dem Marker können Sie sich den ausgewählten Chunk farblich in der Heatmap anzeigen lassen.",
+                    target="switch_chronology_filter"
                 ),
             ]
         )
@@ -287,18 +291,6 @@ def tooltip_creation(trigger):
                 dbc.Tooltip(
                     "Drücken Sie auf 'Enter Topics', um sich die ausgewählte Anzahl an Worten pro Topic anzeigen zu lassen.",
                     target="enter_print_topics",
-                ),
-                dbc.Tooltip(
-                    "Zeigt die Interview-ID des ausgewählten Interviews an.",
-                    target="interview_titel",
-                ),
-                dbc.Tooltip(
-                    "Mit dem Marker können Sie sich den ausgewählten Chunk farblich in der Heatmap anzeigen lassen.",
-                    target="switch_chronology_filter"
-                ),
-                dbc.Tooltip(
-                    "Geben Sie hier manuell die Interview-ID des Interviews ein, das Sie angezeigt bekommen möchten.",
-                    target="interview_manual_id",
                 ),
             ]
         )
