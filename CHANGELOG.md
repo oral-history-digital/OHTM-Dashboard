@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2026-06-10
+
+### New Features
+
+- **Favicon and tab title** — Added a favicon (`assets/favicon.ico`) shown in the browser tab.
+- **Front-page chunk navigation tooltips** — New tooltips for the chunk display on the overview page (chunk number, previous/next buttons, interview ID input and display, heatmap marker switch).
+
+### Improvements
+
+- **Page-specific tooltips** — `tooltip_creation` now receives the current URL path and only renders the tooltips for the active page instead of all tooltips at once. The separate sidebar tooltip callback (`menu_tooltip`) was merged into a single callback that reacts to both the tooltip switch and page changes.
+- **Scrollable sidebar** — The sidebar now scrolls (`overflowY: auto`) when its content exceeds the viewport height; sidebar row margins were tightened and the search-info badge now wraps long text instead of overflowing.
+- **Text search layout** — The result table in the text search view now uses the full content width (removed the fixed 8-column width).
+- **"Sammlung" wording** — The bar graph hover labels now read "Sammlung" instead of "Archiv", matching the legend titles introduced in 0.3.2.
+- **Info page** — The "Weitere Informationen" reference is now a clickable link, and the closing quotation mark in "Archiv „Deutsches Gedächtnis"" was fixed.
+- **Code cleanup** — Removed unused imports (`copy`, `deepcopy`, `json`, `plotly`, `html`) across several modules.
+
+### Bug Fixes
+
+- **Merge-conflict leftovers** — Removed remaining merge-conflict artifacts from the tooltip callback and a duplicated, nested sidebar row that broke the layout.
+
+### Infrastructure
+
+- The server (`ohtm_dash_server.py`) now starts the dashboard with `sideboard_start_settings=True`, so topic labels and tooltips are enabled by default.
+
 ## [0.3.2] - 2026-06-09
 
 ### New Features
