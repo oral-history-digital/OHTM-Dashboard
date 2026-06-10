@@ -3,7 +3,6 @@ from builtins import print
 import pandas as pd
 import copy
 import plotly.express as px
-import plotly.graph_objects as go
 import numpy as np
 import ast
 from dash import no_update

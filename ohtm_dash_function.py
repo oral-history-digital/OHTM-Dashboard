@@ -5,7 +5,6 @@ import base64
 import dash
 import dash_bootstrap_components as dbc
 from dash import Input, Output, State, ctx, dcc, html, no_update
-import copy
 # import dash_mantine_components
 
 from functions.dash_board_functions.dropdown_list import create_dropdown_list
@@ -27,7 +26,6 @@ from functions.print_functions.print_details_cv import print_details_cv_function
 from functions.dash_board_functions.tooltip_function import (
     tooltip_creation,
     menu_label_function,
-    menu_tooltip,
 )
 from functions.textfiles_functions.impressum_text_file import (
     impressum_titel_text,
@@ -1674,26 +1672,6 @@ def create_ohd_dash(
             ]
         )
 
-    # Tooltip for the Menue Selection
-    @app.callback(
-        Output("tooltip_store_sidebar", "children"),
-        Input("side_bar_menu_switch", "value"),
-        Input("overview", "n_clicks"),
-        Input("chunk_analyzation", "n_clicks"),
-        Input("bar_graph", "n_clicks"),
-        Input("heatmap", "n_clicks"),
-        Input("interview_heatmap", "n_clicks"),
-        Input("text_search", "n_clicks"),
-        Input("topic_words", "n_clicks"),
-        prevent_inital_call=False,
-    )
-    def set_tooltip_for_menu(switch, m1, m2, m3, m4, m5, m6, m7):
-        if "tooltip_on" in switch:
-            tooltip = menu_tooltip(ctx.triggered)
-            return tooltip
-        else:
-            return []
-
     # Menu Label for the Menue Selection
     @app.callback(
         Output("menu_selection_info", "children"),
@@ -2466,14 +2444,23 @@ def create_ohd_dash(
 
     # Function to switch Tooltips on or off. The Tooltips are created in tooltip_function seperatly
 
+
+    # Tooltip for the Menue Selection
     @app.callback(
         Output("tooltip_store", "children"),
         Input("side_bar_menu_switch", "value"),
-        prevent_initial_call=False,
+        Input("url", "pathname"),
+        prevent_inital_call=False,
     )
+<<<<<<< HEAD
     def tooltip_showing(data):
         if "tooltip_on" in data:
             tooltip = tooltip_creation()
+=======
+    def set_tooltip_for_menu(switch, pathname):
+        if "tooltip_on" in switch:
+            tooltip = tooltip_creation(pathname)
+>>>>>>> 67343bb (fixes and ruffing)
             return tooltip
         else:
             return []

@@ -2,7 +2,6 @@
 This function defines the impressum text for the dash application
 """
 
-from dash import html
 
 
 glossar_titel_text = "OHTM Dashboard Glossar"

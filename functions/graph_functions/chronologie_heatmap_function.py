@@ -2,7 +2,6 @@ import json
 import pandas as pd
 import plotly.express as px
 import warnings
-import plotly
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 

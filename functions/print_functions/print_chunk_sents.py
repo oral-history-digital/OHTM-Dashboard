@@ -6,8 +6,6 @@ import pandas as pd
 from dash import ctx, html
 from functions.basic_functions.create_link_to_ohd import create_link
 import copy
-from copy import deepcopy
-import json
 
 
 def chunk_sent_drawing(

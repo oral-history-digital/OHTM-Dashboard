@@ -1,7 +1,6 @@
 """ """
 
 import copy
-from copy import deepcopy
 from functions.basic_functions.create_link_to_ohd import create_link
 import dash_bootstrap_components as dbc
 import pandas as pd
