@@ -17,9 +17,14 @@ In der Menüleiste können Sie Tooltips aktivieren, die Ihnen bei der Bedienung 
 Zusätzlich können Sie sich die manuell vergebenen Labels für die Topics anzeigen lassen oder die Topics zu thematischen Clustern gruppieren. Über den ICA-Schalter können Sie eine spezielle Interview-Heatmap aktivieren, die von Dennis Möbus entwickelt wurde. 
 
 Das OHTM-Dashboard und die zugrundeliegende Topic Modeling-Pipeline wurden im DFG-geförderten Projekt „Oral-History.Digital“ von Philipp Bayerschmidt und Dennis Möbus entwickelt. Darauf basieren auch automatische Inhaltsverzeichnisse und Register für 681 Interviews im Archiv „Deutsches Gedächtnis“.
-Weitere Informationen finden sich unter https://www.oral-history.digital/dokumente/index.html#tm.
+Weitere Informationen finden sich """, html.A(
+        "hier.",
+        href="https://www.oral-history.digital/dokumente/index.html#tm",
+        target="_blank",
+    ),
+    "\n"
 
-
+"""
 Abkürzungen der Sammlungsnamen:
 BDD = Bombardierung Dresdens
 BJ = Berliner Jugend
@@ -48,7 +53,7 @@ ZGD = Zwangsaussiedlungen aus dem Grenzgebiet der DDR
 
     """,
     html.A(
-        "Archiv „Deutsches Gedächtnis",
+        "Archiv „Deutsches Gedächtnis“",
         href="https://deutsches-gedaechtnis.fernuni-hagen.de/de",
         target="_blank",
     ),
