@@ -86,7 +86,7 @@ def bar_graph_corpus(
                         "Cluster: %{x}",
                         "%{customdata}",
                         "Weight: %{y}",
-                        f"Archiv: {trace.name}",
+                        f"Sammlung: {trace.name}",
                         "<extra></extra>",
                     ]
                 )
@@ -109,7 +109,7 @@ def bar_graph_corpus(
                         "Topics: %{x}",
                         "Label: %{customdata}",
                         "Weight: %{y}",
-                        f"Archiv: {trace.name}",
+                        f"Sammlung: {trace.name}",
                         "<extra></extra>",
                     ]
                 )
@@ -122,7 +122,7 @@ def bar_graph_corpus(
                     [
                         "Topics: %{x}",
                         "Weight: %{y}",
-                        f"Archiv: {trace.name}",
+                        f"Sammlung: {trace.name}",
                         "<extra></extra>",
                     ]
                 )
@@ -366,7 +366,7 @@ def bar_graph_cv_function(
                         "Cluster: %{x}",
                         "%{customdata}",
                         "Weight: %{y}",
-                        f"Archiv: {trace.name}",
+                        f"Sammlung: {trace.name}",
                         "<extra></extra>",
                     ]
                 )
@@ -391,7 +391,7 @@ def bar_graph_cv_function(
                         "Topics: %{x}",
                         "Label: %{customdata}",
                         "Weight: %{y}",
-                        f"Archiv: {trace.name}",
+                        f"Sammlung: {trace.name}",
                         "<extra></extra>",
                     ]
                 )
@@ -403,7 +403,7 @@ def bar_graph_cv_function(
                     [
                         "Topics: %{x}",
                         "Weight: %{y}",
-                        f"Archiv: {trace.name}",
+                        f"Sammlung: {trace.name}",
                         "<extra></extra>",
                     ]
                 )

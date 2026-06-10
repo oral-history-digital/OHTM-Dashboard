@@ -103,7 +103,6 @@ def create_ohd_dash(
                 [
                     # Tooltips
                     html.Div(id="tooltip_store"),
-                    html.Div(id="tooltip_store_sidebar"),
                     # Stores for different Variables and States
                     
                     dcc.Store(id="top_dic", data="", storage_type="session"),
@@ -896,7 +895,7 @@ def create_ohd_dash(
                 ),
                 dbc.Row(
                     [
-                        dbc.Col([html.Div(id="table-container")], width=8),
+                        dbc.Col([html.Div(id="table-container")]),
                     ]
                 ),
             ]
