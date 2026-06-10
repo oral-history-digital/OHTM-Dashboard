@@ -20,6 +20,7 @@ if ohtm_file:
             chronologie_analyse=True,
             pop_up_window=True,
             axis_titel_option=True,
+            sideboard_start_settings = True
         )
         # gunicorn ohtm_dash_server:server
         server = app.server
