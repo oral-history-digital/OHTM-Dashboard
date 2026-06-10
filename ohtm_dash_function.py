@@ -2452,15 +2452,9 @@ def create_ohd_dash(
         Input("url", "pathname"),
         prevent_inital_call=False,
     )
-<<<<<<< HEAD
-    def tooltip_showing(data):
+    def tooltip_showing(data, pathname):
         if "tooltip_on" in data:
-            tooltip = tooltip_creation()
-=======
-    def set_tooltip_for_menu(switch, pathname):
-        if "tooltip_on" in switch:
             tooltip = tooltip_creation(pathname)
->>>>>>> 67343bb (fixes and ruffing)
             return tooltip
         else:
             return []
