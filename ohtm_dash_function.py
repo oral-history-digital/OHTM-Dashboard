@@ -325,22 +325,7 @@ def create_ohd_dash(
                         style={"display": "flex", "flexWrap":"wrap"},
                         className="m-0",
                     ),
-                    dbc.Row(                    dbc.Row(
-                        [
-                            html.H5(
-                                dbc.Badge(
-                                    id="topic_label_side_bar",
-                                    children="",
-                                    color="secondary",
-                                    style={
-                                        "font-size": "0.7vw",  # PRÄSENTATION 1
-                                    },
-                                )
-                            )
-                        ],
-                        style={"display": "flex"},
-                        className="m-0",
-                    ),
+                    dbc.Row(
                         [
                             dbc.Input(
                                 id="input",
