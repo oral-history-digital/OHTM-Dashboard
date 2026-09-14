@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.4] - 2026-09-14
+
+### Improvements
+
+- **Lower memory usage** — The corpus repeats a small set of strings across roughly a million sentences (`speaker` has a single distinct value, `tape` sixteen, `time` about 223k). `ohtm_dash_server.py` now shares them while parsing via an `object_pairs_hook`, taking the running server from 971 to 801 MiB resident and 1191 to 1021 MiB peak, at a cost of about 0.8 s at startup. Sharing them after the parse does not help, because glibc keeps the freed pages.
+
+### Infrastructure
+
+- **`slim_ohtm.py`** — New script that strips `cleaned` (a list of token strings per sentence) and `model_base` from an `.ohtm` file. Neither is read by the dashboard, and `cleaned` alone accounts for 138 MiB. Together with the string sharing above the server runs at 560 MiB resident and 753 MiB peak. A stopgap until the producer stops emitting the fields.
+- **SQLite migration spec** — `SQLITE_MIGRATION.md` sets out a plan to serve the corpus from SQLite rather than parsing the whole `.ohtm` into memory.
+
 ## [0.3.3] - 2026-06-10
 
 ### New Features
